@@ -1809,3 +1809,64 @@ body.modal-open {
     }
 
 }
+
+/* =========================================================
+   FOTOGRAFÍAS EN DETALLE
+   ========================================================= */
+
+.detail-photo-group {
+    padding-top: 23px;
+    padding-bottom: 23px;
+}
+
+
+.photo-folder-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    margin-top: 16px;
+}
+
+
+.photo-folder-action .btn {
+    margin: 0;
+}
+
+
+.detail-no-photos {
+    margin: 14px 0 0;
+
+    padding: 0;
+
+    background: transparent;
+
+    border: 0;
+
+    color: #9da3aa;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+@media (max-width: 560px) {
+
+    .photo-folder-action {
+        width: 100%;
+    }
+
+
+    .photo-folder-action .btn {
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        text-align: center;
+    }
+}
