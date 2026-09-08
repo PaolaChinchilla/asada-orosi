@@ -773,7 +773,12 @@ function hasRecordPhotos(
             record.imagenes
         )
 
-            ? record.imagenes
+            ? record.imagenes.filter(
+                image =>
+                    Boolean(
+                        image
+                    )
+            )
 
             : [];
 
@@ -783,6 +788,14 @@ function hasRecordPhotos(
             record.carpetaFotosUrl || ""
         ).trim();
 
+
+    /*
+        Esto permite manejar también los registros antiguos.
+
+        Si antiguamente se creó una carpeta vacía,
+        pero FotosJSON está vacío, se considera que
+        NO tiene fotografías.
+    */
 
     return (
         images.length > 0 &&
@@ -3684,29 +3697,13 @@ async function renderDetail() {
             );
 
 
+        const hasPhotos =
+            hasRecordPhotos(
+                record
+            );
+
+
         root.innerHTML = `
-
-            <div class="nav-actions">
-
-                <a
-                    href="${backUrl}"
-                    class="btn-back">
-
-                    Volver
-
-                </a>
-
-
-                <a
-                    href="index.html"
-                    class="btn-back">
-
-                    Volver al inicio
-
-                </a>
-
-            </div>
-
 
             <div class="page-head detail-page-head">
 
@@ -3747,6 +3744,7 @@ async function renderDetail() {
 
                     <div class="vehicle-info-grid">
 
+
                         <div class="detail-info">
 
                             <span class="detail-info-label">
@@ -3755,7 +3753,10 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.vehiculo || "Sin información")}
+                                ${esc(
+            record.vehiculo ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
@@ -3769,7 +3770,10 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.placa || "Sin información")}
+                                ${esc(
+            record.placa ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
@@ -3783,7 +3787,10 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.fechaHora || "Sin información")}
+                                ${esc(
+            record.fechaHora ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
@@ -3797,10 +3804,14 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.kilometraje || "Sin información")}
+                                ${esc(
+            record.kilometraje ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
+
 
                     </div>
 
@@ -3820,6 +3831,7 @@ async function renderDetail() {
 
                     <div class="detail-group detail-two-columns">
 
+
                         <div class="detail-data-block">
 
                             <span class="detail-info-label">
@@ -3828,7 +3840,10 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.usuario || "Sin información")}
+                                ${esc(
+            record.usuario ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
@@ -3842,10 +3857,14 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.responsable || "Sin información")}
+                                ${esc(
+            record.responsable ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
+
 
                     </div>
 
@@ -3857,12 +3876,15 @@ async function renderDetail() {
                         </span>
 
 
-                        ${renderSelectedReviewPoints(record.puntos)}
+                        ${renderSelectedReviewPoints(
+            record.puntos
+        )}
 
                     </div>
 
 
                     <div class="detail-group detail-two-columns">
+
 
                         <div class="detail-data-block">
 
@@ -3872,7 +3894,10 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.condicion || "Sin información")}
+                                ${esc(
+            record.condicion ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
@@ -3886,10 +3911,14 @@ async function renderDetail() {
 
 
                             <strong>
-                                ${esc(record.motivo || "Sin información")}
+                                ${esc(
+            record.motivo ||
+            "Sin información"
+        )}
                             </strong>
 
                         </div>
+
 
                     </div>
 
@@ -3906,7 +3935,9 @@ async function renderDetail() {
 
 
                                 <p class="detail-text">
-                                    ${esc(record.comentarioCondicion)}
+                                    ${esc(
+                    record.comentarioCondicion
+                )}
                                 </p>
 
                             </div>
@@ -3929,7 +3960,9 @@ async function renderDetail() {
 
                             ${record.comentario
 
-                ? esc(record.comentario)
+                ? esc(
+                    record.comentario
+                )
 
                 : "Sin comentarios adicionales"
 
@@ -3940,16 +3973,23 @@ async function renderDetail() {
                     </div>
 
 
-                    ${hasRecordPhotos(record)
+                    <div class="detail-group detail-photo-group">
+
+                        <span class="detail-info-label detail-group-title">
+                            Fotografías
+                        </span>
+
+
+                        ${hasPhotos
 
                 ? `
-
-                            <div class="detail-group detail-photo-group">
 
                                 <div class="photo-folder-action">
 
                                     <a
-                                        href="${esc(record.carpetaFotosUrl)}"
+                                        href="${esc(
+                    record.carpetaFotosUrl
+                )}"
                                         target="_blank"
                                         rel="noopener"
                                         class="btn secondary">
@@ -3960,19 +4000,27 @@ async function renderDetail() {
 
                                 </div>
 
-                            </div>
+                            `
 
-                        `
+                : `
 
-                : ""
+                                <p class="detail-no-photos">
+                                    No se registraron fotografías para esta revisión.
+                                </p>
+
+                            `
 
             }
+
+                    </div>
 
 
                     <div class="detail-card-actions">
 
                         <a
-                            href="mantenimiento.html?id=${encodeURIComponent(record.id)}"
+                            href="mantenimiento.html?id=${encodeURIComponent(
+                record.id
+            )}"
                             class="btn primary">
 
                             Editar registro
@@ -3981,7 +4029,9 @@ async function renderDetail() {
 
                     </div>
 
+
                 </section>
+
 
             </div>
 
@@ -4022,7 +4072,23 @@ async function renderDetail() {
 
         root.innerHTML = `
 
-            <div class="nav-actions">
+            <div class="empty-state">
+
+                <h1>
+                    No fue posible cargar el registro
+                </h1>
+
+
+                <p>
+                    ${esc(
+            error.message
+        )}
+                </p>
+
+            </div>
+
+
+            <div class="nav-actions detail-bottom-navigation">
 
                 <a
                     href="registros.html"
@@ -4043,24 +4109,9 @@ async function renderDetail() {
 
             </div>
 
-
-            <div class="empty-state">
-
-                <h1>
-                    No fue posible cargar el registro
-                </h1>
-
-
-                <p>
-                    ${esc(error.message)}
-                </p>
-
-            </div>
-
         `;
     }
 }
-
 
 /* =========================================================
    REGISTRO NO ENCONTRADO
