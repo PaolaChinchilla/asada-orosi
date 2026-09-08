@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#16181c">
+
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>
+        Registro de revisiones | ASADA Orosi
+    </title>
+</head>
+
+<body>
+
+    <header class="topbar">
+
+        <button type="button" class="menu-btn" onclick="toggleMenu()">
+            ☰
+        </button>
+
+
+        <div class="brand">
+
+            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
+
+            <span>
+                ASADA OROSI
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <aside id="sideMenu" class="side-menu">
+
+        <a href="index.html">
+            Inicio
+        </a>
+
+        <a href="registros.html">
+            Registro de revisiones
+        </a>
+
+        <a href="mantenimiento.html">
+            Crear registro de revisión
+        </a>
+
+        <a href="excel.html">
+            Descargar Excel
+        </a>
+
+    </aside>
+
+
+    <main class="page">
+
+        <div id="recordsPage"></div>
+
+    </main>
+
+
+    <script src="js/app.js"></script>
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                renderRecordsPage();
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

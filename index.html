@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16181c">
+
+    <meta
+        name="description"
+        content="Sistema de registro y consulta de revisiones de vehículos de ASADA Orosi.">
+
+    <link rel="manifest" href="manifest.json">
+    <link
+    rel="stylesheet"
+    href="./css/style.css?v=20260908-1">
+
+    <title>ASADA Orosi | Registro de Revisiones</title>
+</head>
+
+<body>
+
+    <header class="topbar">
+
+        <button
+            type="button"
+            class="menu-btn"
+            onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">
+            ☰
+        </button>
+
+        <div class="brand">
+
+            <img
+                src="img/asadalogo.png"
+                alt="Logo ASADA Orosi"
+                class="brand-logo">
+
+            <span>ASADA OROSI</span>
+
+        </div>
+
+    </header>
+
+
+    <aside id="sideMenu" class="side-menu">
+
+        <a href="index.html">
+            Inicio
+        </a>
+
+        <a href="registros.html">
+            Registro de revisiones
+        </a>
+
+        <a href="mantenimiento.html">
+            Crear nueva revisión
+        </a>
+
+        <a href="excel.html">
+            Descargar Excel
+        </a>
+
+    </aside>
+
+
+    <main class="page dashboard">
+
+        <section class="hero">
+
+            <span class="eyebrow">
+                ASADA OROSI
+            </span>
+
+            <h1>
+                GESTIÓN DE REVISIONES DE VEHÍCULOS
+            </h1>
+
+            <p>
+                Consulte, registre y descargue la información de las
+                revisiones realizadas a los vehículos de la ASADA.
+            </p>
+
+            <div
+                id="connectionStatus"
+                class="connection online">
+                En línea
+            </div>
+
+        </section>
+
+
+        <section
+            class="menu-grid"
+            aria-label="Opciones principales">
+
+            <a
+                class="menu-card"
+                href="registros.html">
+
+                <div>
+
+                    <h2>
+                        Registro de revisiones hechas
+                    </h2>
+
+                    <p>
+                        Consulte las revisiones realizadas seleccionando
+                        el vehículo que desea visualizar.
+                    </p>
+
+                </div>
+
+                <span>
+                    Ver registros
+                </span>
+
+            </a>
+
+
+            <a
+                class="menu-card"
+                href="mantenimiento.html">
+
+                <div>
+
+                    <h2>
+                        Crear registro de revisión
+                    </h2>
+
+                    <p>
+                        Complete el formulario de revisión diaria para
+                        registrar el estado de un vehículo.
+                    </p>
+
+                </div>
+
+                <span>
+                    Crear registro
+                </span>
+
+            </a>
+
+
+            <a
+                class="menu-card wide"
+                href="excel.html">
+
+                <div>
+
+                    <h2>
+                        Descargar Excel
+                    </h2>
+
+                    <p>
+                        Descargue todos los registros o seleccione un
+                        vehículo específico.
+                    </p>
+
+                </div>
+
+                <span>
+                    Descargar
+                </span>
+
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <script src="./js/app.js?v=20260908-1"></script>
+
+</body>
+
+</html>
