@@ -5225,3 +5225,975 @@ if (
         }
     );
 }
+
+/* =========================================================
+   PASO 2
+   COMBUSTIBLE Y VIDEO DE CONDICIÓN
+   ========================================================= */
+
+
+/* =========================================================
+   CONFIGURACIÓN DEL VIDEO
+   ========================================================= */
+
+const ASADA_MAX_CONDITION_VIDEO_SECONDS =
+    60;
+
+
+const ASADA_MAX_CONDITION_VIDEO_BYTES =
+    25 * 1024 * 1024;
+
+
+/*
+    Video nuevo seleccionado por el usuario.
+*/
+
+window._pendingConditionVideoData =
+    null;
+
+
+/*
+    Video que ya existe cuando estamos editando
+    un registro.
+*/
+
+window._existingConditionVideo =
+    null;
+
+
+
+/* =========================================================
+   LEER VIDEO COMO BASE64
+   ========================================================= */
+
+function asadaReadVideoAsDataUrl(
+    file
+) {
+
+    return new Promise(
+        (
+            resolve,
+            reject
+        ) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                () => {
+
+                    resolve(
+                        reader.result
+                    );
+
+                };
+
+
+            reader.onerror =
+                () => {
+
+                    reject(
+                        new Error(
+                            "No fue posible leer el video seleccionado."
+                        )
+                    );
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+}
+
+
+
+/* =========================================================
+   OBTENER DURACIÓN DEL VIDEO
+   ========================================================= */
+
+function asadaGetVideoDuration(
+    file
+) {
+
+    return new Promise(
+        (
+            resolve,
+            reject
+        ) => {
+
+            const video =
+                document.createElement(
+                    "video"
+                );
+
+
+            const objectUrl =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            video.preload =
+                "metadata";
+
+
+            video.onloadedmetadata =
+                () => {
+
+                    const duration =
+                        Number(
+                            video.duration || 0
+                        );
+
+
+                    URL.revokeObjectURL(
+                        objectUrl
+                    );
+
+
+                    resolve(
+                        duration
+                    );
+
+                };
+
+
+            video.onerror =
+                () => {
+
+                    URL.revokeObjectURL(
+                        objectUrl
+                    );
+
+
+                    reject(
+                        new Error(
+                            "No fue posible leer la duración del video."
+                        )
+                    );
+
+                };
+
+
+            video.src =
+                objectUrl;
+
+        }
+    );
+}
+
+
+
+/* =========================================================
+   QUITAR VIDEO NUEVO
+   ========================================================= */
+
+function asadaClearPendingConditionVideo() {
+
+    window._pendingConditionVideoData =
+        null;
+
+
+    const input =
+        document.getElementById(
+            "videoCondicion"
+        );
+
+
+    if (
+        input
+    ) {
+
+        input.value =
+            "";
+
+    }
+
+
+    asadaRenderConditionVideoPreview();
+
+}
+
+
+
+/* =========================================================
+   MOSTRAR VISTA PREVIA DEL VIDEO
+   ========================================================= */
+
+function asadaRenderConditionVideoPreview() {
+
+    const container =
+        document.getElementById(
+            "videoPreview"
+        );
+
+
+    if (
+        !container
+    ) {
+
+        return;
+
+    }
+
+
+    const pending =
+        window._pendingConditionVideoData;
+
+
+    const existing =
+        window._existingConditionVideo;
+
+
+
+    /*
+        VIDEO NUEVO
+    */
+
+    if (
+        pending &&
+        pending.data
+    ) {
+
+        container.innerHTML = `
+
+            <div class="video-preview-card">
+
+                <video
+                    controls
+                    preload="metadata">
+
+                    <source
+                        src="${pending.data}"
+                        type="${esc(
+            pending.type ||
+            "video/mp4"
+        )}">
+
+                    Su navegador no puede reproducir este video.
+
+                </video>
+
+
+                <p>
+                    ${esc(
+            pending.name ||
+            "Video de condición"
+        )}
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    onclick="asadaClearPendingConditionVideo()">
+
+                    Quitar video
+
+                </button>
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+
+    /*
+        VIDEO YA GUARDADO
+    */
+
+    if (
+        existing &&
+        existing.url
+    ) {
+
+        container.innerHTML = `
+
+            <div class="video-preview-card">
+
+                <p>
+                    Este registro ya tiene un video de condición guardado.
+                </p>
+
+
+                <a
+                    class="btn secondary"
+                    href="${esc(
+            existing.url
+        )}"
+                    target="_blank"
+                    rel="noopener noreferrer">
+
+                    Ver video guardado
+
+                </a>
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+
+    /*
+        SIN VIDEO
+    */
+
+    container.innerHTML =
+        "";
+
+}
+
+
+
+/* =========================================================
+   PROCESAR VIDEO SELECCIONADO
+   ========================================================= */
+
+async function asadaPreviewConditionVideo(
+    event
+) {
+
+    const input =
+        event.currentTarget;
+
+
+    const file =
+        input.files &&
+        input.files[0];
+
+
+    if (
+        !file
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        /* ---------------------------------------------
+           VALIDAR QUE SEA VIDEO
+           --------------------------------------------- */
+
+        if (
+            !String(
+                file.type || ""
+            ).startsWith(
+                "video/"
+            )
+        ) {
+
+            throw new Error(
+                "Seleccione únicamente un archivo de video."
+            );
+
+        }
+
+
+
+        /* ---------------------------------------------
+           VALIDAR PESO
+           --------------------------------------------- */
+
+        if (
+            file.size >
+            ASADA_MAX_CONDITION_VIDEO_BYTES
+        ) {
+
+            throw new Error(
+                "El video es demasiado pesado. " +
+                "El tamaño máximo permitido es de 25 MB. " +
+                "Puede grabar un video más corto o con menor calidad."
+            );
+
+        }
+
+
+
+        /* ---------------------------------------------
+           VALIDAR DURACIÓN
+           --------------------------------------------- */
+
+        const duration =
+            await asadaGetVideoDuration(
+                file
+            );
+
+
+        if (
+            !Number.isFinite(
+                duration
+            ) ||
+            duration <= 0
+        ) {
+
+            throw new Error(
+                "No fue posible comprobar la duración del video."
+            );
+
+        }
+
+
+        if (
+            duration >
+            ASADA_MAX_CONDITION_VIDEO_SECONDS +
+            0.25
+        ) {
+
+            throw new Error(
+                "El video no puede superar 1 minuto de duración."
+            );
+
+        }
+
+
+
+        /* ---------------------------------------------
+           CONVERTIR A BASE64
+           --------------------------------------------- */
+
+        const data =
+            await asadaReadVideoAsDataUrl(
+                file
+            );
+
+
+
+        /* ---------------------------------------------
+           GUARDAR TEMPORALMENTE
+           --------------------------------------------- */
+
+        window._pendingConditionVideoData = {
+
+            name:
+                file.name ||
+                "video-condicion",
+
+            type:
+                file.type ||
+                "video/mp4",
+
+            size:
+                file.size,
+
+            duration:
+                Math.round(
+                    duration
+                ),
+
+            data:
+                data
+
+        };
+
+
+        asadaRenderConditionVideoPreview();
+
+
+    } catch (
+    error
+    ) {
+
+        console.error(
+            "Error al procesar el video.",
+            error
+        );
+
+
+        input.value =
+            "";
+
+
+        window._pendingConditionVideoData =
+            null;
+
+
+        asadaRenderConditionVideoPreview();
+
+
+        alert(
+            error.message ||
+            "No fue posible procesar el video seleccionado."
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   AMPLIAR INICIALIZACIÓN DEL FORMULARIO
+   ========================================================= */
+
+const asadaOriginalInitMaintenanceForm =
+    initMaintenanceForm;
+
+
+initMaintenanceForm =
+    async function () {
+
+
+        window._pendingConditionVideoData =
+            null;
+
+
+        window._existingConditionVideo =
+            null;
+
+
+
+        /*
+            Ejecutamos toda tu inicialización anterior.
+        */
+
+        await asadaOriginalInitMaintenanceForm();
+
+
+
+        /*
+            Agregamos ahora el evento del video.
+        */
+
+        const videoInput =
+            document.getElementById(
+                "videoCondicion"
+            );
+
+
+        if (
+            videoInput &&
+            !videoInput.dataset.asadaListener
+        ) {
+
+            videoInput.addEventListener(
+                "change",
+                asadaPreviewConditionVideo
+            );
+
+
+            videoInput.dataset.asadaListener =
+                "1";
+
+        }
+
+
+        asadaRenderConditionVideoPreview();
+
+    };
+
+
+
+/* =========================================================
+   AMPLIAR LÓGICA DE CONDICIÓN
+   ========================================================= */
+
+const asadaOriginalToggleConditionComment =
+    toggleConditionComment;
+
+
+toggleConditionComment =
+    function () {
+
+
+        /*
+            Ejecutamos primero la función que ya tenías.
+
+            Esa función:
+            - muestra comentario para Regular/Sucio
+            - vuelve obligatorio el comentario
+            - oculta el bloque para Limpio
+        */
+
+        asadaOriginalToggleConditionComment();
+
+
+
+        const condition =
+            document.getElementById(
+                "condicion"
+            )?.value || "";
+
+
+
+        /*
+            Si cambia a Limpio no debe quedar
+            un video nuevo seleccionado.
+        */
+
+        if (
+            condition ===
+            "Limpio"
+        ) {
+
+            window._pendingConditionVideoData =
+                null;
+
+
+            window._existingConditionVideo =
+                null;
+
+
+            const videoInput =
+                document.getElementById(
+                    "videoCondicion"
+                );
+
+
+            if (
+                videoInput
+            ) {
+
+                videoInput.value =
+                    "";
+
+            }
+
+
+            asadaRenderConditionVideoPreview();
+
+        }
+
+    };
+
+
+
+/* =========================================================
+   AMPLIAR DATOS QUE SE ENVÍAN A GOOGLE
+   ========================================================= */
+
+const asadaOriginalSaveRecordOnServer =
+    saveRecordOnServer;
+
+
+saveRecordOnServer =
+    async function (
+        record,
+        mode
+    ) {
+
+
+        const condition =
+            document.getElementById(
+                "condicion"
+            )?.value || "";
+
+
+
+        /*
+            Tomamos el objeto que ya creaba tu aplicación
+            y le añadimos los campos nuevos.
+        */
+
+        const extendedRecord = {
+
+            ...record,
+
+
+            nivelCombustible:
+
+                document.getElementById(
+                    "nivelCombustible"
+                )?.value || "",
+
+
+            nuevoVideoCondicion:
+
+                window._pendingConditionVideoData ||
+                null,
+
+
+            eliminarVideoCondicion:
+
+                condition ===
+                "Limpio"
+
+        };
+
+
+
+        /*
+            Enviamos el registro usando la función
+            original que ya funcionaba.
+        */
+
+        const savedRecord =
+            await asadaOriginalSaveRecordOnServer(
+                extendedRecord,
+                mode
+            );
+
+
+
+        /*
+            Después de guardar quitamos el video
+            temporal del navegador.
+        */
+
+        window._pendingConditionVideoData =
+            null;
+
+
+
+        /*
+            Si Google devuelve un video guardado,
+            lo dejamos como video existente.
+        */
+
+        if (
+            savedRecord
+        ) {
+
+
+            if (
+                savedRecord.videoCondicion &&
+                savedRecord.videoCondicion.url
+            ) {
+
+                window._existingConditionVideo =
+                    savedRecord.videoCondicion;
+
+
+            } else if (
+                savedRecord.videoCondicionUrl
+            ) {
+
+                window._existingConditionVideo = {
+
+                    url:
+                        savedRecord.videoCondicionUrl
+
+                };
+
+
+            } else {
+
+                window._existingConditionVideo =
+                    null;
+
+            }
+
+        }
+
+
+        asadaRenderConditionVideoPreview();
+
+
+        return savedRecord;
+
+    };
+
+
+
+/* =========================================================
+   CARGAR COMBUSTIBLE Y VIDEO AL EDITAR
+   ========================================================= */
+
+const asadaOriginalLoadRecord =
+    loadRecord;
+
+
+loadRecord =
+    async function (
+        id
+    ) {
+
+
+        /*
+            Primero cargamos todo lo que ya cargaba
+            tu formulario.
+        */
+
+        await asadaOriginalLoadRecord(
+            id
+        );
+
+
+        try {
+
+
+            /*
+                Consultamos nuevamente el registro
+                para leer los nuevos campos.
+            */
+
+            const record =
+                await getRecordByIdFromServer(
+                    id
+                );
+
+
+            if (
+                !record
+            ) {
+
+                return;
+
+            }
+
+
+
+            /* -----------------------------------------
+               COMBUSTIBLE
+               ----------------------------------------- */
+
+            const fuel =
+                document.getElementById(
+                    "nivelCombustible"
+                );
+
+
+            if (
+                fuel
+            ) {
+
+                fuel.value =
+                    record.nivelCombustible ||
+                    "";
+
+            }
+
+
+
+            /* -----------------------------------------
+               VIDEO EXISTENTE
+               ----------------------------------------- */
+
+            if (
+                record.videoCondicion &&
+                record.videoCondicion.url
+            ) {
+
+                window._existingConditionVideo =
+                    record.videoCondicion;
+
+
+            } else if (
+                record.videoCondicionUrl
+            ) {
+
+                window._existingConditionVideo = {
+
+                    url:
+                        record.videoCondicionUrl
+
+                };
+
+
+            } else {
+
+                window._existingConditionVideo =
+                    null;
+
+            }
+
+
+            asadaRenderConditionVideoPreview();
+
+
+        } catch (
+        error
+        ) {
+
+            console.error(
+                "No fue posible cargar combustible o video.",
+                error
+            );
+
+        }
+
+    };
+
+
+
+/* =========================================================
+   LIMPIAR CAMPOS NUEVOS
+   ========================================================= */
+
+const asadaOriginalResetMaintenanceForm =
+    resetMaintenanceForm;
+
+
+resetMaintenanceForm =
+    function () {
+
+
+        /*
+            Limpiamos primero todo el formulario
+            como ya lo hacía tu código.
+        */
+
+        asadaOriginalResetMaintenanceForm();
+
+
+
+        /* ---------------------------------------------
+           COMBUSTIBLE
+           --------------------------------------------- */
+
+        const fuel =
+            document.getElementById(
+                "nivelCombustible"
+            );
+
+
+        if (
+            fuel
+        ) {
+
+            fuel.value =
+                "";
+
+        }
+
+
+
+        /* ---------------------------------------------
+           VIDEO
+           --------------------------------------------- */
+
+        const videoInput =
+            document.getElementById(
+                "videoCondicion"
+            );
+
+
+        if (
+            videoInput
+        ) {
+
+            videoInput.value =
+                "";
+
+        }
+
+
+        window._pendingConditionVideoData =
+            null;
+
+
+        window._existingConditionVideo =
+            null;
+
+
+        asadaRenderConditionVideoPreview();
+
+    };
