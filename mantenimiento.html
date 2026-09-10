@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#16181c">
+
+    <meta name="description" content="Formulario de revisión diaria de vehículos de ASADA Orosi.">
+
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/style.css?v=20260910-2">
+
+    <title>
+        Crear registro de revisión | ASADA Orosi
+    </title>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BARRA SUPERIOR
+         ===================================================== -->
+
+    <header class="topbar">
+
+        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">☰</button>
+
+
+        <div class="brand">
+
+            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
+
+            <span>
+                ASADA OROSI
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MENÚ LATERAL
+         ===================================================== -->
+
+    <aside id="sideMenu" class="side-menu">
+
+        <a href="index.html">
+            Inicio
+        </a>
+
+        <a href="registros.html">
+            Registro de revisiones
+        </a>
+
+        <a href="mantenimiento.html">
+            Crear registro de revisión
+        </a>
+
+        <a href="excel.html">
+            Descargar Excel
+        </a>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <main class="page">
+
+
+        <div class="nav-actions">
+
+            <a href="index.html" class="btn-back">
+
+                Volver al inicio
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ENCABEZADO
+             ================================================= -->
+
+        <div class="page-head">
+
+            <div>
+
+                <span class="eyebrow">
+                    FORMULARIO
+                </span>
+
+                <h1 id="formTitle">
+                    Nueva revisión diaria
+                </h1>
+
+                <p>
+                    Complete la información solicitada en el formulario.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FORMULARIO
+             ================================================= -->
+
+        <form id="maintenanceForm" class="form-shell">
+
+
+            <input type="hidden" id="recordId">
+
+
+
+            <!-- =============================================
+                 INFORMACIÓN DEL VEHÍCULO
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Información del vehículo.
+                </h2>
+
+
+                <div class="form-grid">
+
+
+                    <label>
+
+                        Vehículo.
+
+                        <select id="vehiculo" required onchange="updatePlate()">
+
+                            <option value="">
+                                Seleccione el vehículo.
+                            </option>
+
+                            <option value="Toyota Rush">
+                                Toyota Rush
+                            </option>
+
+                            <option value="Isuzu D-Max Gris">
+                                Isuzu D-Max Gris
+                            </option>
+
+                            <option value="Isuzu D-Max Blanco">
+                                Isuzu D-Max Blanco
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+
+                    <label>
+
+                        Placa.
+
+                        <input id="placa" readonly placeholder="Se selecciona automáticamente">
+
+                    </label>
+
+
+
+                    <label>
+
+                        Fecha y hora.
+
+                        <input id="fechaHora" readonly>
+
+                    </label>
+
+
+
+                    <label>
+
+                        Kilometraje actual del vehículo.
+
+                        <input id="kilometraje" type="number" min="0" step="1" required inputmode="numeric"
+                            placeholder="Ejemplo: 85420">
+
+                    </label>
+
+
+
+                    <!-- NUEVO -->
+                    <label>
+
+                        Nivel de combustible.
+
+                        <select id="nivelCombustible" required>
+
+                            <option value="">
+                                Seleccione el nivel de combustible.
+                            </option>
+
+                            <option value="Reserva">
+                                Reserva
+                            </option>
+
+                            <option value="1/4">
+                                1/4
+                            </option>
+
+                            <option value="2/4">
+                                2/4
+                            </option>
+
+                            <option value="3/4">
+                                3/4
+                            </option>
+
+                            <option value="4/4 - Lleno">
+                                4/4 - Lleno
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 QUIÉN UTILIZARÁ EL VEHÍCULO
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    El carro lo utilizará:
+                </h2>
+
+
+                <div class="choice-row" id="usuarioChoices">
+
+
+                    <button type="button" class="choice" data-group="usuario" data-value="Miembro de Junta">
+
+                        Miembro de Junta
+
+                    </button>
+
+
+
+                    <button type="button" class="choice" data-group="usuario" data-value="Personal de ASADA">
+
+                        Personal de ASADA
+
+                    </button>
+
+
+
+                    <button type="button" class="choice" data-group="usuario" data-value="Ingeniero Salud Ocupacional">
+
+                        Ingeniero Salud Ocupacional
+
+                    </button>
+
+
+
+                    <!-- NUEVO -->
+                    <button type="button" class="choice" data-group="usuario" data-value="Disponible">
+
+                        Disponible
+
+                    </button>
+
+
+                </div>
+
+
+                <input type="hidden" id="usuario">
+
+            </section>
+
+
+
+            <!-- =============================================
+                 RESPONSABLE
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Responsable de la Inspección.
+                </h2>
+
+
+                <input type="text" id="responsable" required autocomplete="name"
+                    placeholder="Escriba su nombre completo">
+
+            </section>
+
+
+
+            <!-- =============================================
+                 PUNTOS DE REVISIÓN
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Señale los puntos que revisó antes de usar el vehículo
+                </h2>
+
+
+                <div class="multi-grid" id="puntos">
+
+
+                    <button type="button" class="multi-choice" data-value="Agua">
+
+                        Agua
+
+                    </button>
+
+
+
+                    <button type="button" class="multi-choice" data-value="Aceite">
+
+                        Aceite
+
+                    </button>
+
+
+
+                    <button type="button" class="multi-choice" data-value="Llantas">
+
+                        Llantas
+
+                    </button>
+
+
+
+                    <button type="button" class="multi-choice" data-value="Equipo de seguridad vigente">
+
+                        Equipo de seguridad vigente
+
+                    </button>
+
+
+
+                    <button type="button" class="multi-choice" data-value="Espejos y escobillas">
+
+                        Espejos y escobillas
+
+                    </button>
+
+
+
+                    <button type="button" class="multi-choice" data-value="Cinturón en buen estado">
+
+                        Cinturón en buen estado
+
+                    </button>
+
+
+
+                    <button type="button" class="multi-choice" data-value="RTV y marchamo">
+
+                        RTV y marchamo
+
+                    </button>
+
+
+                </div>
+
+
+                <input type="hidden" id="puntosHidden">
+
+            </section>
+
+
+
+            <!-- =============================================
+                 CONDICIÓN DEL VEHÍCULO
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Condición como encuentra el vehículo a la hora de usarlo
+                </h2>
+
+
+                <div class="choice-row">
+
+
+                    <button type="button" class="condition choice" data-value="Limpio">
+
+                        Limpio
+
+                    </button>
+
+
+
+                    <button type="button" class="condition choice" data-value="Regular">
+
+                        Regular
+
+                    </button>
+
+
+
+                    <button type="button" class="condition choice" data-value="Sucio">
+
+                        Sucio
+
+                    </button>
+
+
+                </div>
+
+
+                <input type="hidden" id="condicion">
+
+
+
+                <!-- =========================================
+                     SOLO REGULAR O SUCIO
+                     ========================================= -->
+
+                <div id="conditionCommentWrap" class="hidden">
+
+
+                    <label>
+
+                        Comentario sobre la condición
+
+                        <textarea id="comentarioCondicion" rows="3"
+                            placeholder="Describa brevemente la condición del vehículo"></textarea>
+
+                        <small>
+                            Este comentario es obligatorio cuando la condición
+                            seleccionada es Regular o Sucio.
+                        </small>
+
+                    </label>
+
+
+
+                    <!-- VIDEO OPCIONAL -->
+
+                    <div class="condition-video-section">
+
+                        <label class="upload-box">
+
+                            <input id="videoCondicion" type="file" accept="video/*">
+
+                            <span>
+                                Video de la condición.
+                            </span>
+
+                            <small>
+                                Opcional. Puede seleccionar o grabar un video
+                                de máximo 1 minuto.
+                            </small>
+
+                        </label>
+
+
+                        <div id="videoPreview" class="video-preview">
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 MOTIVO
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Motivo por el que se utiliza el vehículo
+                </h2>
+
+
+                <select id="motivo" required>
+
+
+                    <option value="">
+                        Seleccione el motivo.
+                    </option>
+
+
+                    <option value="Trabajo diario">
+                        Trabajo diario
+                    </option>
+
+
+                    <option value="Llevarlo al mecánico o revisión">
+                        Llevarlo al mecánico o revisión
+                    </option>
+
+
+                    <option value="Averías">
+                        Averías
+                    </option>
+
+
+                    <option value="Mandados de la ASADA">
+                        Mandados de la ASADA
+                    </option>
+
+
+                    <option value="Echarle gasolina">
+                        Echarle gasolina
+                    </option>
+
+
+                    <option value="Capacitación">
+                        Capacitación
+                    </option>
+
+
+                    <option value="Actividades relacionadas con la ASADA">
+                        Actividades relacionadas con la ASADA
+                    </option>
+
+
+                    <option value="Inspecciones">
+                        Inspecciones
+                    </option>
+
+
+                    <option value="Traslado de compañeros">
+                        Traslado de compañeros
+                    </option>
+
+
+                </select>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 COMENTARIO GENERAL
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Comentario General.
+                </h2>
+
+
+                <textarea id="comentario" rows="4" placeholder="Comentarios adicionales"></textarea>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 FOTOGRAFÍAS
+                 ============================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Imágenes de condiciones del vehículo.
+                </h2>
+
+
+                <p class="note">
+                    Estas fotografías corresponden únicamente a la revisión
+                    de condición del vehículo y se conservarán durante
+                    6 meses.
+                </p>
+
+
+                <label class="upload-box">
+
+                    <input id="imagenes" type="file" accept="image/*" multiple>
+
+                    <span>
+                        Seleccionar fotografías
+                    </span>
+
+                    <small>
+                        Puede seleccionar varias fotografías.
+                    </small>
+
+                </label>
+
+
+                <div id="preview" class="photo-grid">
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 BOTONES
+                 ============================================= -->
+
+            <div class="form-actions">
+
+
+                <a class="btn secondary" href="index.html">
+
+                    Cancelar
+
+                </a>
+
+
+                <button class="btn primary" type="submit">
+
+                    Guardar registro
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         CONFIRMACIÓN
+         ===================================================== -->
+
+    <div id="saveConfirmation" class="confirmation-overlay hidden">
+
+
+        <div class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
+
+
+            <div class="confirmation-header">
+
+                <span class="confirmation-label">
+                    ASADA OROSI
+                </span>
+
+
+                <h2 id="confirmationTitle">
+                    Registro creado correctamente
+                </h2>
+
+            </div>
+
+
+
+            <div class="confirmation-body">
+
+
+                <p id="confirmationMessage">
+                    La revisión fue registrada correctamente.
+                </p>
+
+
+                <div class="confirmation-id-box">
+
+                    <span>
+                        ID del registro
+                    </span>
+
+                    <strong id="confirmationRecordId"></strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="confirmation-actions">
+
+
+                <button type="button" class="btn primary" id="confirmationViewRecords">
+
+                    Ver registros del vehículo
+
+                </button>
+
+
+
+                <button type="button" class="btn secondary" onclick="createAnotherRecord()">
+
+                    Crear otro registro
+
+                </button>
+
+
+
+                <button type="button" class="btn secondary" onclick="closeSaveConfirmation()">
+
+                    Cerrar
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script src="js/app.js?v=20260910-2"></script>
+
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                initMaintenanceForm();
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>
