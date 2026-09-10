@@ -6539,3 +6539,278 @@ renderDetail =
         }
 
     };
+
+    /* =========================================================
+   PASO 4
+   MODO CLARO Y MODO OSCURO
+   ========================================================= */
+
+
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
+
+const ASADA_THEME_STORAGE_KEY =
+    "asada-theme";
+
+
+/* =========================================================
+   OBTENER TEMA GUARDADO
+   ========================================================= */
+
+function asadaGetSavedTheme() {
+
+    const savedTheme =
+        localStorage.getItem(
+            ASADA_THEME_STORAGE_KEY
+        );
+
+
+    if (
+        savedTheme === "light" ||
+        savedTheme === "dark"
+    ) {
+
+        return savedTheme;
+    }
+
+
+    /*
+        El diseño actual de la aplicación es oscuro,
+        por eso será el modo predeterminado.
+    */
+
+    return "dark";
+}
+
+
+/* =========================================================
+   APLICAR TEMA
+   ========================================================= */
+
+function asadaApplyTheme(
+    theme
+) {
+
+    const safeTheme =
+        theme === "light"
+
+            ? "light"
+
+            : "dark";
+
+
+    document.documentElement.setAttribute(
+        "data-theme",
+        safeTheme
+    );
+
+
+    /*
+        Guardar la preferencia.
+    */
+
+    localStorage.setItem(
+        ASADA_THEME_STORAGE_KEY,
+        safeTheme
+    );
+
+
+    /*
+        Cambiar el color utilizado por el navegador
+        en la parte superior.
+    */
+
+    const themeMeta =
+        document.querySelector(
+            'meta[name="theme-color"]'
+        );
+
+
+    if (
+        themeMeta
+    ) {
+
+        themeMeta.setAttribute(
+            "content",
+            safeTheme === "light"
+
+                ? "#f4f6f7"
+
+                : "#16181c"
+        );
+    }
+
+
+    /*
+        Actualizar botón.
+    */
+
+    const button =
+        document.getElementById(
+            "asadaThemeButton"
+        );
+
+
+    if (
+        button
+    ) {
+
+        if (
+            safeTheme === "dark"
+        ) {
+
+            button.textContent =
+                "Modo claro";
+
+
+            button.setAttribute(
+                "aria-label",
+                "Cambiar a modo claro"
+            );
+
+        } else {
+
+            button.textContent =
+                "Modo oscuro";
+
+
+            button.setAttribute(
+                "aria-label",
+                "Cambiar a modo oscuro"
+            );
+        }
+    }
+}
+
+
+/* =========================================================
+   CAMBIAR TEMA
+   ========================================================= */
+
+function asadaToggleTheme() {
+
+    const currentTheme =
+        document.documentElement.getAttribute(
+            "data-theme"
+        ) || "dark";
+
+
+    const newTheme =
+        currentTheme === "dark"
+
+            ? "light"
+
+            : "dark";
+
+
+    asadaApplyTheme(
+        newTheme
+    );
+}
+
+
+/* =========================================================
+   CREAR BOTÓN EN LA BARRA SUPERIOR
+   ========================================================= */
+
+function asadaCreateThemeButton() {
+
+    const topbar =
+        document.querySelector(
+            ".topbar"
+        );
+
+
+    if (
+        !topbar
+    ) {
+
+        return;
+    }
+
+
+    /*
+        Evitar crear dos botones.
+    */
+
+    if (
+        document.getElementById(
+            "asadaThemeButton"
+        )
+    ) {
+
+        return;
+    }
+
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+
+    button.type =
+        "button";
+
+
+    button.id =
+        "asadaThemeButton";
+
+
+    button.className =
+        "theme-toggle-btn";
+
+
+    button.addEventListener(
+        "click",
+        asadaToggleTheme
+    );
+
+
+    topbar.appendChild(
+        button
+    );
+
+
+    /*
+        Colocar el texto correcto.
+    */
+
+    asadaApplyTheme(
+        asadaGetSavedTheme()
+    );
+}
+
+
+/* =========================================================
+   INICIAR TEMA
+   ========================================================= */
+
+/*
+    Aplicamos el tema guardado inmediatamente.
+*/
+
+asadaApplyTheme(
+    asadaGetSavedTheme()
+);
+
+
+/*
+    Cuando la página esté lista,
+    agregamos el botón.
+*/
+
+if (
+    document.readyState === "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        asadaCreateThemeButton
+    );
+
+} else {
+
+    asadaCreateThemeButton();
+}
