@@ -2,23 +2,42 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#16181c">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="theme-color"
+        content="#16181c">
 
     <meta
         name="description"
         content="Sistema de registro y consulta de revisiones de vehículos de ASADA Orosi.">
 
-    <link rel="manifest" href="manifest.json">
     <link
-    rel="stylesheet"
-    href="./css/style.css?v=20260908-1">
+        rel="manifest"
+        href="manifest.json">
 
-    <title>ASADA Orosi | Registro de Revisiones</title>
+    <link
+        rel="stylesheet"
+        href="./css/style.css?v=20260910-5">
+
+    <title>
+        ASADA Orosi | Gestión de vehículos
+    </title>
+
 </head>
 
+
 <body>
+
+
+    <!-- =====================================================
+         BARRA SUPERIOR
+         ===================================================== -->
 
     <header class="topbar">
 
@@ -27,8 +46,11 @@
             class="menu-btn"
             onclick="toggleMenu()"
             aria-label="Abrir menú de navegación">
+
             ☰
+
         </button>
+
 
         <div class="brand">
 
@@ -37,25 +59,42 @@
                 alt="Logo ASADA Orosi"
                 class="brand-logo">
 
-            <span>ASADA OROSI</span>
+            <span>
+                ASADA OROSI
+            </span>
 
         </div>
 
     </header>
 
 
-    <aside id="sideMenu" class="side-menu">
+
+    <!-- =====================================================
+         MENÚ LATERAL
+         ===================================================== -->
+
+    <aside
+        id="sideMenu"
+        class="side-menu">
 
         <a href="index.html">
             Inicio
         </a>
 
         <a href="registros.html">
-            Registro de revisiones
+            Listado de revisiones
         </a>
 
         <a href="mantenimiento.html">
             Crear nueva revisión
+        </a>
+
+        <a href="crear-accidente.html">
+            Crear registro de daño y accidente
+        </a>
+
+        <a href="accidentes.html">
+            Listado de daños y accidentes
         </a>
 
         <a href="excel.html">
@@ -65,7 +104,17 @@
     </aside>
 
 
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
     <main class="page dashboard">
+
+
+        <!-- =================================================
+             ENCABEZADO
+             ================================================= -->
 
         <section class="hero">
 
@@ -73,27 +122,40 @@
                 ASADA OROSI
             </span>
 
+
             <h1>
-                GESTIÓN DE REVISIONES DE VEHÍCULOS
+                GESTIÓN DE VEHÍCULOS
             </h1>
 
+
             <p>
-                Consulte, registre y descargue la información de las
-                revisiones realizadas a los vehículos de la ASADA.
+                Consulte y registre revisiones, daños y accidentes
+                relacionados con los vehículos de la ASADA.
             </p>
+
 
             <div
                 id="connectionStatus"
                 class="connection online">
+
                 En línea
+
             </div>
 
         </section>
 
 
+
+        <!-- =================================================
+             OPCIONES
+             ================================================= -->
+
         <section
             class="menu-grid"
             aria-label="Opciones principales">
+
+
+            <!-- LISTADO DE REVISIONES -->
 
             <a
                 class="menu-card"
@@ -102,7 +164,7 @@
                 <div>
 
                     <h2>
-                        Registro de revisiones hechas
+                        Listado de revisiones hechas
                     </h2>
 
                     <p>
@@ -118,6 +180,9 @@
 
             </a>
 
+
+
+            <!-- CREAR REVISIÓN -->
 
             <a
                 class="menu-card"
@@ -143,6 +208,63 @@
             </a>
 
 
+
+            <!-- CREAR DAÑO O ACCIDENTE -->
+
+            <a
+                class="menu-card"
+                href="crear-accidente.html">
+
+                <div>
+
+                    <h2>
+                        Crear registro de daño y accidente
+                    </h2>
+
+                    <p>
+                        Registre un accidente, daño o situación relacionada
+                        con alguno de los vehículos de la ASADA.
+                    </p>
+
+                </div>
+
+                <span>
+                    Crear registro
+                </span>
+
+            </a>
+
+
+
+            <!-- LISTADO DE DAÑOS Y ACCIDENTES -->
+
+            <a
+                class="menu-card"
+                href="accidentes.html">
+
+                <div>
+
+                    <h2>
+                        Listado de daños y accidentes
+                    </h2>
+
+                    <p>
+                        Consulte los daños y accidentes registrados,
+                        su información, fotografías y reporte.
+                    </p>
+
+                </div>
+
+                <span>
+                    Ver registros
+                </span>
+
+            </a>
+
+
+
+            <!-- EXCEL -->
+
             <a
                 class="menu-card wide"
                 href="excel.html">
@@ -154,8 +276,7 @@
                     </h2>
 
                     <p>
-                        Descargue todos los registros o seleccione un
-                        vehículo específico.
+                        Descargue la información registrada en el sistema.
                     </p>
 
                 </div>
@@ -166,12 +287,14 @@
 
             </a>
 
+
         </section>
 
     </main>
 
 
-    <script src="./js/app.js?v=20260908-1"></script>
+
+    <script src="./js/app.js?v=20260910-5"></script>
 
 </body>
 

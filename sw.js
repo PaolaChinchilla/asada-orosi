@@ -3,7 +3,7 @@
    ========================================================= */
 
 const CACHE_NAME =
-    "asada-static-v10";
+    "asada-static-v12";
 
 
 const STATIC_FILES = [
@@ -13,6 +13,12 @@ const STATIC_FILES = [
     "./index.html",
 
     "./registros.html",
+
+    "./crear-accidente.html",
+
+    "./accidentes.html",
+
+    "./detalle-accidente.html",
 
     "./mantenimiento.html",
 

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#16181c">
+
+    <meta name="description" content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
+
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="css/style.css?v=20260910-6">
+
+
+    <!-- =====================================================
+         LEAFLET
+         ===================================================== -->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+
+    <title>
+        Crear registro de daño y accidente | ASADA Orosi
+    </title>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BARRA SUPERIOR
+         ===================================================== -->
+
+    <header class="topbar">
+
+        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
+
+            ☰
+
+        </button>
+
+
+        <div class="brand">
+
+            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
+
+            <span>
+                ASADA OROSI
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MENÚ LATERAL
+         ===================================================== -->
+
+    <aside id="sideMenu" class="side-menu">
+
+        <a href="index.html">
+            Inicio
+        </a>
+
+        <a href="registros.html">
+            Listado de revisiones
+        </a>
+
+        <a href="mantenimiento.html">
+            Crear nueva revisión
+        </a>
+
+        <a href="crear-accidente.html">
+            Crear registro de daño y accidente
+        </a>
+
+        <a href="accidentes.html">
+            Listado de daños y accidentes
+        </a>
+
+        <a href="excel.html">
+            Descargar Excel
+        </a>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <main class="page">
+
+
+        <div class="nav-actions">
+
+            <a href="index.html" class="btn-back">
+
+                Volver al inicio
+
+            </a>
+
+        </div>
+
+
+
+        <div class="page-head">
+
+            <div>
+
+                <span class="eyebrow">
+                    DAÑOS Y ACCIDENTES
+                </span>
+
+                <h1 id="accidentFormTitle">
+                    Crear registro de daño y accidente
+                </h1>
+
+                <p>
+                    Complete la información correspondiente al daño
+                    o accidente del vehículo.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FORMULARIO
+             ================================================= -->
+
+        <form id="accidentForm" class="form-shell">
+
+
+            <!--
+                El ID será generado por Google Apps Script.
+            -->
+
+            <input type="hidden" id="accidentId">
+
+
+
+            <!-- =================================================
+                 INFORMACIÓN GENERAL
+                 ================================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Información general
+                </h2>
+
+
+                <div class="form-grid">
+
+
+                    <label>
+
+                        Chofer
+
+                        <input type="text" id="accidentDriver" required autocomplete="name"
+                            placeholder="Nombre y apellidos del chofer">
+
+                    </label>
+
+
+
+                    <label>
+
+                        Fecha y hora
+
+                        <input type="text" id="accidentDateTime" readonly>
+
+                    </label>
+
+
+
+                    <label>
+
+                        Vehículo
+
+                        <select id="accidentVehicle" required onchange="updateAccidentPlate()">
+
+                            <option value="">
+                                Seleccione...
+                            </option>
+
+                            <option value="Toyota Rush">
+                                Toyota Rush
+                            </option>
+
+                            <option value="Isuzu D-Max Gris">
+                                Isuzu D-Max Gris
+                            </option>
+
+                            <option value="Isuzu D-Max Blanco">
+                                Isuzu D-Max Blanco
+                            </option>
+
+                        </select>
+
+                    </label>
+
+
+
+                    <label>
+
+                        Placa
+
+                        <input type="text" id="accidentPlate" readonly placeholder="Se selecciona automáticamente">
+
+                    </label>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 DESCRIPCIÓN
+                 ================================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Descripción del daño o accidente
+                </h2>
+
+
+                <label>
+
+                    Describa lo sucedido
+
+                    <textarea id="accidentDescription" rows="6" required
+                        placeholder="Describa de forma detallada el daño o accidente"></textarea>
+
+                </label>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 OCUPANTES
+                 ================================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Ocupantes
+                </h2>
+
+
+                <label>
+
+                    Nombre y apellidos de los ocupantes
+
+                    <textarea id="accidentOccupants" rows="4" placeholder="Escriba una persona por línea"></textarea>
+
+                    <small>
+                        Si no había acompañantes puede dejar este espacio vacío.
+                    </small>
+
+                </label>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 UBICACIÓN
+                 ================================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Ubicación geográfica
+                </h2>
+
+
+                <label>
+
+                    Ubicación o referencia del lugar
+
+                    <input type="text" id="accidentLocation" required
+                        placeholder="Ejemplo: carretera principal de Orosi, frente a...">
+
+                </label>
+
+
+                <div class="accident-location-actions">
+
+                    <button type="button" class="btn secondary" id="accidentGpsButton"
+                        onclick="captureAccidentLocation()">
+
+                        Obtener ubicación actual
+
+                    </button>
+
+                </div>
+
+
+                <p id="accidentGpsStatus" class="note" aria-live="polite">
+
+                    Presione el botón para obtener las coordenadas del dispositivo.
+
+                </p>
+
+
+
+                <div class="accident-location-layout">
+
+
+                    <!-- =========================================
+                         COORDENADAS
+                         ========================================= -->
+
+                    <div class="accident-coordinate-panel">
+
+
+                        <label>
+
+                            Coordenada X - Longitud
+
+                            <input type="text" id="accidentLongitude" readonly>
+
+                        </label>
+
+
+
+                        <label>
+
+                            Coordenada Y - Latitud
+
+                            <input type="text" id="accidentLatitude" readonly>
+
+                        </label>
+
+
+
+                        <label>
+
+                            Altitud (m)
+
+                            <input type="text" id="accidentAltitude" readonly>
+
+                        </label>
+
+
+
+                        <label>
+
+                            Precisión (m)
+
+                            <input type="text" id="accidentAccuracy" readonly>
+
+                        </label>
+
+
+                    </div>
+
+
+
+                    <!-- =========================================
+                         MAPA
+                         ========================================= -->
+
+                    <div class="accident-map-panel">
+
+                        <div id="accidentMap" aria-label="Mapa de ubicación del daño o accidente">
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 FOTOGRAFÍAS
+                 ================================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Fotografías del daño o accidente
+                </h2>
+
+
+                <p class="note">
+                    Estas fotografías se conservarán permanentemente
+                    como evidencia del daño o accidente.
+                </p>
+
+
+                <label class="upload-box">
+
+                    <input id="accidentPhotos" type="file" accept="image/*" multiple>
+
+                    <span>
+                        Seleccionar fotografías
+                    </span>
+
+                    <small>
+                        Puede seleccionar varias fotografías.
+                    </small>
+
+                </label>
+
+
+                <div id="accidentPhotoPreview" class="photo-grid">
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 PERSONA A QUIEN SE REPORTÓ
+                 ================================================= -->
+
+            <section class="form-section">
+
+                <h2>
+                    Reporte del incidente
+                </h2>
+
+
+                <label>
+
+                    Persona a quien se le reportó
+
+                    <input type="text" id="accidentReportedTo" required autocomplete="name"
+                        placeholder="Nombre y apellidos">
+
+                </label>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 BOTONES
+                 ================================================= -->
+
+            <div class="form-actions">
+
+
+                <a href="index.html" class="btn secondary">
+
+                    Cancelar
+
+                </a>
+
+
+                <button type="submit" class="btn primary">
+
+                    Guardar registro
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         LEAFLET
+         ===================================================== -->
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
+        </script>
+
+
+
+    <!-- =====================================================
+         APP
+         ===================================================== -->
+
+    <script src="js/app.js?v=20260910-6"></script>
+
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                initAccidentForm();
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>
