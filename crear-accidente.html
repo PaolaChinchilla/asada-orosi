@@ -5,23 +5,34 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="theme-color" content="#16181c">
+    <meta
+        name="theme-color"
+        content="#16181c">
 
-    <meta name="description" content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
+    <meta
+        name="description"
+        content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
 
-    <link rel="manifest" href="manifest.json">
+    <link
+        rel="manifest"
+        href="manifest.json">
 
-    <link rel="stylesheet" href="css/style.css?v=20260910-6">
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260910-7">
 
 
     <!-- =====================================================
-         LEAFLET
+         LEAFLET - MAPA
          ===================================================== -->
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 
     <title>
@@ -40,7 +51,11 @@
 
     <header class="topbar">
 
-        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
+        <button
+            type="button"
+            class="menu-btn"
+            onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">
 
             ☰
 
@@ -49,7 +64,10 @@
 
         <div class="brand">
 
-            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
+            <img
+                src="img/asadalogo.png"
+                alt="Logo ASADA Orosi"
+                class="brand-logo">
 
             <span>
                 ASADA OROSI
@@ -65,7 +83,9 @@
          MENÚ LATERAL
          ===================================================== -->
 
-    <aside id="sideMenu" class="side-menu">
+    <aside
+        id="sideMenu"
+        class="side-menu">
 
         <a href="index.html">
             Inicio
@@ -104,7 +124,9 @@
 
         <div class="nav-actions">
 
-            <a href="index.html" class="btn-back">
+            <a
+                href="index.html"
+                class="btn-back">
 
                 Volver al inicio
 
@@ -122,9 +144,11 @@
                     DAÑOS Y ACCIDENTES
                 </span>
 
+
                 <h1 id="accidentFormTitle">
                     Crear registro de daño y accidente
                 </h1>
+
 
                 <p>
                     Complete la información correspondiente al daño
@@ -141,14 +165,19 @@
              FORMULARIO
              ================================================= -->
 
-        <form id="accidentForm" class="form-shell">
+        <form
+            id="accidentForm"
+            class="form-shell">
 
 
             <!--
-                El ID será generado por Google Apps Script.
+                El ID se generará automáticamente
+                en Google Apps Script al guardar.
             -->
 
-            <input type="hidden" id="accidentId">
+            <input
+                type="hidden"
+                id="accidentId">
 
 
 
@@ -166,32 +195,47 @@
                 <div class="form-grid">
 
 
+                    <!-- CHOFER -->
+
                     <label>
 
                         Chofer
 
-                        <input type="text" id="accidentDriver" required autocomplete="name"
+                        <input
+                            type="text"
+                            id="accidentDriver"
+                            required
+                            autocomplete="name"
                             placeholder="Nombre y apellidos del chofer">
 
                     </label>
 
 
 
+                    <!-- FECHA AUTOMÁTICA -->
+
                     <label>
 
                         Fecha y hora
 
-                        <input type="text" id="accidentDateTime" readonly>
+                        <input
+                            type="text"
+                            id="accidentDateTime"
+                            readonly>
 
                     </label>
 
 
 
+                    <!-- VEHÍCULO -->
+
                     <label>
 
                         Vehículo
 
-                        <select id="accidentVehicle" required onchange="updateAccidentPlate()">
+                        <select
+                            id="accidentVehicle"
+                            required>
 
                             <option value="">
                                 Seleccione...
@@ -215,11 +259,17 @@
 
 
 
+                    <!-- PLACA AUTOMÁTICA -->
+
                     <label>
 
                         Placa
 
-                        <input type="text" id="accidentPlate" readonly placeholder="Se selecciona automáticamente">
+                        <input
+                            type="text"
+                            id="accidentPlate"
+                            readonly
+                            placeholder="Se selecciona automáticamente">
 
                     </label>
 
@@ -245,7 +295,10 @@
 
                     Describa lo sucedido
 
-                    <textarea id="accidentDescription" rows="6" required
+                    <textarea
+                        id="accidentDescription"
+                        rows="6"
+                        required
                         placeholder="Describa de forma detallada el daño o accidente"></textarea>
 
                 </label>
@@ -269,10 +322,15 @@
 
                     Nombre y apellidos de los ocupantes
 
-                    <textarea id="accidentOccupants" rows="4" placeholder="Escriba una persona por línea"></textarea>
+                    <textarea
+                        id="accidentOccupants"
+                        rows="4"
+                        placeholder="Escriba una persona por línea"></textarea>
 
                     <small>
-                        Si no había acompañantes puede dejar este espacio vacío.
+                        Si viajaban varias personas, escriba una persona
+                        por cada línea. Si no había acompañantes puede
+                        dejar este espacio vacío.
                     </small>
 
                 </label>
@@ -296,16 +354,22 @@
 
                     Ubicación o referencia del lugar
 
-                    <input type="text" id="accidentLocation" required
+                    <input
+                        type="text"
+                        id="accidentLocation"
+                        required
                         placeholder="Ejemplo: carretera principal de Orosi, frente a...">
 
                 </label>
 
 
+
                 <div class="accident-location-actions">
 
-                    <button type="button" class="btn secondary" id="accidentGpsButton"
-                        onclick="captureAccidentLocation()">
+                    <button
+                        type="button"
+                        class="btn secondary"
+                        id="accidentGpsButton">
 
                         Obtener ubicación actual
 
@@ -314,7 +378,11 @@
                 </div>
 
 
-                <p id="accidentGpsStatus" class="note" aria-live="polite">
+
+                <p
+                    id="accidentGpsStatus"
+                    class="note"
+                    aria-live="polite">
 
                     Presione el botón para obtener las coordenadas del dispositivo.
 
@@ -336,7 +404,10 @@
 
                             Coordenada X - Longitud
 
-                            <input type="text" id="accidentLongitude" readonly>
+                            <input
+                                type="text"
+                                id="accidentLongitude"
+                                readonly>
 
                         </label>
 
@@ -346,7 +417,10 @@
 
                             Coordenada Y - Latitud
 
-                            <input type="text" id="accidentLatitude" readonly>
+                            <input
+                                type="text"
+                                id="accidentLatitude"
+                                readonly>
 
                         </label>
 
@@ -356,7 +430,10 @@
 
                             Altitud (m)
 
-                            <input type="text" id="accidentAltitude" readonly>
+                            <input
+                                type="text"
+                                id="accidentAltitude"
+                                readonly>
 
                         </label>
 
@@ -366,7 +443,10 @@
 
                             Precisión (m)
 
-                            <input type="text" id="accidentAccuracy" readonly>
+                            <input
+                                type="text"
+                                id="accidentAccuracy"
+                                readonly>
 
                         </label>
 
@@ -381,7 +461,9 @@
 
                     <div class="accident-map-panel">
 
-                        <div id="accidentMap" aria-label="Mapa de ubicación del daño o accidente">
+                        <div
+                            id="accidentMap"
+                            aria-label="Mapa de ubicación del daño o accidente">
                         </div>
 
                     </div>
@@ -412,7 +494,11 @@
 
                 <label class="upload-box">
 
-                    <input id="accidentPhotos" type="file" accept="image/*" multiple>
+                    <input
+                        id="accidentPhotos"
+                        type="file"
+                        accept="image/*"
+                        multiple>
 
                     <span>
                         Seleccionar fotografías
@@ -425,7 +511,9 @@
                 </label>
 
 
-                <div id="accidentPhotoPreview" class="photo-grid">
+                <div
+                    id="accidentPhotoPreview"
+                    class="photo-grid">
                 </div>
 
             </section>
@@ -447,7 +535,11 @@
 
                     Persona a quien se le reportó
 
-                    <input type="text" id="accidentReportedTo" required autocomplete="name"
+                    <input
+                        type="text"
+                        id="accidentReportedTo"
+                        required
+                        autocomplete="name"
                         placeholder="Nombre y apellidos">
 
                 </label>
@@ -457,20 +549,24 @@
 
 
             <!-- =================================================
-                 BOTONES
+                 ACCIONES
                  ================================================= -->
 
             <div class="form-actions">
 
 
-                <a href="index.html" class="btn secondary">
+                <a
+                    href="index.html"
+                    class="btn secondary">
 
                     Cancelar
 
                 </a>
 
 
-                <button type="submit" class="btn primary">
+                <button
+                    type="submit"
+                    class="btn primary">
 
                     Guardar registro
 
@@ -490,26 +586,902 @@
          LEAFLET
          ===================================================== -->
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
-        </script>
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
 
 
 
     <!-- =====================================================
-         APP
+         APLICACIÓN PRINCIPAL
          ===================================================== -->
 
-    <script src="js/app.js?v=20260910-6"></script>
+    <script src="js/app.js?v=20260910-7"></script>
 
+
+
+    <!-- =====================================================
+         INICIALIZACIÓN EXCLUSIVA DE ACCIDENTES
+
+         Esta parte hace funcionar:
+         - Fecha automática
+         - Placa automática
+         - GPS
+         - Mapa
+         ===================================================== -->
 
     <script>
+
+        /* =====================================================
+           VEHÍCULOS Y PLACAS
+           ===================================================== */
+
+        const ACCIDENT_VEHICLE_PLATES = {
+
+            "Toyota Rush":
+                "BPW199",
+
+            "Isuzu D-Max Gris":
+                "CL376760",
+
+            "Isuzu D-Max Blanco":
+                "AGV"
+
+        };
+
+
+
+        /* =====================================================
+           VARIABLES DEL MAPA
+           ===================================================== */
+
+        let accidentPageMap =
+            null;
+
+
+        let accidentPageMarker =
+            null;
+
+
+
+        /* =====================================================
+           FECHA Y HORA AUTOMÁTICA
+           ===================================================== */
+
+        function setAutomaticAccidentDateTime() {
+
+            const input =
+                document.getElementById(
+                    "accidentDateTime"
+                );
+
+
+            if (
+                !input
+            ) {
+
+                return;
+
+            }
+
+
+            const now =
+                new Date();
+
+
+            const pad =
+                function (
+                    value
+                ) {
+
+                    return String(
+                        value
+                    ).padStart(
+                        2,
+                        "0"
+                    );
+
+                };
+
+
+            input.value =
+
+                now.getFullYear() +
+                "-" +
+
+                pad(
+                    now.getMonth() + 1
+                ) +
+                "-" +
+
+                pad(
+                    now.getDate()
+                ) +
+                " " +
+
+                pad(
+                    now.getHours()
+                ) +
+                ":" +
+
+                pad(
+                    now.getMinutes()
+                );
+
+        }
+
+
+
+        /* =====================================================
+           PLACA AUTOMÁTICA
+           ===================================================== */
+
+        function setAutomaticAccidentPlate() {
+
+            const vehicle =
+                document.getElementById(
+                    "accidentVehicle"
+                );
+
+
+            const plate =
+                document.getElementById(
+                    "accidentPlate"
+                );
+
+
+            if (
+                !vehicle ||
+                !plate
+            ) {
+
+                return;
+
+            }
+
+
+            plate.value =
+                ACCIDENT_VEHICLE_PLATES[
+                    vehicle.value
+                ] || "";
+
+        }
+
+
+
+        /* =====================================================
+           CREAR MAPA
+           ===================================================== */
+
+        function createAccidentPageMap() {
+
+            const mapContainer =
+                document.getElementById(
+                    "accidentMap"
+                );
+
+
+            if (
+                !mapContainer
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+                Si Leaflet no cargó, el GPS seguirá
+                funcionando aunque el mapa no aparezca.
+            */
+
+            if (
+                typeof L ===
+                "undefined"
+            ) {
+
+                console.error(
+                    "No fue posible cargar Leaflet."
+                );
+
+
+                const status =
+                    document.getElementById(
+                        "accidentGpsStatus"
+                    );
+
+
+                if (
+                    status
+                ) {
+
+                    status.textContent =
+                        "El mapa no pudo cargarse. Puede intentar recargar la página.";
+
+                }
+
+
+                return;
+
+            }
+
+
+            if (
+                accidentPageMap
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+                Centro inicial aproximado de Orosi.
+            */
+
+            accidentPageMap =
+                L.map(
+                    "accidentMap"
+                ).setView(
+                    [
+                        9.7965,
+                        -83.8538
+                    ],
+                    13
+                );
+
+
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+
+                    maxZoom:
+                        19,
+
+                    attribution:
+                        "&copy; OpenStreetMap"
+
+                }
+            ).addTo(
+                accidentPageMap
+            );
+
+
+            /*
+                Leaflet a veces necesita recalcular
+                el tamaño después de cargar.
+            */
+
+            window.setTimeout(
+                function () {
+
+                    if (
+                        accidentPageMap
+                    ) {
+
+                        accidentPageMap.invalidateSize();
+
+                    }
+
+                },
+                300
+            );
+
+        }
+
+
+
+        /* =====================================================
+           MOSTRAR POSICIÓN EN MAPA
+           ===================================================== */
+
+        function showAccidentPositionOnMap(
+            latitude,
+            longitude
+        ) {
+
+            if (
+                !accidentPageMap
+            ) {
+
+                createAccidentPageMap();
+
+            }
+
+
+            if (
+                !accidentPageMap ||
+                typeof L ===
+                "undefined"
+            ) {
+
+                return;
+
+            }
+
+
+            const position = [
+
+                latitude,
+
+                longitude
+
+            ];
+
+
+            if (
+                accidentPageMarker
+            ) {
+
+                accidentPageMarker.setLatLng(
+                    position
+                );
+
+            } else {
+
+                accidentPageMarker =
+                    L.marker(
+                        position
+                    )
+                        .addTo(
+                            accidentPageMap
+                        )
+                        .bindPopup(
+                            "Ubicación del daño o accidente"
+                        );
+
+            }
+
+
+            accidentPageMap.setView(
+                position,
+                17
+            );
+
+
+            accidentPageMarker.openPopup();
+
+        }
+
+
+
+        /* =====================================================
+           OBTENER UBICACIÓN GPS
+           ===================================================== */
+
+        function getCurrentAccidentLocation() {
+
+            const status =
+                document.getElementById(
+                    "accidentGpsStatus"
+                );
+
+
+            const button =
+                document.getElementById(
+                    "accidentGpsButton"
+                );
+
+
+            /*
+                La geolocalización requiere contexto seguro.
+            */
+
+            if (
+                !window.isSecureContext
+            ) {
+
+                if (
+                    status
+                ) {
+
+                    status.textContent =
+                        "La ubicación requiere una conexión segura HTTPS.";
+
+                }
+
+
+                return;
+
+            }
+
+
+            /*
+                Verificar compatibilidad.
+            */
+
+            if (
+                !navigator.geolocation
+            ) {
+
+                if (
+                    status
+                ) {
+
+                    status.textContent =
+                        "Este navegador no permite obtener la ubicación.";
+
+                }
+
+
+                return;
+
+            }
+
+
+            if (
+                status
+            ) {
+
+                status.textContent =
+                    "Obteniendo ubicación. Espere unos segundos...";
+
+            }
+
+
+            if (
+                button
+            ) {
+
+                button.disabled =
+                    true;
+
+
+                button.textContent =
+                    "Obteniendo ubicación...";
+
+            }
+
+
+
+            navigator.geolocation.getCurrentPosition(
+
+
+                /* =============================================
+                   UBICACIÓN CORRECTA
+                   ============================================= */
+
+                function (
+                    position
+                ) {
+
+                    const coords =
+                        position.coords;
+
+
+                    const latitude =
+                        Number(
+                            coords.latitude
+                        );
+
+
+                    const longitude =
+                        Number(
+                            coords.longitude
+                        );
+
+
+                    const latitudeInput =
+                        document.getElementById(
+                            "accidentLatitude"
+                        );
+
+
+                    const longitudeInput =
+                        document.getElementById(
+                            "accidentLongitude"
+                        );
+
+
+                    const altitudeInput =
+                        document.getElementById(
+                            "accidentAltitude"
+                        );
+
+
+                    const accuracyInput =
+                        document.getElementById(
+                            "accidentAccuracy"
+                        );
+
+
+
+                    /*
+                        Y = LATITUD
+                    */
+
+                    if (
+                        latitudeInput
+                    ) {
+
+                        latitudeInput.value =
+                            latitude.toFixed(
+                                6
+                            );
+
+                    }
+
+
+
+                    /*
+                        X = LONGITUD
+                    */
+
+                    if (
+                        longitudeInput
+                    ) {
+
+                        longitudeInput.value =
+                            longitude.toFixed(
+                                6
+                            );
+
+                    }
+
+
+
+                    /*
+                        ALTITUD
+                    */
+
+                    if (
+                        altitudeInput
+                    ) {
+
+                        if (
+                            coords.altitude ===
+                            null
+                        ) {
+
+                            altitudeInput.value =
+                                "No disponible";
+
+                        } else {
+
+                            altitudeInput.value =
+                                Number(
+                                    coords.altitude
+                                ).toFixed(
+                                    1
+                                );
+
+                        }
+
+                    }
+
+
+
+                    /*
+                        PRECISIÓN
+                    */
+
+                    if (
+                        accuracyInput
+                    ) {
+
+                        accuracyInput.value =
+                            Number(
+                                coords.accuracy
+                            ).toFixed(
+                                1
+                            );
+
+                    }
+
+
+
+                    /*
+                        ACTUALIZAR MAPA
+                    */
+
+                    showAccidentPositionOnMap(
+                        latitude,
+                        longitude
+                    );
+
+
+
+                    if (
+                        status
+                    ) {
+
+                        status.textContent =
+                            "Ubicación obtenida correctamente.";
+
+                    }
+
+
+
+                    if (
+                        button
+                    ) {
+
+                        button.disabled =
+                            false;
+
+
+                        button.textContent =
+                            "Actualizar ubicación";
+
+                    }
+
+                },
+
+
+
+                /* =============================================
+                   ERROR DE GPS
+                   ============================================= */
+
+                function (
+                    error
+                ) {
+
+                    let message =
+                        "No fue posible obtener la ubicación.";
+
+
+                    if (
+                        error.code ===
+                        1
+                    ) {
+
+                        message =
+                            "No se autorizó el acceso a la ubicación. Revise los permisos del navegador.";
+
+                    }
+
+
+                    if (
+                        error.code ===
+                        2
+                    ) {
+
+                        message =
+                            "El dispositivo no pudo determinar la ubicación. Active la ubicación del dispositivo e intente nuevamente.";
+
+                    }
+
+
+                    if (
+                        error.code ===
+                        3
+                    ) {
+
+                        message =
+                            "La ubicación tardó demasiado en responder. Intente nuevamente.";
+
+                    }
+
+
+                    if (
+                        status
+                    ) {
+
+                        status.textContent =
+                            message;
+
+                    }
+
+
+                    if (
+                        button
+                    ) {
+
+                        button.disabled =
+                            false;
+
+
+                        button.textContent =
+                            "Obtener ubicación actual";
+
+                    }
+
+
+                    console.error(
+                        "Error de ubicación:",
+                        error
+                    );
+
+                },
+
+
+                /* =============================================
+                   CONFIGURACIÓN
+                   ============================================= */
+
+                {
+
+                    enableHighAccuracy:
+                        true,
+
+                    timeout:
+                        30000,
+
+                    maximumAge:
+                        0
+
+                }
+
+            );
+
+        }
+
+
+
+        /* =====================================================
+           FOTOGRAFÍAS
+           ===================================================== */
+
+        function initializeAccidentPhotos() {
+
+            const photoInput =
+                document.getElementById(
+                    "accidentPhotos"
+                );
+
+
+            if (
+                !photoInput
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+                Si la función nueva de app.js existe,
+                utilizamos la compresión que ya hicimos.
+            */
+
+            if (
+                typeof previewAccidentPhotos ===
+                "function"
+            ) {
+
+                photoInput.addEventListener(
+                    "change",
+                    previewAccidentPhotos
+                );
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           INICIAR PÁGINA
+           ===================================================== */
 
         document.addEventListener(
             "DOMContentLoaded",
             function () {
 
-                initAccidentForm();
+
+                /*
+                    FECHA Y HORA INMEDIATAMENTE
+                */
+
+                setAutomaticAccidentDateTime();
+
+
+
+                /*
+                    PLACA
+                */
+
+                const vehicleSelect =
+                    document.getElementById(
+                        "accidentVehicle"
+                    );
+
+
+                if (
+                    vehicleSelect
+                ) {
+
+                    vehicleSelect.addEventListener(
+                        "change",
+                        setAutomaticAccidentPlate
+                    );
+
+                }
+
+
+                setAutomaticAccidentPlate();
+
+
+
+                /*
+                    MAPA
+                */
+
+                createAccidentPageMap();
+
+
+
+                /*
+                    GPS
+                */
+
+                const gpsButton =
+                    document.getElementById(
+                        "accidentGpsButton"
+                    );
+
+
+                if (
+                    gpsButton
+                ) {
+
+                    gpsButton.addEventListener(
+                        "click",
+                        getCurrentAccidentLocation
+                    );
+
+                }
+
+
+
+                /*
+                    FOTOS
+                */
+
+                initializeAccidentPhotos();
+
+
+
+                /*
+                    TODAVÍA NO GUARDAMOS EN GOOGLE.
+
+                    Esto se reemplaza en el siguiente paso
+                    cuando conectemos la hoja Accidentes.
+                */
+
+                const form =
+                    document.getElementById(
+                        "accidentForm"
+                    );
+
+
+                if (
+                    form
+                ) {
+
+                    form.addEventListener(
+                        "submit",
+                        function (
+                            event
+                        ) {
+
+                            event.preventDefault();
+
+
+                            if (
+                                typeof saveAccidentRecord ===
+                                "function"
+                            ) {
+
+                                saveAccidentRecord(
+                                    event
+                                );
+
+
+                                return;
+
+                            }
+
+
+                            alert(
+                                "El formulario está preparado. Falta conectar el guardado con Google Apps Script."
+                            );
+
+                        }
+                    );
+
+                }
 
             }
         );
