@@ -2012,17 +2012,14 @@ html[data-theme="light"] .side-menu a:hover {
 
 html[data-theme="light"] .hero {
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             #ffffff,
-            #f1f4f5
-        );
+            #f1f4f5);
 
     border-color: #d8dfe2;
 
     box-shadow:
-        0 20px 50px
-        rgba(28, 42, 48, 0.08);
+        0 20px 50px rgba(28, 42, 48, 0.08);
 }
 
 
@@ -2144,8 +2141,7 @@ html[data-theme="light"] textarea:focus {
     border-color: #0d947f;
 
     box-shadow:
-        0 0 0 3px
-        rgba(13, 148, 127, 0.12);
+        0 0 0 3px rgba(13, 148, 127, 0.12);
 }
 
 
@@ -2309,6 +2305,498 @@ html[data-theme="light"] .video-preview-card {
         padding: 7px 10px;
 
         font-size: 12px;
+    }
+
+}
+
+/* =========================================================
+   DAÑOS Y ACCIDENTES
+   UBICACIÓN Y MAPA
+   ========================================================= */
+
+.accident-location-actions {
+    margin-top: 18px;
+    margin-bottom: 12px;
+}
+
+
+.accident-location-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(240px, 320px) minmax(0, 1fr);
+
+    gap: 24px;
+
+    margin-top: 22px;
+
+    align-items: stretch;
+}
+
+
+.accident-coordinate-panel {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 17px;
+
+    padding-right: 24px;
+
+    border-right:
+        1px solid #34373b;
+}
+
+
+.accident-map-panel {
+    min-width: 0;
+
+    border:
+        1px solid #3c4045;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    background: #151719;
+}
+
+
+#accidentMap {
+    width: 100%;
+
+    height: 390px;
+
+    min-height: 390px;
+}
+
+
+.accident-photo-preview-item {
+    width: 100%;
+}
+
+
+.accident-photo-preview-item img {
+    width: 100%;
+
+    height: 150px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border:
+        1px solid #3c4045;
+}
+
+
+/* =========================================================
+   MODO CLARO
+   ========================================================= */
+
+html[data-theme="light"] .accident-coordinate-panel {
+    border-right-color:
+        #d8dfe2;
+}
+
+
+html[data-theme="light"] .accident-map-panel {
+    background:
+        #ffffff;
+
+    border-color:
+        #ccd5d9;
+}
+
+
+html[data-theme="light"] .accident-photo-preview-item img {
+    border-color:
+        #ccd5d9;
+}
+
+
+/* =========================================================
+   LEAFLET
+   ========================================================= */
+
+.leaflet-container {
+    font-family: inherit;
+}
+
+
+.leaflet-control-attribution {
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    .accident-location-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .accident-coordinate-panel {
+        padding-right:
+            0;
+
+        padding-bottom:
+            22px;
+
+        border-right:
+            0;
+
+        border-bottom:
+            1px solid #34373b;
+    }
+
+
+    html[data-theme="light"] .accident-coordinate-panel {
+        border-bottom-color:
+            #d8dfe2;
+    }
+
+
+    #accidentMap {
+        height:
+            320px;
+
+        min-height:
+            320px;
+    }
+
+}
+
+/* =========================================================
+   MAPA DE DAÑOS Y ACCIDENTES
+   ========================================================= */
+
+.accident-location-actions {
+    margin-top: 18px;
+    margin-bottom: 12px;
+}
+
+
+.accident-location-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(250px, 320px) minmax(0, 1fr);
+
+    gap: 24px;
+
+    margin-top: 22px;
+
+    align-items: stretch;
+}
+
+
+.accident-coordinate-panel {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 17px;
+
+    padding-right: 24px;
+
+    border-right:
+        1px solid #34373b;
+}
+
+
+.accident-map-panel {
+    width: 100%;
+
+    min-width: 0;
+
+    min-height: 390px;
+
+    overflow: hidden;
+
+    border:
+        1px solid #3c4045;
+
+    border-radius: 14px;
+
+    background: #151719;
+}
+
+
+#accidentMapFrame {
+    display: block;
+
+    width: 100%;
+
+    height: 390px;
+
+    min-height: 390px;
+
+    border: 0;
+}
+
+
+/* =========================================================
+   MODO CLARO
+   ========================================================= */
+
+html[data-theme="light"] .accident-coordinate-panel {
+    border-right-color:
+        #d8dfe2;
+}
+
+
+html[data-theme="light"] .accident-map-panel {
+    background:
+        #ffffff;
+
+    border-color:
+        #ccd5d9;
+}
+
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    .accident-location-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .accident-coordinate-panel {
+        padding-right:
+            0;
+
+        padding-bottom:
+            22px;
+
+        border-right:
+            0;
+
+        border-bottom:
+            1px solid #34373b;
+    }
+
+
+    html[data-theme="light"] .accident-coordinate-panel {
+        border-bottom-color:
+            #d8dfe2;
+    }
+
+
+    .accident-map-panel {
+        min-height:
+            320px;
+    }
+
+
+    #accidentMapFrame {
+        height:
+            320px;
+
+        min-height:
+            320px;
+    }
+
+}
+
+/* =========================================================
+   MAPA INTERACTIVO - ACCIDENTES
+   ========================================================= */
+
+#accidentInteractiveMap {
+    width: 100%;
+    height: 360px;
+    min-height: 360px;
+    border: 0;
+}
+
+
+.accident-map-large {
+    width: 100%;
+    overflow: hidden;
+
+    border:
+        1px solid #45494e;
+
+    border-radius: 12px;
+
+    background: #151719;
+}
+
+
+/* =========================================================
+   BUSCADOR
+   ========================================================= */
+
+.accident-map-search-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr) auto auto;
+
+    gap: 10px;
+
+    align-items: end;
+}
+
+
+.accident-map-search-label {
+    min-width: 0;
+}
+
+
+.accident-map-search-row .btn {
+    min-height: 43px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   RESULTADOS
+   ========================================================= */
+
+.accident-search-results {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 8px;
+
+    border:
+        1px solid #45494e;
+
+    border-radius: 10px;
+
+    background: #17191c;
+}
+
+
+.accident-search-result {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #e8ebee;
+
+    text-align: left;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    cursor: pointer;
+}
+
+
+.accident-search-result:hover,
+.accident-search-result:focus-visible {
+    background:
+        #292d31;
+
+    outline:
+        none;
+}
+
+
+.accident-search-empty {
+    padding:
+        10px;
+
+    color:
+        #aeb3ba;
+
+    font-size:
+        13px;
+}
+
+
+.accident-map-help {
+    margin:
+        0;
+}
+
+
+/* =========================================================
+   LEAFLET EN MODO OSCURO
+   ========================================================= */
+
+html[data-theme="dark"] .leaflet-container {
+    background:
+        #191c1f;
+}
+
+
+/* =========================================================
+   MODO CLARO
+   ========================================================= */
+
+html[data-theme="light"] .accident-search-results {
+    background:
+        #ffffff;
+
+    border-color:
+        #ccd4d8;
+}
+
+
+html[data-theme="light"] .accident-search-result {
+    color:
+        #172027;
+}
+
+
+html[data-theme="light"] .accident-search-result:hover,
+html[data-theme="light"] .accident-search-result:focus-visible {
+    background:
+        #edf2f3;
+}
+
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    .accident-map-search-row {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .accident-map-search-row .btn {
+        width:
+            100%;
+    }
+
+
+    #accidentInteractiveMap {
+        height:
+            320px;
+
+        min-height:
+            320px;
     }
 
 }
