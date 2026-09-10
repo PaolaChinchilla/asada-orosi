@@ -5,15 +5,25 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="theme-color" content="#16181c">
+    <meta
+        name="theme-color"
+        content="#16181c">
 
-    <meta name="description" content="Listado de daños y accidentes de vehículos de ASADA Orosi.">
+    <meta
+        name="description"
+        content="Listado de daños y accidentes de vehículos de ASADA Orosi.">
 
-    <link rel="manifest" href="manifest.json">
+    <link
+        rel="manifest"
+        href="manifest.json">
 
-    <link rel="stylesheet" href="css/style.css?v=20260910-5">
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260910-13">
 
     <title>
         Listado de daños y accidentes | ASADA Orosi
@@ -25,9 +35,17 @@
 <body>
 
 
+    <!-- =====================================================
+         BARRA SUPERIOR
+         ===================================================== -->
+
     <header class="topbar">
 
-        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
+        <button
+            type="button"
+            class="menu-btn"
+            onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">
 
             ☰
 
@@ -36,7 +54,10 @@
 
         <div class="brand">
 
-            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
+            <img
+                src="img/asadalogo.png"
+                alt="Logo ASADA Orosi"
+                class="brand-logo">
 
             <span>
                 ASADA OROSI
@@ -48,7 +69,13 @@
 
 
 
-    <aside id="sideMenu" class="side-menu">
+    <!-- =====================================================
+         MENÚ LATERAL
+         ===================================================== -->
+
+    <aside
+        id="sideMenu"
+        class="side-menu">
 
         <a href="index.html">
             Inicio
@@ -78,15 +105,33 @@
 
 
 
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
     <main class="page">
 
-        <div id="accidentsPage"></div>
+        <div id="accidentsPage">
+
+            <div class="empty-state">
+
+                <p>
+                    Cargando daños y accidentes...
+                </p>
+
+            </div>
+
+        </div>
 
     </main>
 
 
 
-    <script src="js/app.js?v=20260910-5"></script>
+    <!-- =====================================================
+         APP
+         ===================================================== -->
+
+    <script src="js/app.js?v=20260910-13"></script>
 
 
     <script>
@@ -102,8 +147,37 @@
 
                     renderAccidentsPage();
 
+                    return;
                 }
 
+
+                const root =
+                    document.getElementById(
+                        "accidentsPage"
+                    );
+
+
+                if (
+                    root
+                ) {
+
+                    root.innerHTML = `
+
+                        <div class="empty-state">
+
+                            <h1>
+                                No fue posible cargar el listado
+                            </h1>
+
+                            <p>
+                                La función renderAccidentsPage no está disponible.
+                                Revise que js/app.js esté actualizado.
+                            </p>
+
+                        </div>
+
+                    `;
+                }
             }
         );
 
