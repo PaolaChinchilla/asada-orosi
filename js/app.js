@@ -6197,3 +6197,345 @@ resetMaintenanceForm =
         asadaRenderConditionVideoPreview();
 
     };
+
+/* =========================================================
+PASO 3
+MOSTRAR COMBUSTIBLE Y VIDEO EN EL DETALLE
+========================================================= */
+
+
+/* =========================================================
+   GUARDAMOS LA FUNCIÓN ORIGINAL
+   ========================================================= */
+
+const asadaOriginalRenderDetail =
+    renderDetail;
+
+
+/* =========================================================
+   AMPLIAR DETALLE DEL REGISTRO
+   ========================================================= */
+
+renderDetail =
+    async function () {
+
+
+        /*
+            Primero dejamos que se cargue el detalle
+            exactamente como ya lo hacía tu aplicación.
+        */
+
+        await asadaOriginalRenderDetail();
+
+
+
+        const root =
+            document.getElementById(
+                "detail"
+            );
+
+
+        if (
+            !root
+        ) {
+
+            return;
+
+        }
+
+
+
+        const id =
+            new URLSearchParams(
+                window.location.search
+            ).get(
+                "id"
+            );
+
+
+        if (
+            !id
+        ) {
+
+            return;
+
+        }
+
+
+
+        try {
+
+
+            /*
+                Consultamos el registro para obtener
+                los nuevos campos.
+            */
+
+            const record =
+                await getRecordByIdFromServer(
+                    id
+                );
+
+
+            if (
+                !record
+            ) {
+
+                return;
+
+            }
+
+
+
+            /* =================================================
+               NIVEL DE COMBUSTIBLE
+               ================================================= */
+
+            const vehicleInfoGrid =
+                root.querySelector(
+                    ".vehicle-info-grid"
+                );
+
+
+            if (
+                vehicleInfoGrid &&
+                !document.getElementById(
+                    "detailFuelLevel"
+                )
+            ) {
+
+
+                vehicleInfoGrid.insertAdjacentHTML(
+                    "beforeend",
+                    `
+
+                        <div
+                            class="detail-info"
+                            id="detailFuelLevel">
+
+                            <span class="detail-info-label">
+                                Nivel de combustible
+                            </span>
+
+
+                            <strong>
+
+                                ${esc(
+                        record.nivelCombustible ||
+                        "Sin información"
+                    )}
+
+                            </strong>
+
+                        </div>
+
+                    `
+                );
+
+            }
+
+
+
+            /* =================================================
+               VIDEO DE CONDICIÓN
+               ================================================= */
+
+            let videoUrl =
+                "";
+
+
+            let videoDuration =
+                0;
+
+
+
+            /*
+                Primero intentamos leer el objeto completo.
+            */
+
+            if (
+                record.videoCondicion &&
+                typeof record.videoCondicion ===
+                "object"
+            ) {
+
+
+                videoUrl =
+                    String(
+                        record.videoCondicion.url ||
+                        ""
+                    ).trim();
+
+
+                videoDuration =
+                    Number(
+                        record.videoCondicion.duration ||
+                        0
+                    );
+
+            }
+
+
+
+            /*
+                Si no vino el objeto completo,
+                utilizamos la URL guardada directamente.
+            */
+
+            if (
+                !videoUrl &&
+                record.videoCondicionUrl
+            ) {
+
+                videoUrl =
+                    String(
+                        record.videoCondicionUrl
+                    ).trim();
+
+            }
+
+
+
+            /*
+                Solo mostramos esta sección cuando
+                realmente existe un video.
+            */
+
+            if (
+                videoUrl &&
+                !document.getElementById(
+                    "detailConditionVideo"
+                )
+            ) {
+
+
+                const reviewCard =
+                    root.querySelector(
+                        ".detail-review-card"
+                    );
+
+
+                if (
+                    reviewCard
+                ) {
+
+
+                    const photoGroup =
+                        reviewCard.querySelector(
+                            ".detail-photo-group"
+                        );
+
+
+                    const actions =
+                        reviewCard.querySelector(
+                            ".detail-card-actions"
+                        );
+
+
+
+                    const durationText =
+                        videoDuration > 0
+
+                            ? `
+
+                                <p class="detail-text">
+                                    Duración aproximada:
+                                    ${esc(
+                                videoDuration
+                            )}
+                                    segundos
+                                </p>
+
+                            `
+
+                            : "";
+
+
+
+                    const videoHtml = `
+
+                        <div
+                            class="detail-group detail-video-group"
+                            id="detailConditionVideo">
+
+                            <span
+                                class="detail-info-label detail-group-title">
+
+                                Video de condición
+
+                            </span>
+
+
+                            ${durationText}
+
+
+                            <div class="photo-folder-action">
+
+                                <a
+                                    href="${esc(
+                        videoUrl
+                    )}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn secondary">
+
+                                    Ver video de condición
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+
+
+                    /*
+                        Lo ponemos antes de las fotografías.
+                    */
+
+                    if (
+                        photoGroup
+                    ) {
+
+                        photoGroup.insertAdjacentHTML(
+                            "beforebegin",
+                            videoHtml
+                        );
+
+
+                    } else if (
+                        actions
+                    ) {
+
+                        actions.insertAdjacentHTML(
+                            "beforebegin",
+                            videoHtml
+                        );
+
+                    }
+
+                }
+
+            }
+
+
+        } catch (
+        error
+        ) {
+
+
+            /*
+                Si este pequeño complemento falla,
+                no queremos que se dañe todo el detalle.
+            */
+
+            console.error(
+                "No fue posible mostrar combustible o video en el detalle.",
+                error
+            );
+
+        }
+
+    };
