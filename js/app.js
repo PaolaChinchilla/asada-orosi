@@ -8417,7 +8417,7 @@ function showAccidentSavedConfirmation(
 
         idText.textContent =
             accident &&
-                accident.id
+            accident.id
 
                 ? accident.id
 
@@ -8452,7 +8452,7 @@ function showAccidentSavedConfirmation(
 
                 const vehicle =
                     accident &&
-                        accident.vehiculo
+                    accident.vehiculo
 
                         ? accident.vehiculo
 
@@ -8463,9 +8463,9 @@ function showAccidentSavedConfirmation(
                     vehicle
 
                         ? "accidentes.html?vehicle=" +
-                        encodeURIComponent(
-                            vehicle
-                        )
+                            encodeURIComponent(
+                                vehicle
+                            )
 
                         : "accidentes.html";
             };
@@ -8682,6 +8682,11 @@ async function saveAccidentRecord(
             )?.value
                 .trim() || "",
 
+        puedeContinuarUso:
+            document.getElementById(
+                "accidentCanContinueUse"
+            )?.value || "",
+
         nuevasFotos:
             Array.isArray(
                 window._pendingAccidentPhotoData
@@ -8839,7 +8844,7 @@ async function saveAccidentRecord(
 
         alert(
             error &&
-                error.message
+            error.message
 
                 ? error.message
 
@@ -8865,4 +8870,884 @@ async function saveAccidentRecord(
                 originalButtonText;
         }
     }
+}
+
+/* =========================================================
+   PASO 8
+   LISTADO DE DAÑOS Y ACCIDENTES
+   ========================================================= */
+
+
+/* =========================================================
+   PÁGINA PRINCIPAL DE ACCIDENTES
+   ========================================================= */
+
+async function renderAccidentsPage() {
+
+    const root =
+        document.getElementById(
+            "accidentsPage"
+        );
+
+
+    if (
+        !root
+    ) {
+
+        return;
+    }
+
+
+    const vehicleName =
+        new URLSearchParams(
+            window.location.search
+        ).get(
+            "vehicle"
+        );
+
+
+    if (
+        !vehicleName
+    ) {
+
+        renderAccidentVehicleSelection();
+
+        return;
+    }
+
+
+    await renderVehicleAccidents(
+        vehicleName
+    );
+}
+
+
+/* =========================================================
+   SELECCIÓN DE VEHÍCULO - ACCIDENTES
+   ========================================================= */
+
+function renderAccidentVehicleSelection() {
+
+    const root =
+        document.getElementById(
+            "accidentsPage"
+        );
+
+
+    if (
+        !root
+    ) {
+
+        return;
+    }
+
+
+    root.innerHTML = `
+
+        <div class="nav-actions">
+
+            <a
+                href="index.html"
+                class="btn-back">
+
+                Volver al inicio
+
+            </a>
+
+        </div>
+
+
+        <div class="page-head">
+
+            <div>
+
+                <span class="eyebrow">
+                    DAÑOS Y ACCIDENTES
+                </span>
+
+
+                <h1>
+                    Seleccione un vehículo
+                </h1>
+
+
+                <p>
+                    Seleccione el vehículo cuyos reportes de daños o accidentes desea consultar.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="vehicle-selection-grid">
+
+            ${VEHICLES.map(
+                vehicle => `
+
+                    <button
+                        type="button"
+                        class="vehicle-selection-card"
+                        onclick="selectAccidentVehicle('${escapeJs(vehicle.nombre)}')">
+
+                        <div class="vehicle-selection-content">
+
+                            <span class="vehicle-selection-label">
+                                VEHÍCULO
+                            </span>
+
+
+                            <h2>
+                                ${esc(vehicle.nombre)}
+                            </h2>
+
+
+                            <p>
+                                Placa: ${esc(vehicle.placa)}
+                            </p>
+
+
+                            <span class="vehicle-selection-action">
+                                Consultar daños y accidentes
+                            </span>
+
+                        </div>
+
+                    </button>
+
+                `
+            ).join("")}
+
+        </div>
+
+    `;
+}
+
+
+function selectAccidentVehicle(
+    vehicleName
+) {
+
+    window.location.href =
+        "accidentes.html?vehicle=" +
+        encodeURIComponent(
+            vehicleName
+        );
+}
+
+
+/* =========================================================
+   ACCIDENTES DE UN VEHÍCULO
+   ========================================================= */
+
+async function renderVehicleAccidents(
+    vehicleName
+) {
+
+    const root =
+        document.getElementById(
+            "accidentsPage"
+        );
+
+
+    if (
+        !root
+    ) {
+
+        return;
+    }
+
+
+    const vehicle =
+        VEHICLES.find(
+            item =>
+                item.nombre ===
+                vehicleName
+        );
+
+
+    if (
+        !vehicle
+    ) {
+
+        root.innerHTML = `
+
+            <div class="nav-actions">
+
+                <a
+                    href="accidentes.html"
+                    class="btn-back">
+
+                    Volver
+
+                </a>
+
+
+                <a
+                    href="index.html"
+                    class="btn-back">
+
+                    Volver al inicio
+
+                </a>
+
+            </div>
+
+
+            <div class="empty-state">
+
+                <h1>
+                    Vehículo no encontrado
+                </h1>
+
+
+                <p>
+                    El vehículo solicitado no existe.
+                </p>
+
+            </div>
+
+        `;
+
+
+        return;
+    }
+
+
+    root.innerHTML = `
+
+        <div class="nav-actions">
+
+            <a
+                href="accidentes.html"
+                class="btn-back">
+
+                Volver
+
+            </a>
+
+
+            <a
+                href="index.html"
+                class="btn-back">
+
+                Volver al inicio
+
+            </a>
+
+        </div>
+
+
+        <div class="page-head">
+
+            <div>
+
+                <span class="eyebrow">
+                    DAÑOS Y ACCIDENTES
+                </span>
+
+
+                <h1>
+                    ${esc(vehicle.nombre)}
+                </h1>
+
+
+                <p>
+                    Placa: ${esc(vehicle.placa)}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <section class="record-filters">
+
+            <div class="record-filter-title">
+
+                <h2>
+                    Buscar reportes
+                </h2>
+
+
+                <p>
+                    Puede utilizar uno o varios filtros.
+                </p>
+
+            </div>
+
+
+            <div class="record-filter-grid">
+
+                <label>
+
+                    Fecha
+
+                    <input
+                        type="date"
+                        id="accidentFilterDate">
+
+                </label>
+
+
+                <label>
+
+                    Chofer
+
+                    <input
+                        type="text"
+                        id="accidentFilterDriver"
+                        placeholder="Buscar por chofer">
+
+                </label>
+
+
+                <label>
+
+                    Persona a quien se reportó
+
+                    <input
+                        type="text"
+                        id="accidentFilterReportedTo"
+                        placeholder="Buscar por persona">
+
+                </label>
+
+
+                <label>
+
+                    ID del registro
+
+                    <input
+                        type="text"
+                        id="accidentFilterId"
+                        maxlength="6"
+                        placeholder="Ejemplo: A7K92P"
+                        autocomplete="off">
+
+                </label>
+
+
+                <label>
+
+                    ¿Puede continuar en uso?
+
+                    <select id="accidentFilterCanContinue">
+
+                        <option value="">
+                            Todos
+                        </option>
+
+                        <option value="Sí">
+                            Sí
+                        </option>
+
+                        <option value="No">
+                            No
+                        </option>
+
+                    </select>
+
+                </label>
+
+            </div>
+
+
+            <div class="search-actions">
+
+                <button
+                    type="button"
+                    class="btn primary"
+                    onclick="filterVehicleAccidents()">
+
+                    Buscar
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    onclick="clearAccidentFilters()">
+
+                    Limpiar
+
+                </button>
+
+
+                <a
+                    href="crear-accidente.html"
+                    class="btn secondary">
+
+                    Crear nuevo registro
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <div
+            id="vehicleAccidentsList"
+            class="records-list">
+
+            <div class="empty-state">
+
+                <p>
+                    Cargando daños y accidentes...
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    try {
+
+        const accidents =
+            await getAccidentsByVehicleFromServer(
+                vehicleName
+            );
+
+
+        accidents.sort(
+            (
+                first,
+                second
+            ) =>
+                String(
+                    second.fechaHora || ""
+                ).localeCompare(
+                    String(
+                        first.fechaHora || ""
+                    )
+                )
+        );
+
+
+        window.currentVehicleAccidents =
+            accidents;
+
+
+        renderAccidentList(
+            accidents
+        );
+
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Error al cargar daños y accidentes.",
+            error
+        );
+
+
+        const list =
+            document.getElementById(
+                "vehicleAccidentsList"
+            );
+
+
+        if (
+            list
+        ) {
+
+            list.innerHTML = `
+
+                <div class="empty-state">
+
+                    <h2>
+                        No fue posible cargar los reportes
+                    </h2>
+
+
+                    <p>
+                        ${esc(
+                            error &&
+                            error.message
+
+                                ? error.message
+
+                                : "Se produjo un error al consultar Google."
+                        )}
+                    </p>
+
+
+                    <button
+                        type="button"
+                        class="btn primary"
+                        onclick="renderVehicleAccidents('${escapeJs(vehicleName)}')">
+
+                        Intentar nuevamente
+
+                    </button>
+
+                </div>
+
+            `;
+        }
+    }
+}
+
+
+/* =========================================================
+   LISTA DE ACCIDENTES
+   ========================================================= */
+
+function renderAccidentList(
+    accidents
+) {
+
+    const list =
+        document.getElementById(
+            "vehicleAccidentsList"
+        );
+
+
+    if (
+        !list
+    ) {
+
+        return;
+    }
+
+
+    if (
+        !Array.isArray(
+            accidents
+        ) ||
+        accidents.length === 0
+    ) {
+
+        list.innerHTML = `
+
+            <div class="empty-state">
+
+                <h2>
+                    No hay daños o accidentes
+                </h2>
+
+
+                <p>
+                    No existen reportes que coincidan con la búsqueda.
+                </p>
+
+
+                <a
+                    href="crear-accidente.html"
+                    class="btn primary">
+
+                    Crear registro de daño o accidente
+
+                </a>
+
+            </div>
+
+        `;
+
+
+        return;
+    }
+
+
+    list.innerHTML =
+        accidents.map(
+            accident => {
+
+                const canContinue =
+                    String(
+                        accident.puedeContinuarUso || ""
+                    ).trim();
+
+
+                const canContinueText =
+                    canContinue === "Sí"
+
+                        ? "Sí"
+
+                        : canContinue === "No"
+
+                            ? "No"
+
+                            : "Sin información";
+
+
+                return `
+
+                    <article class="record-card">
+
+                        <div class="record-card-top">
+
+                            <div>
+
+                                <span class="record-label">
+                                    DAÑO / ACCIDENTE
+                                </span>
+
+
+                                <h2>
+                                    ${esc(accident.id || "Sin ID")}
+                                </h2>
+
+                            </div>
+
+
+                            <div class="record-vehicle">
+
+                                <strong>
+                                    ${esc(accident.vehiculo || "Sin vehículo")}
+                                </strong>
+
+
+                                <span>
+                                    ${esc(accident.placa || "")}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="record-data-grid">
+
+                            <div class="record-data">
+
+                                <span>
+                                    Fecha y hora
+                                </span>
+
+
+                                <strong>
+                                    ${esc(accident.fechaHora || "Sin información")}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="record-data">
+
+                                <span>
+                                    Chofer
+                                </span>
+
+
+                                <strong>
+                                    ${esc(accident.chofer || "Sin información")}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="record-data">
+
+                                <span>
+                                    Reportado a
+                                </span>
+
+
+                                <strong>
+                                    ${esc(accident.personaReportada || "Sin información")}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="record-data">
+
+                                <span>
+                                    Puede continuar en uso
+                                </span>
+
+
+                                <strong>
+                                    ${esc(canContinueText)}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="record-card-actions">
+
+                            <a
+                                href="detalle-accidente.html?id=${encodeURIComponent(accident.id || "")}"
+                                class="btn primary">
+
+                                Consultar registro
+
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                `;
+            }
+        ).join("");
+}
+
+
+/* =========================================================
+   FILTRAR ACCIDENTES
+   ========================================================= */
+
+function filterVehicleAccidents() {
+
+    const accidents =
+        Array.isArray(
+            window.currentVehicleAccidents
+        )
+
+            ? window.currentVehicleAccidents
+
+            : [];
+
+
+    const date =
+        document.getElementById(
+            "accidentFilterDate"
+        )?.value || "";
+
+
+    const driver =
+        document.getElementById(
+            "accidentFilterDriver"
+        )?.value
+            .trim()
+            .toLowerCase() || "";
+
+
+    const reportedTo =
+        document.getElementById(
+            "accidentFilterReportedTo"
+        )?.value
+            .trim()
+            .toLowerCase() || "";
+
+
+    const id =
+        document.getElementById(
+            "accidentFilterId"
+        )?.value
+            .trim()
+            .toUpperCase() || "";
+
+
+    const canContinue =
+        document.getElementById(
+            "accidentFilterCanContinue"
+        )?.value || "";
+
+
+    const filtered =
+        accidents.filter(
+            accident => (
+
+                (
+                    !date ||
+                    String(
+                        accident.fechaHora || ""
+                    ).startsWith(
+                        date
+                    )
+                ) &&
+
+                (
+                    !driver ||
+                    String(
+                        accident.chofer || ""
+                    )
+                        .toLowerCase()
+                        .includes(
+                            driver
+                        )
+                ) &&
+
+                (
+                    !reportedTo ||
+                    String(
+                        accident.personaReportada || ""
+                    )
+                        .toLowerCase()
+                        .includes(
+                            reportedTo
+                        )
+                ) &&
+
+                (
+                    !id ||
+                    String(
+                        accident.id || ""
+                    )
+                        .toUpperCase()
+                        .includes(
+                            id
+                        )
+                ) &&
+
+                (
+                    !canContinue ||
+                    String(
+                        accident.puedeContinuarUso || ""
+                    ).trim() ===
+                    canContinue
+                )
+
+            )
+        );
+
+
+    renderAccidentList(
+        filtered
+    );
+}
+
+
+/* =========================================================
+   LIMPIAR FILTROS DE ACCIDENTES
+   ========================================================= */
+
+function clearAccidentFilters() {
+
+    [
+        "accidentFilterDate",
+        "accidentFilterDriver",
+        "accidentFilterReportedTo",
+        "accidentFilterId",
+        "accidentFilterCanContinue"
+    ].forEach(
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (
+                element
+            ) {
+
+                element.value =
+                    "";
+            }
+        }
+    );
+
+
+    renderAccidentList(
+        Array.isArray(
+            window.currentVehicleAccidents
+        )
+
+            ? window.currentVehicleAccidents
+
+            : []
+    );
 }
