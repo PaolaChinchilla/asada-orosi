@@ -6540,10 +6540,10 @@ renderDetail =
 
     };
 
-    /* =========================================================
-   PASO 4
-   MODO CLARO Y MODO OSCURO
-   ========================================================= */
+/* =========================================================
+PASO 4
+MODO CLARO Y MODO OSCURO
+========================================================= */
 
 
 /* =========================================================
@@ -6813,4 +6813,2056 @@ if (
 } else {
 
     asadaCreateThemeButton();
+}
+
+/* =========================================================
+   PASO 5
+   ACCESIBILIDAD Y MENÚ DE ACCIDENTES
+   ========================================================= */
+
+
+/* =========================================================
+   CARGAR PLUGIN DE ACCESIBILIDAD
+   ========================================================= */
+
+function asadaLoadAccessibilityPlugin() {
+
+    if (
+        document.getElementById(
+            "asadaAccessibilityPlugin"
+        )
+    ) {
+
+        return;
+    }
+
+
+    const script =
+        document.createElement(
+            "script"
+        );
+
+
+    script.id =
+        "asadaAccessibilityPlugin";
+
+
+    /*
+        Dejamos la versión fija para evitar que una
+        actualización futura cambie el comportamiento
+        de la aplicación sin que nosotros lo sepamos.
+    */
+
+    script.src =
+        "https://cdn.jsdelivr.net/npm/sienna-accessibility@2.2.333";
+
+
+    script.async =
+        true;
+
+
+    script.onerror =
+        function () {
+
+            console.error(
+                "No fue posible cargar el complemento de accesibilidad."
+            );
+
+        };
+
+
+    document.body.appendChild(
+        script
+    );
+}
+
+
+
+/* =========================================================
+   AGREGAR ACCIDENTES AL MENÚ LATERAL
+   ========================================================= */
+
+function asadaAddAccidentMenuLinks() {
+
+    const menu =
+        document.getElementById(
+            "sideMenu"
+        );
+
+
+    if (
+        !menu
+    ) {
+
+        return;
+    }
+
+
+    /*
+        Evitamos agregar los enlaces dos veces.
+    */
+
+    if (
+        document.getElementById(
+            "menuCreateAccident"
+        )
+    ) {
+
+        return;
+    }
+
+
+    const excelLink =
+        Array.from(
+            menu.querySelectorAll(
+                "a"
+            )
+        ).find(
+            link =>
+                link.getAttribute(
+                    "href"
+                ) ===
+                "excel.html"
+        );
+
+
+    const createLink =
+        document.createElement(
+            "a"
+        );
+
+
+    createLink.id =
+        "menuCreateAccident";
+
+
+    createLink.href =
+        "crear-accidente.html";
+
+
+    createLink.textContent =
+        "Crear registro de daño y accidente";
+
+
+    const listLink =
+        document.createElement(
+            "a"
+        );
+
+
+    listLink.id =
+        "menuAccidentList";
+
+
+    listLink.href =
+        "accidentes.html";
+
+
+    listLink.textContent =
+        "Listado de daños y accidentes";
+
+
+    if (
+        excelLink
+    ) {
+
+        menu.insertBefore(
+            createLink,
+            excelLink
+        );
+
+
+        menu.insertBefore(
+            listLink,
+            excelLink
+        );
+
+    } else {
+
+        menu.appendChild(
+            createLink
+        );
+
+
+        menu.appendChild(
+            listLink
+        );
+    }
+}
+
+
+
+/* =========================================================
+   INICIAR
+   ========================================================= */
+
+function asadaInitGlobalTools() {
+
+    asadaAddAccidentMenuLinks();
+
+    asadaLoadAccessibilityPlugin();
+}
+
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        asadaInitGlobalTools
+    );
+
+} else {
+
+    asadaInitGlobalTools();
+}
+
+/* =========================================================
+   PASO 6
+   DAÑOS Y ACCIDENTES - MAPA Y FORMULARIO
+   ========================================================= */
+
+
+/* =========================================================
+   VARIABLES DE ACCIDENTES
+   ========================================================= */
+
+window._accidentMap =
+    null;
+
+
+window._accidentMarker =
+    null;
+
+
+window._pendingAccidentPhotoData =
+    [];
+
+
+/* =========================================================
+   PLACA AUTOMÁTICA
+   ========================================================= */
+
+function updateAccidentPlate() {
+
+    const vehicleSelect =
+        document.getElementById(
+            "accidentVehicle"
+        );
+
+
+    const plateInput =
+        document.getElementById(
+            "accidentPlate"
+        );
+
+
+    if (
+        !vehicleSelect ||
+        !plateInput
+    ) {
+
+        return;
+    }
+
+
+    const vehicle =
+        VEHICLES.find(
+            item =>
+                item.nombre ===
+                vehicleSelect.value
+        );
+
+
+    plateInput.value =
+        vehicle
+
+            ? vehicle.placa
+
+            : "";
+}
+
+
+/* =========================================================
+   CREAR MAPA
+   ========================================================= */
+
+function initAccidentMap() {
+
+    const container =
+        document.getElementById(
+            "accidentMap"
+        );
+
+
+    if (
+        !container
+    ) {
+
+        return;
+    }
+
+
+    if (
+        typeof L ===
+        "undefined"
+    ) {
+
+        console.error(
+            "Leaflet no está disponible."
+        );
+
+
+        return;
+    }
+
+
+    if (
+        window._accidentMap
+    ) {
+
+        return;
+    }
+
+
+    /*
+        Ubicación inicial aproximada para mostrar
+        la zona de Orosi mientras todavía no se
+        han obtenido las coordenadas del dispositivo.
+    */
+
+    const initialLatitude =
+        9.80;
+
+
+    const initialLongitude =
+        -83.85;
+
+
+    window._accidentMap =
+        L.map(
+            "accidentMap",
+            {
+                zoomControl:
+                    true
+            }
+        )
+            .setView(
+                [
+                    initialLatitude,
+                    initialLongitude
+                ],
+                13
+            );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom:
+                19,
+
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+        }
+    ).addTo(
+        window._accidentMap
+    );
+
+
+    /*
+        Corregir tamaño después de que el navegador
+        haya terminado de dibujar la página.
+    */
+
+    window.setTimeout(
+        function () {
+
+            if (
+                window._accidentMap
+            ) {
+
+                window._accidentMap.invalidateSize();
+            }
+
+        },
+        250
+    );
+}
+
+
+/* =========================================================
+   COLOCAR MARCADOR
+   ========================================================= */
+
+function setAccidentMapPosition(
+    latitude,
+    longitude
+) {
+
+    if (
+        !window._accidentMap
+    ) {
+
+        initAccidentMap();
+    }
+
+
+    if (
+        !window._accidentMap
+    ) {
+
+        return;
+    }
+
+
+    const coordinates = [
+
+        Number(
+            latitude
+        ),
+
+        Number(
+            longitude
+        )
+
+    ];
+
+
+    if (
+        !Number.isFinite(
+            coordinates[0]
+        ) ||
+        !Number.isFinite(
+            coordinates[1]
+        )
+    ) {
+
+        return;
+    }
+
+
+    if (
+        window._accidentMarker
+    ) {
+
+        window._accidentMarker.setLatLng(
+            coordinates
+        );
+
+    } else {
+
+        window._accidentMarker =
+            L.marker(
+                coordinates
+            )
+                .addTo(
+                    window._accidentMap
+                )
+                .bindPopup(
+                    "Ubicación registrada"
+                );
+    }
+
+
+    window._accidentMap.setView(
+        coordinates,
+        17
+    );
+
+
+    window._accidentMarker.openPopup();
+}
+
+
+/* =========================================================
+   OBTENER GPS
+   ========================================================= */
+
+function captureAccidentLocation() {
+
+    const status =
+        document.getElementById(
+            "accidentGpsStatus"
+        );
+
+
+    const button =
+        document.getElementById(
+            "accidentGpsButton"
+        );
+
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        if (
+            status
+        ) {
+
+            status.textContent =
+                "Este dispositivo no permite obtener la ubicación GPS.";
+        }
+
+
+        return;
+    }
+
+
+    if (
+        status
+    ) {
+
+        status.textContent =
+            "Obteniendo ubicación...";
+    }
+
+
+    if (
+        button
+    ) {
+
+        button.disabled =
+            true;
+
+
+        button.textContent =
+            "Obteniendo ubicación...";
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function (
+            position
+        ) {
+
+            const coordinates =
+                position.coords;
+
+
+            const latitude =
+                Number(
+                    coordinates.latitude
+                );
+
+
+            const longitude =
+                Number(
+                    coordinates.longitude
+                );
+
+
+            const altitude =
+                coordinates.altitude;
+
+
+            const accuracy =
+                coordinates.accuracy;
+
+
+
+            const latitudeInput =
+                document.getElementById(
+                    "accidentLatitude"
+                );
+
+
+            const longitudeInput =
+                document.getElementById(
+                    "accidentLongitude"
+                );
+
+
+            const altitudeInput =
+                document.getElementById(
+                    "accidentAltitude"
+                );
+
+
+            const accuracyInput =
+                document.getElementById(
+                    "accidentAccuracy"
+                );
+
+
+
+            /*
+                Y = LATITUD
+            */
+
+            if (
+                latitudeInput
+            ) {
+
+                latitudeInput.value =
+                    latitude.toFixed(
+                        6
+                    );
+            }
+
+
+
+            /*
+                X = LONGITUD
+            */
+
+            if (
+                longitudeInput
+            ) {
+
+                longitudeInput.value =
+                    longitude.toFixed(
+                        6
+                    );
+            }
+
+
+
+            /*
+                ALTITUD
+
+                Algunos teléfonos no proporcionan
+                este dato.
+            */
+
+            if (
+                altitudeInput
+            ) {
+
+                altitudeInput.value =
+                    Number.isFinite(
+                        Number(
+                            altitude
+                        )
+                    )
+
+                        ? Number(
+                            altitude
+                        ).toFixed(
+                            1
+                        )
+
+                        : "No disponible";
+            }
+
+
+
+            /*
+                PRECISIÓN
+            */
+
+            if (
+                accuracyInput
+            ) {
+
+                accuracyInput.value =
+                    Number.isFinite(
+                        Number(
+                            accuracy
+                        )
+                    )
+
+                        ? Number(
+                            accuracy
+                        ).toFixed(
+                            1
+                        )
+
+                        : "";
+            }
+
+
+
+            /*
+                ACTUALIZAR MAPA
+            */
+
+            setAccidentMapPosition(
+                latitude,
+                longitude
+            );
+
+
+
+            if (
+                status
+            ) {
+
+                status.textContent =
+                    "Ubicación obtenida correctamente.";
+            }
+
+
+
+            if (
+                button
+            ) {
+
+                button.disabled =
+                    false;
+
+
+                button.textContent =
+                    "Actualizar ubicación";
+            }
+
+        },
+
+
+        function (
+            error
+        ) {
+
+            console.error(
+                "Error de geolocalización.",
+                error
+            );
+
+
+            let message =
+                "No fue posible obtener la ubicación.";
+
+
+            switch (
+            error.code
+            ) {
+
+                case 1:
+
+                    message =
+                        "No se autorizó el acceso a la ubicación.";
+
+                    break;
+
+
+                case 2:
+
+                    message =
+                        "El dispositivo no pudo determinar la ubicación.";
+
+                    break;
+
+
+                case 3:
+
+                    message =
+                        "La búsqueda de la ubicación tardó demasiado.";
+
+                    break;
+            }
+
+
+            if (
+                status
+            ) {
+
+                status.textContent =
+                    message;
+            }
+
+
+            if (
+                button
+            ) {
+
+                button.disabled =
+                    false;
+
+
+                button.textContent =
+                    "Obtener ubicación actual";
+            }
+
+        },
+
+
+        {
+            enableHighAccuracy:
+                true,
+
+            timeout:
+                20000,
+
+            maximumAge:
+                0
+        }
+    );
+}
+
+
+/* =========================================================
+   FOTOS DE ACCIDENTE
+   ========================================================= */
+
+async function previewAccidentPhotos(
+    event
+) {
+
+    const files =
+        Array.from(
+            event.target.files ||
+            []
+        );
+
+
+    if (
+        files.length ===
+        0
+    ) {
+
+        return;
+    }
+
+
+    const currentPhotos =
+        Array.isArray(
+            window._pendingAccidentPhotoData
+        )
+
+            ? window._pendingAccidentPhotoData
+
+            : [];
+
+
+    if (
+        currentPhotos.length +
+        files.length >
+        10
+    ) {
+
+        alert(
+            "Puede seleccionar un máximo de 10 fotografías."
+        );
+
+
+        event.target.value =
+            "";
+
+
+        return;
+    }
+
+
+    try {
+
+        const newPhotos =
+            [];
+
+
+        for (
+            const file of files
+        ) {
+
+            /*
+                Reutilizamos la compresión de imágenes
+                que ya utiliza el formulario de revisiones.
+            */
+
+            const photo =
+                await compressImageFile(
+                    file
+                );
+
+
+            newPhotos.push(
+                photo
+            );
+        }
+
+
+        window._pendingAccidentPhotoData =
+            [
+                ...currentPhotos,
+                ...newPhotos
+            ];
+
+
+        renderAccidentPhotoPreview();
+
+
+    } catch (
+    error
+    ) {
+
+        console.error(
+            "Error al preparar fotografías del accidente.",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "No fue posible procesar una de las fotografías."
+        );
+    }
+
+
+    event.target.value =
+        "";
+}
+
+
+/* =========================================================
+   MOSTRAR FOTOS
+   ========================================================= */
+
+function renderAccidentPhotoPreview() {
+
+    const preview =
+        document.getElementById(
+            "accidentPhotoPreview"
+        );
+
+
+    if (
+        !preview
+    ) {
+
+        return;
+    }
+
+
+    const photos =
+        Array.isArray(
+            window._pendingAccidentPhotoData
+        )
+
+            ? window._pendingAccidentPhotoData
+
+            : [];
+
+
+    preview.innerHTML =
+        photos
+            .map(
+                function (
+                    photo,
+                    index
+                ) {
+
+                    if (
+                        !photo ||
+                        !photo.data
+                    ) {
+
+                        return "";
+                    }
+
+
+                    return `
+
+                        <div class="accident-photo-preview-item">
+
+                            <img
+                                src="${esc(
+                        photo.data
+                    )}"
+                                alt="Fotografía ${index + 1} del daño o accidente">
+
+                        </div>
+
+                    `;
+                }
+            )
+            .join(
+                ""
+            );
+}
+
+
+/* =========================================================
+   VALIDAR GPS ANTES DEL FUTURO GUARDADO
+   ========================================================= */
+
+function validateAccidentGps() {
+
+    const latitude =
+        document.getElementById(
+            "accidentLatitude"
+        )?.value || "";
+
+
+    const longitude =
+        document.getElementById(
+            "accidentLongitude"
+        )?.value || "";
+
+
+    if (
+        !latitude ||
+        !longitude
+    ) {
+
+        alert(
+            "Debe obtener la ubicación GPS antes de guardar el registro."
+        );
+
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
+/* =========================================================
+   INICIAR FORMULARIO
+   ========================================================= */
+
+function initAccidentForm() {
+
+    const form =
+        document.getElementById(
+            "accidentForm"
+        );
+
+
+    if (
+        !form
+    ) {
+
+        return;
+    }
+
+
+    window._pendingAccidentPhotoData =
+        [];
+
+
+    /*
+        FECHA Y HORA AUTOMÁTICA
+    */
+
+    const dateInput =
+        document.getElementById(
+            "accidentDateTime"
+        );
+
+
+    if (
+        dateInput &&
+        !dateInput.value
+    ) {
+
+        dateInput.value =
+            formatDate(
+                new Date()
+            );
+    }
+
+
+    /*
+        PLACA
+    */
+
+    updateAccidentPlate();
+
+
+    /*
+        MAPA
+    */
+
+    initAccidentMap();
+
+
+    /*
+        FOTOGRAFÍAS
+    */
+
+    const photosInput =
+        document.getElementById(
+            "accidentPhotos"
+        );
+
+
+    if (
+        photosInput
+    ) {
+
+        photosInput.addEventListener(
+            "change",
+            previewAccidentPhotos
+        );
+    }
+
+
+    /*
+        Hasta que conectemos Code.gs evitamos
+        que el navegador recargue accidentalmente
+        la página si presiona Guardar.
+    */
+
+    form.addEventListener(
+        "submit",
+        function (
+            event
+        ) {
+
+            event.preventDefault();
+
+
+            if (
+                typeof saveAccidentRecord ===
+                "function"
+            ) {
+
+                saveAccidentRecord(
+                    event
+                );
+
+
+                return;
+            }
+
+
+            alert(
+                "El formulario y el mapa ya están preparados. Falta conectar el guardado con Google Apps Script."
+            );
+        }
+    );
+}
+
+/* =========================================================
+   PASO 7
+   GUARDAR DAÑOS Y ACCIDENTES EN GOOGLE
+   ========================================================= */
+
+
+/* =========================================================
+   API - GUARDAR ACCIDENTE
+   ========================================================= */
+
+async function saveAccidentOnServer(
+    accident,
+    mode = "create"
+) {
+
+    const result =
+        await callApi(
+            "saveAccident",
+            {
+                accident:
+                    accident,
+
+                mode:
+                    mode
+            }
+        );
+
+
+    if (
+        !result ||
+        !result.accident
+    ) {
+
+        throw new Error(
+            "Google no devolvió el registro de daño o accidente guardado."
+        );
+    }
+
+
+    return result.accident;
+}
+
+
+/* =========================================================
+   API - CONSULTAR TODOS LOS ACCIDENTES
+   ========================================================= */
+
+async function getAllAccidentsFromServer() {
+
+    const result =
+        await callApi(
+            "getAllAccidents"
+        );
+
+
+    return Array.isArray(
+        result &&
+        result.accidents
+    )
+
+        ? result.accidents
+
+        : [];
+}
+
+
+/* =========================================================
+   API - CONSULTAR ACCIDENTES POR VEHÍCULO
+   ========================================================= */
+
+async function getAccidentsByVehicleFromServer(
+    vehicle
+) {
+
+    const result =
+        await callApi(
+            "getAccidentsByVehicle",
+            {
+                vehicle:
+                    vehicle
+            }
+        );
+
+
+    return Array.isArray(
+        result &&
+        result.accidents
+    )
+
+        ? result.accidents
+
+        : [];
+}
+
+
+/* =========================================================
+   API - CONSULTAR ACCIDENTE POR ID
+   ========================================================= */
+
+async function getAccidentByIdFromServer(
+    id
+) {
+
+    const result =
+        await callApi(
+            "getAccidentById",
+            {
+                id:
+                    id
+            }
+        );
+
+
+    return result &&
+        result.accident
+
+        ? result.accident
+
+        : null;
+}
+
+
+/* =========================================================
+   CREAR CUADRO DE CONFIRMACIÓN
+   ========================================================= */
+
+function ensureAccidentConfirmationModal() {
+
+    let modal =
+        document.getElementById(
+            "accidentSaveConfirmation"
+        );
+
+
+    if (
+        modal
+    ) {
+
+        return modal;
+    }
+
+
+    modal =
+        document.createElement(
+            "div"
+        );
+
+
+    modal.id =
+        "accidentSaveConfirmation";
+
+
+    modal.className =
+        "confirmation-overlay hidden";
+
+
+    modal.innerHTML = `
+
+        <div
+            class="confirmation-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="accidentConfirmationTitle">
+
+
+            <div class="confirmation-header">
+
+                <span class="confirmation-label">
+                    ASADA OROSI
+                </span>
+
+
+                <h2 id="accidentConfirmationTitle">
+                    Guardando registro
+                </h2>
+
+            </div>
+
+
+            <div class="confirmation-body">
+
+                <p id="accidentConfirmationMessage">
+                    Estamos guardando la información.
+                    Espere un momento.
+                </p>
+
+
+                <div
+                    class="confirmation-id-box"
+                    id="accidentConfirmationIdBox"
+                    style="display: none;">
+
+                    <span>
+                        ID del registro
+                    </span>
+
+                    <strong
+                        id="accidentConfirmationRecordId">
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="confirmation-actions"
+                id="accidentConfirmationActions"
+                style="display: none;">
+
+
+                <button
+                    type="button"
+                    class="btn primary"
+                    id="accidentConfirmationViewList">
+
+                    Ver listado de daños y accidentes
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="accidentConfirmationAnother">
+
+                    Crear otro registro
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="accidentConfirmationClose">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    const anotherButton =
+        document.getElementById(
+            "accidentConfirmationAnother"
+        );
+
+
+    if (
+        anotherButton
+    ) {
+
+        anotherButton.addEventListener(
+            "click",
+            function () {
+
+                window.location.href =
+                    "crear-accidente.html";
+            }
+        );
+    }
+
+
+    const closeButton =
+        document.getElementById(
+            "accidentConfirmationClose"
+        );
+
+
+    if (
+        closeButton
+    ) {
+
+        closeButton.addEventListener(
+            "click",
+            closeAccidentConfirmation
+        );
+    }
+
+
+    return modal;
+}
+
+
+/* =========================================================
+   MOSTRAR GUARDANDO
+   ========================================================= */
+
+function showAccidentSavingConfirmation(
+    isEditing
+) {
+
+    const modal =
+        ensureAccidentConfirmationModal();
+
+
+    const title =
+        document.getElementById(
+            "accidentConfirmationTitle"
+        );
+
+
+    const message =
+        document.getElementById(
+            "accidentConfirmationMessage"
+        );
+
+
+    const idBox =
+        document.getElementById(
+            "accidentConfirmationIdBox"
+        );
+
+
+    const actions =
+        document.getElementById(
+            "accidentConfirmationActions"
+        );
+
+
+    const photoCount =
+        Array.isArray(
+            window._pendingAccidentPhotoData
+        )
+
+            ? window._pendingAccidentPhotoData.length
+
+            : 0;
+
+
+    if (
+        title
+    ) {
+
+        title.textContent =
+            isEditing
+
+                ? "Actualizando registro"
+
+                : "Guardando registro";
+    }
+
+
+    if (
+        message
+    ) {
+
+        if (
+            photoCount > 0
+        ) {
+
+            message.textContent =
+                isEditing
+
+                    ? "Estamos actualizando el registro y guardando las fotografías. Este proceso puede tardar unos segundos."
+
+                    : "Estamos guardando el registro y las fotografías. Este proceso puede tardar unos segundos.";
+
+        } else {
+
+            message.textContent =
+                isEditing
+
+                    ? "Estamos actualizando la información. Espere un momento."
+
+                    : "Estamos guardando la información. Espere un momento.";
+        }
+    }
+
+
+    if (
+        idBox
+    ) {
+
+        idBox.style.display =
+            "none";
+    }
+
+
+    if (
+        actions
+    ) {
+
+        actions.style.display =
+            "none";
+    }
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+}
+
+
+/* =========================================================
+   MOSTRAR GUARDADO CORRECTAMENTE
+   ========================================================= */
+
+function showAccidentSavedConfirmation(
+    accident,
+    isEditing
+) {
+
+    const modal =
+        ensureAccidentConfirmationModal();
+
+
+    const title =
+        document.getElementById(
+            "accidentConfirmationTitle"
+        );
+
+
+    const message =
+        document.getElementById(
+            "accidentConfirmationMessage"
+        );
+
+
+    const idBox =
+        document.getElementById(
+            "accidentConfirmationIdBox"
+        );
+
+
+    const idText =
+        document.getElementById(
+            "accidentConfirmationRecordId"
+        );
+
+
+    const actions =
+        document.getElementById(
+            "accidentConfirmationActions"
+        );
+
+
+    const viewListButton =
+        document.getElementById(
+            "accidentConfirmationViewList"
+        );
+
+
+    if (
+        title
+    ) {
+
+        title.textContent =
+            isEditing
+
+                ? "Registro actualizado correctamente"
+
+                : "Registro creado correctamente";
+    }
+
+
+    if (
+        message
+    ) {
+
+        message.textContent =
+            isEditing
+
+                ? "Los cambios del daño o accidente fueron guardados correctamente."
+
+                : "El daño o accidente fue registrado correctamente.";
+    }
+
+
+    if (
+        idText
+    ) {
+
+        idText.textContent =
+            accident &&
+                accident.id
+
+                ? accident.id
+
+                : "";
+    }
+
+
+    if (
+        idBox
+    ) {
+
+        idBox.style.display =
+            "";
+    }
+
+
+    if (
+        actions
+    ) {
+
+        actions.style.display =
+            "";
+    }
+
+
+    if (
+        viewListButton
+    ) {
+
+        viewListButton.onclick =
+            function () {
+
+                const vehicle =
+                    accident &&
+                        accident.vehiculo
+
+                        ? accident.vehiculo
+
+                        : "";
+
+
+                window.location.href =
+                    vehicle
+
+                        ? "accidentes.html?vehicle=" +
+                        encodeURIComponent(
+                            vehicle
+                        )
+
+                        : "accidentes.html";
+            };
+    }
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+}
+
+
+/* =========================================================
+   CERRAR CUADRO DE CONFIRMACIÓN
+   ========================================================= */
+
+function closeAccidentConfirmation() {
+
+    const modal =
+        document.getElementById(
+            "accidentSaveConfirmation"
+        );
+
+
+    if (
+        modal
+    ) {
+
+        modal.classList.add(
+            "hidden"
+        );
+    }
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+}
+
+
+/* =========================================================
+   GUARDAR FORMULARIO DE DAÑO O ACCIDENTE
+   ========================================================= */
+
+async function saveAccidentRecord(
+    event
+) {
+
+    if (
+        event &&
+        typeof event.preventDefault ===
+        "function"
+    ) {
+
+        event.preventDefault();
+    }
+
+
+    if (
+        window._savingAccident
+    ) {
+
+        return;
+    }
+
+
+    const form =
+        document.getElementById(
+            "accidentForm"
+        );
+
+
+    if (
+        !form
+    ) {
+
+        return;
+    }
+
+
+    if (
+        !form.reportValidity()
+    ) {
+
+        return;
+    }
+
+
+    const latitude =
+        document.getElementById(
+            "accidentLatitude"
+        )?.value
+            .trim() || "";
+
+
+    const longitude =
+        document.getElementById(
+            "accidentLongitude"
+        )?.value
+            .trim() || "";
+
+
+    if (
+        !latitude ||
+        !longitude
+    ) {
+
+        alert(
+            "Debe seleccionar una ubicación usando el mapa, Buscar o Mi ubicación."
+        );
+
+
+        return;
+    }
+
+
+    if (
+        !navigator.onLine
+    ) {
+
+        alert(
+            "Se necesita conexión a Internet para guardar el daño o accidente."
+        );
+
+
+        return;
+    }
+
+
+    const hiddenId =
+        document.getElementById(
+            "accidentId"
+        )?.value
+            .trim()
+            .toUpperCase() || "";
+
+
+    const isEditing =
+        Boolean(
+            hiddenId
+        );
+
+
+    const accident = {
+
+        id:
+            hiddenId,
+
+        chofer:
+            document.getElementById(
+                "accidentDriver"
+            )?.value
+                .trim() || "",
+
+        fechaHora:
+            document.getElementById(
+                "accidentDateTime"
+            )?.value || "",
+
+        vehiculo:
+            document.getElementById(
+                "accidentVehicle"
+            )?.value || "",
+
+        placa:
+            document.getElementById(
+                "accidentPlate"
+            )?.value || "",
+
+        descripcion:
+            document.getElementById(
+                "accidentDescription"
+            )?.value
+                .trim() || "",
+
+        ocupantes:
+            document.getElementById(
+                "accidentOccupants"
+            )?.value
+                .trim() || "",
+
+        ubicacion:
+            document.getElementById(
+                "accidentLocation"
+            )?.value
+                .trim() || "",
+
+        longitud:
+            longitude,
+
+        latitud:
+            latitude,
+
+        altitud:
+            document.getElementById(
+                "accidentAltitude"
+            )?.value
+                .trim() || "",
+
+        precision:
+            document.getElementById(
+                "accidentAccuracy"
+            )?.value
+                .trim() || "",
+
+        personaReportada:
+            document.getElementById(
+                "accidentReportedTo"
+            )?.value
+                .trim() || "",
+
+        nuevasFotos:
+            Array.isArray(
+                window._pendingAccidentPhotoData
+            )
+
+                ? window._pendingAccidentPhotoData
+
+                : []
+
+    };
+
+
+    const submitButton =
+        form.querySelector(
+            'button[type="submit"]'
+        );
+
+
+    const originalButtonText =
+        submitButton
+
+            ? submitButton.textContent
+
+            : "Guardar registro";
+
+
+    try {
+
+        window._savingAccident =
+            true;
+
+
+        if (
+            submitButton
+        ) {
+
+            submitButton.disabled =
+                true;
+
+
+            submitButton.textContent =
+                isEditing
+
+                    ? "Actualizando registro..."
+
+                    : "Guardando registro...";
+        }
+
+
+        showAccidentSavingConfirmation(
+            isEditing
+        );
+
+
+        const savedAccident =
+            await saveAccidentOnServer(
+                accident,
+                isEditing
+
+                    ? "update"
+
+                    : "create"
+            );
+
+
+        const idInput =
+            document.getElementById(
+                "accidentId"
+            );
+
+
+        if (
+            idInput
+        ) {
+
+            idInput.value =
+                savedAccident.id ||
+                "";
+        }
+
+
+        const dateInput =
+            document.getElementById(
+                "accidentDateTime"
+            );
+
+
+        if (
+            dateInput &&
+            savedAccident.fechaHora
+        ) {
+
+            dateInput.value =
+                savedAccident.fechaHora;
+        }
+
+
+        /*
+            Las fotos nuevas ya quedaron guardadas
+            permanentemente en Google Drive.
+        */
+
+        window._pendingAccidentPhotoData =
+            [];
+
+
+        const photoInput =
+            document.getElementById(
+                "accidentPhotos"
+            );
+
+
+        if (
+            photoInput
+        ) {
+
+            photoInput.value =
+                "";
+        }
+
+
+        const preview =
+            document.getElementById(
+                "accidentPhotoPreview"
+            );
+
+
+        if (
+            preview
+        ) {
+
+            preview.innerHTML =
+                "";
+        }
+
+
+        showAccidentSavedConfirmation(
+            savedAccident,
+            isEditing
+        );
+
+
+    } catch (
+    error
+    ) {
+
+        console.error(
+            "Error al guardar daño o accidente.",
+            error
+        );
+
+
+        closeAccidentConfirmation();
+
+
+        alert(
+            error &&
+                error.message
+
+                ? error.message
+
+                : "No fue posible guardar el daño o accidente."
+        );
+
+
+    } finally {
+
+        window._savingAccident =
+            false;
+
+
+        if (
+            submitButton
+        ) {
+
+            submitButton.disabled =
+                false;
+
+
+            submitButton.textContent =
+                originalButtonText;
+        }
+    }
 }
