@@ -1,44 +1,75 @@
+/* =========================================================
+   ASADA OROSI - ESTILOS GENERALES
+   ========================================================= */
+
 * {
     box-sizing: border-box;
 }
 
-body {
-    margin: 0;
-    background: #101214;
-    color: #f4f5f7;
-    font-family: Inter, Segoe UI, Arial, sans-serif;
+html {
+    min-height: 100%;
 }
 
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #101214;
+    color: #f4f5f7;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================================
+   BARRA SUPERIOR
+   ========================================================= */
+
 .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
     height: 64px;
-    background: #242526;
-    border-bottom: 1px solid #3b3d40;
+
     display: flex;
     align-items: center;
     gap: 18px;
+
     padding: 0 18px;
-    position: sticky;
-    top: 0;
-    z-index: 20;
+
+    background: #242526;
+
+    border-bottom: 1px solid #3b3d40;
 }
 
 .menu-btn {
     border: 0;
     background: transparent;
-    color: #fff;
+    color: #ffffff;
     font-size: 23px;
     cursor: pointer;
 }
 
 .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: 20px;
     font-weight: 600;
-    display: flex;
-    gap: 12px;
-    align-items: center;
 }
 
-/* Estilo para tu logo de la ASADA */
 .brand-logo {
     width: 45px;
     height: 45px;
@@ -46,17 +77,31 @@ body {
     object-fit: cover;
 }
 
+
+/* =========================================================
+   MENÚ LATERAL
+   ========================================================= */
+
 .side-menu {
     position: fixed;
+
     left: -280px;
     top: 64px;
     bottom: 0;
+
+    z-index: 1100;
+
     width: 280px;
-    background: #202224;
-    border-right: 1px solid #383a3d;
-    z-index: 30;
+
     padding: 18px;
-    transition: .25s;
+
+    overflow-y: auto;
+
+    background: #202224;
+
+    border-right: 1px solid #383a3d;
+
+    transition: left .25s ease;
 }
 
 .side-menu.open {
@@ -65,44 +110,58 @@ body {
 
 .side-menu a {
     display: block;
-    color: #ddd;
-    text-decoration: none;
+    margin-bottom: 5px;
     padding: 14px 16px;
     border-radius: 10px;
-    margin-bottom: 5px;
+    color: #dddddd;
+    text-decoration: none;
 }
 
-.side-menu a:hover {
+.side-menu a:hover,
+.side-menu a:focus-visible {
     background: #303236;
-    color: #fff;
+    color: #ffffff;
+    outline: none;
 }
+
+
+/* =========================================================
+   PÁGINAS
+   ========================================================= */
 
 .page {
-    max-width: 1120px;
-    margin: auto;
+    width: min(1120px, 100%);
+    margin: 0 auto;
     padding: 34px 24px 70px;
 }
 
 .hero {
+    margin-bottom: 28px;
     padding: 38px;
+
     border: 1px solid #34373b;
     border-radius: 22px;
-    background: linear-gradient(145deg, #202326, #151719);
-    box-shadow: 0 20px 60px #0005;
-    margin-bottom: 28px;
+
+    background:
+        linear-gradient(145deg,
+            #202326,
+            #151719);
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, .33);
 }
 
 .eyebrow {
-    font-size: 12px;
-    letter-spacing: 2px;
     color: #20d4b4;
+    font-size: 12px;
     font-weight: 700;
+    letter-spacing: 2px;
 }
 
 .hero h1,
 .page-head h1 {
-    font-size: 34px;
     margin: 8px 0;
+    font-size: 34px;
 }
 
 .hero p,
@@ -110,38 +169,60 @@ body {
     color: #aeb3ba;
 }
 
-/* Botones de navegación */
+.page-head {
+    margin-bottom: 25px;
+}
+
 .nav-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
 .btn-back {
     display: inline-flex;
     align-items: center;
+
     gap: 8px;
-    color: #aeb3ba;
-    text-decoration: none;
-    font-size: 14px;
-    background: #1b1d20;
+
     padding: 8px 16px;
-    border-radius: 8px;
+
     border: 1px solid #34373b;
-    transition: 0.2s;
+    border-radius: 8px;
+
+    background: #1b1d20;
+
+    color: #aeb3ba;
+
+    font-size: 14px;
+
+    text-decoration: none;
+
+    transition: .2s ease;
 }
 
-.btn-back:hover {
+.btn-back:hover,
+.btn-back:focus-visible {
     background: #303338;
-    color: #fff;
+    color: #ffffff;
+    outline: none;
 }
 
 .connection {
     display: inline-block;
+
     margin-top: 15px;
+
     padding: 8px 12px;
+
     border-radius: 20px;
-    font-size: 13px;
+
     background: #17372f;
+
     color: #63e6c9;
+
+    font-size: 13px;
 }
 
 .connection.offline {
@@ -149,22 +230,38 @@ body {
     color: #ffc27d;
 }
 
+
+/* =========================================================
+   MENÚ DE TARJETAS
+   ========================================================= */
+
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns:
+        repeat(2,
+            minmax(0, 1fr));
+
     gap: 18px;
 }
 
 .menu-card {
-    background: #1d1f22;
+    position: relative;
+
+    min-height: 210px;
+
+    padding: 28px;
+
     border: 1px solid #34373b;
     border-radius: 18px;
-    padding: 28px;
+
+    background: #1d1f22;
+
+    color: #ffffff;
+
     text-decoration: none;
-    color: #fff;
-    min-height: 210px;
-    transition: .2s;
-    position: relative;
+
+    transition: .2s ease;
 }
 
 .menu-card:hover {
@@ -173,10 +270,13 @@ body {
 }
 
 .menu-card.wide {
-    grid-column: 1/-1;
+    grid-column: 1 / -1;
+
     min-height: 130px;
+
     display: flex;
     align-items: center;
+
     gap: 22px;
 }
 
@@ -194,29 +294,41 @@ body {
 
 .menu-card span {
     position: absolute;
+
     right: 25px;
     bottom: 22px;
+
     color: #43ddc0;
 }
 
-.page-head {
-    margin-bottom: 25px;
-}
+
+/* =========================================================
+   VEHÍCULOS
+   ========================================================= */
 
 .vehicle-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+
+    grid-template-columns:
+        repeat(auto-fit,
+            minmax(270px, 1fr));
+
     gap: 18px;
 }
 
 .vehicle-card {
-    background: #1b1d20;
+    overflow: hidden;
+
     border: 1px solid #36393d;
     border-radius: 16px;
-    overflow: hidden;
+
+    background: #1b1d20;
+
+    color: #ffffff;
+
     text-decoration: none;
-    color: #fff;
-    transition: .2s;
+
+    transition: .2s ease;
 }
 
 .vehicle-card:hover {
@@ -224,16 +336,23 @@ body {
     border-color: #60666e;
 }
 
-/* Fotos de vehículos sin emojis, diseño sobrio */
 .vehicle-photo {
     height: 140px;
-    background: linear-gradient(135deg, #24272b, #1a1c1f);
+
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    font-weight: bold;
+
+    background:
+        linear-gradient(135deg,
+            #24272b,
+            #1a1c1f);
+
     color: #43ddc0;
+
+    font-size: 24px;
+    font-weight: 700;
+
     letter-spacing: 1px;
 }
 
@@ -255,16 +374,112 @@ body {
     font-size: 13px;
 }
 
-.form-shell {
-    background: #181a1d;
-    border: 1px solid #34373b;
+
+/* =========================================================
+   SELECCIÓN DE VEHÍCULOS
+   ========================================================= */
+
+.vehicle-selection-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,
+            minmax(0, 1fr));
+
+    gap: 24px;
+
+    margin-top: 30px;
+}
+
+.vehicle-selection-card {
+    width: 100%;
+    min-height: 210px;
+
+    padding: 0;
+
+    border:
+        1px solid rgba(255, 255, 255, .08);
+
     border-radius: 20px;
+
+    background: #1c1f24;
+
+    color: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.vehicle-selection-card:hover {
+    transform: translateY(-4px);
+
+    border-color: #20cdb0;
+
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, .18);
+}
+
+.vehicle-selection-content {
+    min-height: 210px;
+
+    padding: 28px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.vehicle-selection-label {
+    margin-bottom: 18px;
+
+    color: #20cdb0;
+
+    font-size: .75rem;
+
+    font-weight: 700;
+
+    letter-spacing: .12em;
+}
+
+.vehicle-selection-card h2 {
+    margin: 0 0 10px;
+    font-size: 1.45rem;
+}
+
+.vehicle-selection-card p {
+    margin: 0;
+    opacity: .75;
+}
+
+.vehicle-selection-action {
+    margin-top: auto;
+    padding-top: 25px;
+    color: #20cdb0;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+.form-shell {
     overflow: hidden;
+
+    border: 1px solid #34373b;
+
+    border-radius: 20px;
+
+    background: #181a1d;
 }
 
 .form-section {
     padding: 25px;
-    border-bottom: 1px solid #303236;
+
+    border-bottom:
+        1px solid #303236;
 }
 
 .form-section:last-of-type {
@@ -272,21 +487,28 @@ body {
 }
 
 .form-section h2 {
-    font-size: 18px;
     margin: 0 0 18px;
+    font-size: 18px;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+
+    grid-template-columns:
+        repeat(2,
+            minmax(0, 1fr));
+
     gap: 18px;
 }
 
 label {
     display: flex;
     flex-direction: column;
+
     gap: 8px;
+
     color: #dfe2e6;
+
     font-size: 14px;
 }
 
@@ -294,24 +516,38 @@ input,
 select,
 textarea {
     width: 100%;
-    background: #101214;
-    color: #f4f5f7;
-    border: 1px solid #44484d;
-    border-radius: 10px;
+
     padding: 12px 13px;
-    font: inherit;
+
+    border: 1px solid #44484d;
+
+    border-radius: 10px;
+
     outline: none;
+
+    background: #101214;
+
+    color: #f4f5f7;
+
+    font: inherit;
+}
+
+textarea {
+    resize: vertical;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     border-color: #20cdb0;
+
+    box-shadow:
+        0 0 0 3px rgba(32, 205, 176, .10);
 }
 
 input[readonly] {
-    color: #9ea5ad;
     background: #151719;
+    color: #9ea5ad;
 }
 
 .choice-row,
@@ -323,18 +559,25 @@ input[readonly] {
 
 .choice,
 .multi-choice {
-    border: 1px solid #45494e;
-    background: #25282c;
-    color: #dfe3e7;
-    border-radius: 11px;
     padding: 12px 15px;
+
+    border: 1px solid #45494e;
+
+    border-radius: 11px;
+
+    background: #25282c;
+
+    color: #dfe3e7;
+
     cursor: pointer;
 }
 
 .choice.selected,
 .multi-choice.selected {
-    background: #123d36;
     border-color: #20cdb0;
+
+    background: #123d36;
+
     color: #73f0d5;
 }
 
@@ -343,12 +586,17 @@ input[readonly] {
 }
 
 .upload-box {
-    border: 1px dashed #555b61;
-    border-radius: 14px;
     padding: 28px;
-    text-align: center;
-    cursor: pointer;
+
+    border: 1px dashed #555b61;
+
+    border-radius: 14px;
+
     background: #131517;
+
+    text-align: center;
+
+    cursor: pointer;
 }
 
 .upload-box input {
@@ -357,47 +605,91 @@ input[readonly] {
 
 .upload-box span {
     display: block;
+
     font-size: 16px;
+
     font-weight: 600;
 }
 
 .upload-box small {
     display: block;
-    color: #8f969e;
+
     margin-top: 8px;
+
+    color: #8f969e;
 }
 
 .photo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+
+    grid-template-columns:
+        repeat(auto-fill,
+            minmax(120px, 1fr));
+
     gap: 10px;
+
     margin-top: 14px;
 }
 
 .photo-grid img {
     width: 100%;
+
     height: 120px;
+
     object-fit: cover;
-    border-radius: 10px;
+
     border: 1px solid #3c4045;
+
+    border-radius: 10px;
+}
+
+.accident-photo-preview-item {
+    width: 100%;
+}
+
+.accident-photo-preview-item img {
+    width: 100%;
+
+    height: 150px;
+
+    object-fit: cover;
+
+    border: 1px solid #3c4045;
+
+    border-radius: 10px;
 }
 
 .form-actions {
     padding: 20px 25px;
+
     display: flex;
+
     justify-content: flex-end;
+
     gap: 10px;
+
     background: #151719;
 }
 
 .btn {
-    border: 0;
-    border-radius: 10px;
     padding: 12px 18px;
-    text-decoration: none;
-    cursor: pointer;
-    font-weight: 600;
+
+    border: 0;
+
+    border-radius: 10px;
+
     font-size: 14px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.btn:disabled {
+    cursor: wait;
+    opacity: .65;
 }
 
 .primary {
@@ -410,209 +702,30 @@ input[readonly] {
     color: #e9eaec;
 }
 
-.detail-shell {
-    background: #181a1d;
-    border: 1px solid #34373b;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.detail-title {
-    padding: 28px;
-    border-bottom: 1px solid #34373b;
-}
-
-.detail-title h1 {
-    margin: 5px 0;
-}
-
-.detail-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
-
-.detail-item {
-    padding: 20px 24px;
-    border-bottom: 1px solid #2c2f33;
-}
-
-.detail-item.full {
-    grid-column: 1/-1;
-}
-
-.detail-label {
-    color: #9299a1;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.detail-value {
-    margin-top: 6px;
-    line-height: 1.5;
-}
-
-.tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-}
-
-.tag {
-    background: #28302e;
-    border: 1px solid #3d6d63;
-    border-radius: 20px;
-    padding: 6px 9px;
-    font-size: 12px;
-}
-
-.detail-actions {
-    padding: 20px 24px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.photo-detail {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-}
-
-.photo-detail img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 10px;
-}
-
-.export-card {
-    background: #1b1d20;
-    border: 1px solid #36393d;
-    border-radius: 18px;
-    padding: 25px;
-    max-width: 520px;
-}
-
-.export-card .btn {
-    margin-top: 20px;
-}
-
 .note {
     color: #9299a1;
+
     font-size: 13px;
+
     line-height: 1.5;
 }
 
-@media(max-width:700px) {
-    .page {
-        padding: 22px 14px;
-    }
-
-    .menu-grid,
-    .form-grid,
-    .detail-list {
-        grid-template-columns: 1fr;
-    }
-
-    .menu-card.wide {
-        grid-column: auto;
-    }
-
-    .hero {
-        padding: 25px;
-    }
-
-    .hero h1,
-    .page-head h1 {
-        font-size: 28px;
-    }
-
-    .form-section {
-        padding: 20px;
-    }
-
-    .detail-item.full {
-        grid-column: auto;
-    }
-}
 
 /* =========================================================
-   SELECCIÓN DE VEHÍCULOS
-   ========================================================= */
-
-.vehicle-selection-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 24px;
-    margin-top: 30px;
-}
-
-.vehicle-selection-card {
-    width: 100%;
-    min-height: 210px;
-    padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    background: #1c1f24;
-    color: inherit;
-    text-align: left;
-    cursor: pointer;
-    font-family: inherit;
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.vehicle-selection-card:hover {
-    transform: translateY(-4px);
-    border-color: #20cdb0;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
-}
-
-.vehicle-selection-content {
-    min-height: 210px;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-}
-
-.vehicle-selection-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #20cdb0;
-    margin-bottom: 18px;
-}
-
-.vehicle-selection-card h2 {
-    margin: 0 0 10px;
-    font-size: 1.45rem;
-}
-
-.vehicle-selection-card p {
-    margin: 0;
-    opacity: 0.75;
-}
-
-.vehicle-selection-action {
-    margin-top: auto;
-    padding-top: 25px;
-    font-weight: 700;
-    color: #20cdb0;
-}
-
-
-/* =========================================================
-   FILTROS DE REGISTROS
+   FILTROS
    ========================================================= */
 
 .record-filters {
     margin: 25px 0 30px;
+
     padding: 25px;
+
+    border:
+        1px solid rgba(255, 255, 255, .07);
+
     border-radius: 18px;
+
     background: #1c1f24;
-    border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .record-filter-title {
@@ -625,31 +738,30 @@ input[readonly] {
 
 .record-filter-title p {
     margin: 0;
-    opacity: 0.7;
+    opacity: .7;
 }
 
 .record-filter-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    grid-template-columns:
+        repeat(2,
+            minmax(0, 1fr));
+
     gap: 18px;
 }
 
 .record-filter-grid label {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
     font-weight: 600;
-}
-
-.record-filter-grid input {
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .search-actions {
     display: flex;
+
+    flex-wrap: wrap;
+
     gap: 12px;
+
     margin-top: 20px;
 }
 
@@ -665,27 +777,42 @@ input[readonly] {
 
 .record-card {
     padding: 24px;
+
+    border:
+        1px solid rgba(255, 255, 255, .07);
+
     border-radius: 18px;
+
     background: #1c1f24;
-    border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .record-card-top {
     display: flex;
+
     justify-content: space-between;
+
     align-items: flex-start;
+
     gap: 20px;
+
     padding-bottom: 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, .07);
 }
 
 .record-label {
     display: block;
+
     margin-bottom: 7px;
+
     color: #20cdb0;
-    font-size: 0.72rem;
+
+    font-size: .72rem;
+
     font-weight: 700;
-    letter-spacing: 0.12em;
+
+    letter-spacing: .12em;
 }
 
 .record-card-top h2 {
@@ -695,19 +822,27 @@ input[readonly] {
 
 .record-vehicle {
     display: flex;
+
     flex-direction: column;
+
     align-items: flex-end;
+
     gap: 4px;
 }
 
 .record-vehicle span {
-    opacity: 0.7;
+    opacity: .7;
 }
 
 .record-data-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    grid-template-columns:
+        repeat(3,
+            minmax(0, 1fr));
+
     gap: 20px;
+
     padding: 20px 0;
 }
 
@@ -718,12 +853,12 @@ input[readonly] {
 }
 
 .record-data span {
-    font-size: 0.78rem;
-    opacity: 0.65;
+    font-size: .78rem;
+    opacity: .65;
 }
 
 .record-data strong {
-    font-size: 0.95rem;
+    font-size: .95rem;
 }
 
 .record-card-actions {
@@ -731,20 +866,48 @@ input[readonly] {
     justify-content: flex-end;
 }
 
+.empty-state,
+.export-card {
+    padding: 25px;
+
+    border: 1px solid #36393d;
+
+    border-radius: 18px;
+
+    background: #1b1d20;
+}
+
+.export-card {
+    max-width: 520px;
+}
+
+.export-card .btn {
+    margin-top: 20px;
+}
+
 
 /* =========================================================
-   CUADRO DE CONFIRMACIÓN
+   CONFIRMACIÓN
    ========================================================= */
 
 .confirmation-overlay {
     position: fixed;
+
     inset: 0;
+
     z-index: 9999;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     padding: 24px;
-    background: rgba(0, 0, 0, 0.72);
+
+    background:
+        rgba(0, 0, 0, .72);
+
     backdrop-filter: blur(7px);
 }
 
@@ -758,25 +921,39 @@ body.modal-open {
 
 .confirmation-modal {
     width: min(100%, 520px);
+
     overflow: hidden;
+
+    border:
+        1px solid rgba(255, 255, 255, .09);
+
     border-radius: 22px;
+
     background: #1c1f24;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, .35);
 }
 
 .confirmation-header {
     padding: 30px 30px 22px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, .07);
 }
 
 .confirmation-label {
     display: block;
+
     margin-bottom: 10px;
+
     color: #20cdb0;
-    font-size: 0.75rem;
+
+    font-size: .75rem;
+
     font-weight: 700;
-    letter-spacing: 0.12em;
+
+    letter-spacing: .12em;
 }
 
 .confirmation-header h2 {
@@ -790,713 +967,193 @@ body.modal-open {
 
 .confirmation-body p {
     margin: 0 0 20px;
+
     line-height: 1.6;
-    opacity: 0.82;
+
+    opacity: .82;
 }
 
 .confirmation-id-box {
     padding: 18px 20px;
+
+    border:
+        1px solid rgba(32, 205, 176, .25);
+
     border-radius: 14px;
-    background: rgba(32, 205, 176, 0.08);
-    border: 1px solid rgba(32, 205, 176, 0.25);
+
+    background:
+        rgba(32, 205, 176, .08);
 }
 
 .confirmation-id-box span {
     display: block;
+
     margin-bottom: 6px;
-    font-size: 0.78rem;
-    opacity: 0.7;
+
+    font-size: .78rem;
+
+    opacity: .7;
 }
 
 .confirmation-id-box strong {
     font-size: 1.5rem;
-    letter-spacing: 0.08em;
+
+    letter-spacing: .08em;
 }
 
 .confirmation-actions {
     display: flex;
+
     flex-wrap: wrap;
+
     gap: 10px;
+
     padding: 0 30px 30px;
 }
 
 
 /* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 900px) {
-
-    .vehicle-selection-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .record-data-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .record-filter-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-
-@media (max-width: 600px) {
-
-    .confirmation-actions {
-        flex-direction: column;
-    }
-
-    .confirmation-actions .btn {
-        width: 100%;
-    }
-
-    .record-card-top {
-        flex-direction: column;
-    }
-
-    .record-vehicle {
-        align-items: flex-start;
-    }
-}
-
-/* =========================================================
-   DETALLE DEL REGISTRO
+   DETALLE
    ========================================================= */
 
 .detail-page {
-    max-width: 1250px;
+    width: min(1180px, 100%);
+
     margin: 0 auto;
+
     padding-bottom: 60px;
 }
 
-
-/* =========================================================
-   NAVEGACIÓN SUPERIOR DEL DETALLE
-   ========================================================= */
-
-.detail-page .nav-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+.detail-page-head,
+.detail-page .page-head {
     margin-bottom: 28px;
 }
 
-.detail-page .btn-back {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 40px;
-    padding: 0 18px;
-
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 9px;
-
-    background: #171a1f;
-    color: #f2f4f7;
-
-    text-decoration: none;
-    font-size: 0.83rem;
-    font-weight: 600;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.detail-page .btn-back:hover {
-    background: #20242a;
-    border-color: rgba(32, 205, 176, 0.6);
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   ENCABEZADO
-   ========================================================= */
-
-.detail-page .page-head {
-    margin-bottom: 26px;
-}
-
+.detail-page-head .eyebrow,
 .detail-page .page-head .eyebrow {
     display: block;
     margin-bottom: 10px;
-
-    color: #20cdb0;
-
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
 }
 
+.detail-page-head h1,
 .detail-page .page-head h1 {
     margin: 0 0 10px;
 
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1.1;
-
     color: #ffffff;
+
+    font-size:
+        clamp(2rem,
+            4vw,
+            3rem);
+
+    line-height: 1.1;
 }
 
+.detail-page-head p,
 .detail-page .page-head p {
     max-width: 650px;
+
     margin: 0;
 
     color: #9ca3af;
+
     line-height: 1.7;
 }
 
-
-/* =========================================================
-   CONTENEDOR GENERAL
-   ========================================================= */
-
 .detail-shell {
     display: grid;
+
     gap: 22px;
 
     width: 100%;
+
+    overflow: visible;
+
+    border: 0;
+
+    border-radius: 0;
+
+    background: transparent;
 }
 
-
-/* =========================================================
-   CADA SECCIÓN DEL DETALLE
-   ========================================================= */
-
+.detail-card,
 .detail-section {
     position: relative;
 
     padding: 28px;
 
-    background: #171a1f;
+    overflow: hidden;
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border:
+        1px solid rgba(255, 255, 255, .08);
+
     border-radius: 18px;
 
-    box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.12);
+    background: #171a1f;
 
-    overflow: hidden;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, .12);
 }
 
+.detail-card::before,
 .detail-section::before {
     content: "";
 
     position: absolute;
-    top: 0;
-    left: 0;
+
+    inset: 0 auto 0 0;
 
     width: 4px;
-    height: 100%;
 
     background: #20cdb0;
 }
 
+.detail-card-header,
 .detail-section h2 {
     margin: 0 0 22px;
-
-    color: #ffffff;
-
-    font-size: 1.08rem;
-    font-weight: 700;
-    line-height: 1.4;
 }
 
-
-/* =========================================================
-   INFORMACIÓN DEL VEHÍCULO
-   ========================================================= */
-
-.detail-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 16px;
-}
-
-.detail-field {
-    min-height: 92px;
-
-    padding: 18px;
-
-    background: #111419;
-
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-}
-
-.detail-label {
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #8b949e;
-
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.detail-field-value {
-    color: #f8fafc;
-
-    font-size: 1rem;
-    font-weight: 600;
-
-    line-height: 1.5;
-
-    word-break: break-word;
-}
-
-
-/* =========================================================
-   VALORES INDIVIDUALES
-   ========================================================= */
-
-.detail-single-value {
-    display: flex;
-    align-items: center;
-
-    min-height: 58px;
-
-    padding: 16px 18px;
-
-    background: #111419;
-
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-
-    color: #ffffff;
-
-    font-size: 1rem;
-    font-weight: 600;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   PUNTOS REVISADOS
-   ========================================================= */
-
-.detail-check-list {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 12px;
-}
-
-.detail-review-point {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 16px;
-
-    min-height: 62px;
-
-    padding: 14px 16px;
-
-    background: #111419;
-
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-}
-
-.review-point-name {
-    color: #e5e7eb;
-
-    font-size: 0.92rem;
-    font-weight: 600;
-
-    line-height: 1.4;
-}
-
-.review-point-status {
-    flex-shrink: 0;
-
-    padding: 6px 10px;
-
-    border-radius: 7px;
-
-    background: rgba(32, 205, 176, 0.1);
-
-    border: 1px solid rgba(32, 205, 176, 0.25);
-
-    color: #20cdb0;
-
-    font-size: 0.72rem;
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   COMENTARIOS
-   ========================================================= */
-
-.detail-comment-block {
-    padding: 18px;
-
-    background: #111419;
-
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-}
-
-.detail-comment-block p {
-    margin: 0;
-
-    color: #e5e7eb;
-
-    font-size: 0.94rem;
-
-    line-height: 1.7;
-
-    white-space: pre-wrap;
-}
-
-
-/* =========================================================
-   FOTOGRAFÍAS
-   ========================================================= */
-
-.photo-detail {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    gap: 16px;
-}
-
-.detail-photo {
-    position: relative;
-
-    min-height: 220px;
-
-    background: #111419;
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-
-    overflow: hidden;
-}
-
-.detail-photo img {
-    display: block;
-
-    width: 100%;
-    height: 230px;
-
-    object-fit: cover;
-
-    transition: transform 0.25s ease;
-}
-
-.detail-photo:hover img {
-    transform: scale(1.025);
-}
-
-.detail-no-photos {
-    padding: 22px;
-
-    background: #111419;
-
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-
-    color: #9ca3af;
-
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   BOTÓN EDITAR
-   ========================================================= */
-
-.detail-actions {
-    display: flex;
-    justify-content: flex-end;
-
-    margin-top: 2px;
-}
-
-.detail-actions .btn.primary {
-    min-width: 160px;
-
-    padding: 12px 20px;
-
-    border-radius: 10px;
-
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   NAVEGACIÓN INFERIOR
-   ========================================================= */
-
-.detail-shell+.nav-actions,
-.detail-bottom-navigation {
-    margin-top: 28px;
-}
-
-
-/* =========================================================
-   MEJORAS DE ESPACIADO
-   ========================================================= */
-
-.detail-section>*:last-child {
-    margin-bottom: 0;
-}
-
-.detail-section p:last-child {
-    margin-bottom: 0;
-}
-
-
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (max-width: 900px) {
-
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .detail-check-list {
-        grid-template-columns: 1fr;
-    }
-
-    .photo-detail {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-}
-
-
-/* =========================================================
-   CELULAR
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-    .detail-page {
-        padding-left: 14px;
-        padding-right: 14px;
-    }
-
-    .detail-section {
-        padding: 20px;
-        border-radius: 14px;
-    }
-
-    .detail-page .nav-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .detail-page .btn-back {
-        width: 100%;
-    }
-
-    .detail-review-point {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .photo-detail {
-        grid-template-columns: 1fr;
-    }
-
-    .detail-photo {
-        min-height: 250px;
-    }
-
-    .detail-photo img {
-        height: 260px;
-    }
-
-    .detail-actions {
-        justify-content: stretch;
-    }
-
-    .detail-actions .btn.primary {
-        width: 100%;
-        text-align: center;
-    }
-
-}
-
-/* =========================================================
-   PANTALLAS MUY PEQUEÑAS
-   ========================================================= */
-
-@media (max-width: 400px) {
-
-    .detail-page .nav-actions {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-/* =========================================================
-   NUEVO DISEÑO DEL DETALLE
-   ========================================================= */
-
-.detail-page {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding-bottom: 60px;
-}
-
-
-/* =========================================================
-   ENCABEZADO
-   ========================================================= */
-
-.detail-page-head {
-    margin-bottom: 28px;
-}
-
-.detail-page-head .eyebrow {
-    display: block;
-    margin-bottom: 10px;
-
-    color: #20cdb0;
-
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-}
-
-.detail-page-head h1 {
-    margin: 0 0 8px;
-
-    color: #ffffff;
-
-    font-size: 36px;
-    line-height: 1.2;
-}
-
-.detail-page-head p {
-    margin: 0;
-
-    color: #9da3aa;
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   CONTENEDOR
-   ========================================================= */
-
-.detail-shell {
-    display: grid;
-    gap: 22px;
-
-    width: 100%;
-
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    overflow: visible;
-}
-
-
-/* =========================================================
-   LOS DOS CUADROS PRINCIPALES
-   ========================================================= */
-
-.detail-card {
-    position: relative;
-
-    width: 100%;
-
-    padding: 30px;
-
-    background: #181a1d;
-
-    border: 1px solid #34373b;
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.12);
-}
-
-
-/* Línea discreta al lado izquierdo */
-
-.detail-card::before {
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 4px;
-    height: 100%;
-
-    background: #20cdb0;
-}
-
-
-/* =========================================================
-   TÍTULO DE CADA CUADRO
-   ========================================================= */
-
-.detail-card-header {
-    margin-bottom: 25px;
-}
-
-.detail-card-header h2 {
+.detail-card-header h2,
+.detail-section h2 {
     margin: 0;
 
     color: #ffffff;
 
     font-size: 18px;
-    font-weight: 700;
 }
 
-
-/* =========================================================
-   INFORMACIÓN DEL VEHÍCULO
-   ========================================================= */
-
-.vehicle-info-grid {
+.vehicle-info-grid,
+.detail-grid,
+.detail-two-columns {
     display: grid;
 
     grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+        repeat(2,
+            minmax(0, 1fr));
 
-    column-gap: 45px;
-    row-gap: 25px;
+    gap: 20px 45px;
 }
 
-
-/*
-   Ya no hacemos cuatro cuadritos dentro
-   del cuadro principal.
-*/
-
-.detail-info {
+.detail-info,
+.detail-data-block,
+.detail-field {
     min-width: 0;
 }
 
+.detail-field,
+.detail-single-value,
+.detail-comment-block {
+    padding: 18px;
+
+    border:
+        1px solid rgba(255, 255, 255, .07);
+
+    border-radius: 12px;
+
+    background: #111419;
+}
+
+.detail-label,
 .detail-info-label {
     display: block;
 
@@ -1505,18 +1162,22 @@ body.modal-open {
     color: #89919a;
 
     font-size: 11px;
+
     font-weight: 700;
 
-    letter-spacing: 0.08em;
+    letter-spacing: .08em;
+
     text-transform: uppercase;
 }
 
-.detail-info strong {
-    display: block;
-
+.detail-info strong,
+.detail-data-block strong,
+.detail-field-value,
+.detail-single-value {
     color: #f4f5f7;
 
     font-size: 15px;
+
     font-weight: 600;
 
     line-height: 1.5;
@@ -1524,26 +1185,11 @@ body.modal-open {
     word-break: break-word;
 }
 
-
-/* =========================================================
-   SEGUNDO CUADRO
-   ========================================================= */
-
-.detail-review-card {
-    padding-bottom: 25px;
-}
-
-
-/*
-   Cada grupo está dentro del mismo cuadro.
-   Solamente usamos una línea para separarlos.
-*/
-
 .detail-group {
     padding: 23px 0;
 
     border-bottom:
-        1px solid rgba(255, 255, 255, 0.07);
+        1px solid rgba(255, 255, 255, .07);
 }
 
 .detail-group:first-of-type {
@@ -1551,134 +1197,117 @@ body.modal-open {
 }
 
 .detail-group:last-of-type {
-    border-bottom: none;
+    border-bottom: 0;
 }
-
-
-/* =========================================================
-   DOS COLUMNAS
-   ========================================================= */
-
-.detail-two-columns {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 45px;
-}
-
-.detail-data-block {
-    min-width: 0;
-}
-
-.detail-data-block strong {
-    display: block;
-
-    color: #f4f5f7;
-
-    font-size: 15px;
-    font-weight: 600;
-
-    line-height: 1.5;
-
-    word-break: break-word;
-}
-
-
-/* =========================================================
-   PUNTOS REVISADOS
-   ========================================================= */
 
 .detail-group-title {
     margin-bottom: 14px;
 }
 
-.selected-review-points {
+.selected-review-points,
+.tags {
     display: flex;
     flex-wrap: wrap;
-
     gap: 9px;
 }
 
-.selected-review-point {
+.selected-review-point,
+.tag,
+.review-point-status {
     display: inline-flex;
     align-items: center;
 
-    min-height: 34px;
-
     padding: 7px 13px;
+
+    border:
+        1px solid rgba(32, 205, 176, .32);
 
     border-radius: 8px;
 
     background:
-        rgba(32, 205, 176, 0.08);
-
-    border:
-        1px solid rgba(32, 205, 176, 0.32);
+        rgba(32, 205, 176, .08);
 
     color: #6fe7d1;
 
     font-size: 13px;
+
     font-weight: 600;
 }
 
+.detail-check-list {
+    display: grid;
 
-/* Cuando no revisó ninguno */
+    grid-template-columns:
+        repeat(2,
+            minmax(0, 1fr));
 
-.no-review-points {
-    margin: 0;
-
-    color: #9da3aa;
-
-    font-size: 14px;
-    line-height: 1.6;
+    gap: 12px;
 }
 
+.detail-review-point {
+    display: flex;
 
-/* =========================================================
-   TEXTOS Y COMENTARIOS
-   ========================================================= */
+    align-items: center;
 
-.detail-text {
+    justify-content: space-between;
+
+    gap: 16px;
+
+    min-height: 62px;
+
+    padding: 14px 16px;
+
+    border:
+        1px solid rgba(255, 255, 255, .07);
+
+    border-radius: 12px;
+
+    background: #111419;
+}
+
+.review-point-name {
+    color: #e5e7eb;
+
+    font-size: .92rem;
+
+    font-weight: 600;
+}
+
+.detail-text,
+.detail-comment-block p {
     margin: 0;
 
     color: #e2e5e9;
-
-    font-size: 14px;
 
     line-height: 1.75;
 
     white-space: pre-wrap;
 }
 
+.no-review-points,
+.detail-no-photos {
+    color: #9da3aa;
 
-/* =========================================================
-   FOTOGRAFÍAS
-   ========================================================= */
-
-.detail-photo-group {
-    padding-bottom: 10px;
+    line-height: 1.6;
 }
 
 .photo-detail {
     display: grid;
 
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(3,
+            minmax(0, 1fr));
 
     gap: 14px;
 }
 
 .detail-photo {
-    width: 100%;
-
     overflow: hidden;
 
-    border-radius: 12px;
-
     border:
-        1px solid rgba(255, 255, 255, 0.1);
+        1px solid rgba(255, 255, 255, .10);
+
+    border-radius: 12px;
 
     background: #101214;
 }
@@ -1687,53 +1316,22 @@ body.modal-open {
     display: block;
 
     width: 100%;
+
     height: 220px;
 
     object-fit: cover;
 }
 
-.detail-no-photos {
-    padding: 0;
-
-    color: #9da3aa;
-
-    background: transparent;
-    border: none;
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   BOTÓN EDITAR
-   ========================================================= */
-
-.detail-card-actions {
+.detail-card-actions,
+.detail-actions,
+.photo-folder-action {
     display: flex;
 
     justify-content: flex-end;
 
-    padding-top: 24px;
-}
-
-.detail-card-actions .btn {
-    min-width: 155px;
-
-    text-align: center;
-}
-
-
-/* =========================================================
-   BOTONES VOLVER
-   ========================================================= */
-
-.detail-page .nav-actions {
-    display: flex;
-    flex-wrap: wrap;
-
     gap: 10px;
 
-    margin-bottom: 25px;
+    margin-top: 22px;
 }
 
 .detail-bottom-navigation {
@@ -1742,143 +1340,69 @@ body.modal-open {
 
 
 /* =========================================================
-   TABLET
+   COMPATIBILIDAD CON VISTAS EXISTENTES
    ========================================================= */
 
-@media (max-width: 800px) {
+.detail-title {
+    padding: 28px;
 
-    .vehicle-info-grid,
-    .detail-two-columns {
-        grid-template-columns: 1fr;
-
-        gap: 22px;
-    }
-
-
-    .photo-detail {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
+    border-bottom:
+        1px solid #34373b;
 }
 
-
-/* =========================================================
-   CELULAR
-   ========================================================= */
-
-@media (max-width: 560px) {
-
-    .detail-card {
-        padding: 22px 20px;
-    }
-
-
-    .detail-page-head h1 {
-        font-size: 29px;
-    }
-
-
-    .vehicle-info-grid {
-        row-gap: 20px;
-    }
-
-
-    .detail-two-columns {
-        gap: 20px;
-    }
-
-
-    .photo-detail {
-        grid-template-columns: 1fr;
-    }
-
-
-    .detail-photo img {
-        height: 250px;
-    }
-
-
-    .detail-card-actions {
-        justify-content: stretch;
-    }
-
-
-    .detail-card-actions .btn {
-        width: 100%;
-    }
-
+.detail-title h1 {
+    margin: 5px 0;
 }
 
-/* =========================================================
-   FOTOGRAFÍAS EN DETALLE
-   ========================================================= */
+.detail-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,
+            minmax(0, 1fr));
+}
+
+.detail-item {
+    padding: 20px 24px;
+
+    border-bottom:
+        1px solid #2c2f33;
+}
+
+.detail-item.full {
+    grid-column: 1 / -1;
+}
+
+.detail-value {
+    margin-top: 6px;
+
+    line-height: 1.5;
+}
+
+.detail-review-card {
+    padding-bottom: 25px;
+}
 
 .detail-photo-group {
-    padding-top: 23px;
-    padding-bottom: 23px;
+    padding-bottom: 10px;
 }
 
+.video-preview-card {
+    padding: 14px;
 
-.photo-folder-action {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    border:
+        1px solid #3c4045;
 
-    margin-top: 16px;
+    border-radius: 12px;
+
+    background: #131517;
+
+    color: #f4f5f7;
 }
-
-
-.photo-folder-action .btn {
-    margin: 0;
-}
-
-
-.detail-no-photos {
-    margin: 14px 0 0;
-
-    padding: 0;
-
-    background: transparent;
-
-    border: 0;
-
-    color: #9da3aa;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-}
-
-
-@media (max-width: 560px) {
-
-    .photo-folder-action {
-        width: 100%;
-    }
-
-
-    .photo-folder-action .btn {
-        width: 100%;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        text-align: center;
-    }
-}
-
-/* =========================================================
-   PASO 4
-   MODO CLARO Y MODO OSCURO
-   ========================================================= */
 
 
 /* =========================================================
-   CONFIGURACIÓN GENERAL
+   TEMA
    ========================================================= */
 
 html[data-theme="dark"] {
@@ -1888,11 +1412,6 @@ html[data-theme="dark"] {
 html[data-theme="light"] {
     color-scheme: light;
 }
-
-
-/* =========================================================
-   BOTÓN DE TEMA
-   ========================================================= */
 
 .theme-toggle-btn {
     margin-left: auto;
@@ -1909,32 +1428,23 @@ html[data-theme="light"] {
 
     color: #f4f5f7;
 
-    font-family: inherit;
-
     font-size: 13px;
 
     font-weight: 600;
 
     cursor: pointer;
-
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
 }
-
 
 .theme-toggle-btn:hover {
     border-color: #20cdb0;
 }
 
-
 .theme-toggle-btn:focus-visible {
-    outline: 3px solid rgba(32, 205, 176, 0.4);
+    outline:
+        3px solid rgba(32, 205, 176, .4);
 
     outline-offset: 2px;
 }
-
 
 
 /* =========================================================
@@ -1943,207 +1453,83 @@ html[data-theme="light"] {
 
 html[data-theme="light"] body {
     background: #f4f6f7;
-
     color: #172027;
 }
 
-
-/* BARRA SUPERIOR */
-
-html[data-theme="light"] .topbar {
-    background: #ffffff;
-
-    border-bottom-color: #d9dfe3;
-
-    color: #172027;
-}
-
-
-html[data-theme="light"] .menu-btn {
-    color: #172027;
-}
-
-
-html[data-theme="light"] .brand {
-    color: #172027;
-}
-
-
-/* BOTÓN DE TEMA */
-
-html[data-theme="light"] .theme-toggle-btn {
-    background: #eef2f3;
-
-    border-color: #cbd3d8;
-
-    color: #172027;
-}
-
-
-html[data-theme="light"] .theme-toggle-btn:hover {
-    background: #e4ebec;
-
-    border-color: #148d7a;
-}
-
-
-/* MENÚ LATERAL */
-
-html[data-theme="light"] .side-menu {
-    background: #ffffff;
-
-    border-right-color: #d9dfe3;
-}
-
-
-html[data-theme="light"] .side-menu a {
-    color: #253039;
-}
-
-
-html[data-theme="light"] .side-menu a:hover {
-    background: #edf2f3;
-
-    color: #11181d;
-}
-
-
-/* ENCABEZADOS */
-
-html[data-theme="light"] .hero {
-    background:
-        linear-gradient(145deg,
-            #ffffff,
-            #f1f4f5);
-
-    border-color: #d8dfe2;
-
-    box-shadow:
-        0 20px 50px rgba(28, 42, 48, 0.08);
-}
-
-
-html[data-theme="light"] .hero h1,
-html[data-theme="light"] .page-head h1 {
-    color: #11191f;
-}
-
-
-html[data-theme="light"] .hero p,
-html[data-theme="light"] .page-head p {
-    color: #5c6972;
-}
-
-
-html[data-theme="light"] .eyebrow {
-    color: #087d6c;
-}
-
-
-/* ESTADO DE CONEXIÓN */
-
-html[data-theme="light"] .connection {
-    background: #dff4ee;
-
-    color: #076553;
-}
-
-
-html[data-theme="light"] .connection.offline {
-    background: #fff1dd;
-
-    color: #8b5510;
-}
-
-
-/* TARJETAS PRINCIPALES */
-
+html[data-theme="light"] .topbar,
+html[data-theme="light"] .side-menu,
+html[data-theme="light"] .form-shell,
 html[data-theme="light"] .menu-card,
 html[data-theme="light"] .vehicle-card,
 html[data-theme="light"] .vehicle-selection-card,
 html[data-theme="light"] .record-card,
 html[data-theme="light"] .record-filters,
 html[data-theme="light"] .export-card,
-html[data-theme="light"] .empty-state {
+html[data-theme="light"] .empty-state,
+html[data-theme="light"] .confirmation-modal,
+html[data-theme="light"] .detail-card,
+html[data-theme="light"] .detail-section {
     background: #ffffff;
 
+    color: #172027;
+
+    border-color: #d8dfe2;
+}
+
+html[data-theme="light"] .menu-btn,
+html[data-theme="light"] .brand,
+html[data-theme="light"] .hero h1,
+html[data-theme="light"] .page-head h1,
+html[data-theme="light"] .form-section h2,
+html[data-theme="light"] .detail-card-header h2,
+html[data-theme="light"] .detail-section h2 {
+    color: #172027;
+}
+
+html[data-theme="light"] .side-menu a {
+    color: #253039;
+}
+
+html[data-theme="light"] .side-menu a:hover {
+    background: #edf2f3;
+    color: #11181d;
+}
+
+html[data-theme="light"] .hero {
     border-color: #d8dfe2;
 
-    color: #172027;
+    background:
+        linear-gradient(145deg,
+            #ffffff,
+            #f1f4f5);
+
+    box-shadow:
+        0 20px 50px rgba(28, 42, 48, .08);
 }
 
-
-html[data-theme="light"] .menu-card h2,
-html[data-theme="light"] .vehicle-selection-card h2,
-html[data-theme="light"] .record-card h2 {
-    color: #172027;
-}
-
-
-html[data-theme="light"] .menu-card p,
-html[data-theme="light"] .vehicle-selection-card p,
-html[data-theme="light"] .record-card p {
+html[data-theme="light"] .hero p,
+html[data-theme="light"] .page-head p,
+html[data-theme="light"] .note {
     color: #5c6972;
 }
 
-
-html[data-theme="light"] .menu-card span,
-html[data-theme="light"] .vehicle-selection-action,
-html[data-theme="light"] .vehicle-selection-label {
+html[data-theme="light"] .eyebrow {
     color: #087d6c;
 }
-
-
-/* FORMULARIOS */
-
-html[data-theme="light"] .form-shell {
-    background: #ffffff;
-
-    border-color: #d8dfe2;
-}
-
-
-html[data-theme="light"] .form-section {
-    border-bottom-color: #e2e7e9;
-}
-
-
-html[data-theme="light"] .form-section h2 {
-    color: #172027;
-}
-
 
 html[data-theme="light"] label {
     color: #26333b;
 }
 
-
 html[data-theme="light"] input,
 html[data-theme="light"] select,
 html[data-theme="light"] textarea {
+    border-color: #bfc9ce;
+
     background: #ffffff;
 
     color: #172027;
-
-    border-color: #bfc9ce;
 }
-
-
-html[data-theme="light"] input::placeholder,
-html[data-theme="light"] textarea::placeholder {
-    color: #78858c;
-}
-
-
-html[data-theme="light"] input:focus,
-html[data-theme="light"] select:focus,
-html[data-theme="light"] textarea:focus {
-    border-color: #0d947f;
-
-    box-shadow:
-        0 0 0 3px rgba(13, 148, 127, 0.12);
-}
-
 
 html[data-theme="light"] input[readonly] {
     background: #eef2f3;
@@ -2151,140 +1537,45 @@ html[data-theme="light"] input[readonly] {
     color: #56646d;
 }
 
-
-/* BOTONES DE SELECCIÓN */
-
-html[data-theme="light"] .choice,
-html[data-theme="light"] .multi-choice {
-    background: #f3f6f7;
-
-    border-color: #cbd3d7;
-
-    color: #26333b;
-}
-
-
-html[data-theme="light"] .choice:hover,
-html[data-theme="light"] .multi-choice:hover {
-    border-color: #0d947f;
-}
-
-
-html[data-theme="light"] .choice.selected,
-html[data-theme="light"] .multi-choice.selected {
-    background: #d9f4ee;
-
-    border-color: #0d947f;
-
-    color: #075e50;
-}
-
-
-/* SUBIDA DE ARCHIVOS */
-
-html[data-theme="light"] .upload-box {
-    background: #f7f9fa;
-
-    border-color: #aebbc1;
-
-    color: #26333b;
-}
-
-
-html[data-theme="light"] .upload-box small,
-html[data-theme="light"] .note {
-    color: #64727a;
-}
-
-
-/* ACCIONES DEL FORMULARIO */
-
-html[data-theme="light"] .form-actions {
-    background: #f4f6f7;
-
-    border-top-color: #e1e6e8;
-}
-
-
-/* BOTONES SECUNDARIOS */
-
 html[data-theme="light"] .secondary,
-html[data-theme="light"] .btn-back {
+html[data-theme="light"] .btn-back,
+html[data-theme="light"] .theme-toggle-btn {
+    border-color: #ccd4d8;
+
     background: #e8edef;
 
     color: #172027;
-
-    border-color: #ccd4d8;
 }
 
-
-/* DETALLE */
-
-html[data-theme="light"] .detail-shell,
-html[data-theme="light"] .detail-card {
-    background: #ffffff;
-
-    border-color: #d8dfe2;
-
-    color: #172027;
+html[data-theme="light"] .form-actions {
+    background: #f4f6f7;
 }
 
+html[data-theme="light"] .upload-box {
+    border-color: #aebbc1;
 
-html[data-theme="light"] .detail-card-header,
-html[data-theme="light"] .detail-group,
-html[data-theme="light"] .detail-info {
-    border-color: #e1e6e8;
+    background: #f7f9fa;
+
+    color: #26333b;
 }
 
+html[data-theme="light"] .detail-field,
+html[data-theme="light"] .detail-single-value,
+html[data-theme="light"] .detail-comment-block,
+html[data-theme="light"] .detail-review-point {
+    border-color: #dce3e6;
 
-html[data-theme="light"] .detail-info-label,
-html[data-theme="light"] .record-label,
-html[data-theme="light"] .record-data span {
-    color: #63717a;
+    background: #f7f9fa;
 }
 
-
-html[data-theme="light"] .detail-text,
-html[data-theme="light"] .detail-data-block strong,
 html[data-theme="light"] .detail-info strong,
-html[data-theme="light"] .record-data strong {
+html[data-theme="light"] .detail-data-block strong,
+html[data-theme="light"] .detail-field-value,
+html[data-theme="light"] .detail-single-value,
+html[data-theme="light"] .detail-text,
+html[data-theme="light"] .detail-comment-block p {
     color: #172027;
 }
-
-
-/* FOTOGRAFÍAS */
-
-html[data-theme="light"] .photo-grid img {
-    border-color: #ccd4d8;
-}
-
-
-/* MODAL DE CONFIRMACIÓN */
-
-html[data-theme="light"] .confirmation-modal {
-    background: #ffffff;
-
-    color: #172027;
-
-    border-color: #d8dfe2;
-}
-
-
-html[data-theme="light"] .confirmation-header,
-html[data-theme="light"] .confirmation-body,
-html[data-theme="light"] .confirmation-actions {
-    border-color: #e1e6e8;
-}
-
-
-html[data-theme="light"] .confirmation-id-box {
-    background: #f1f5f5;
-
-    border-color: #d6dfe1;
-}
-
-
-/* VIDEO */
 
 html[data-theme="light"] .video-preview-card {
     background: #f7f9fa;
@@ -2296,346 +1587,78 @@ html[data-theme="light"] .video-preview-card {
 
 
 /* =========================================================
-   RESPONSIVE DEL BOTÓN DE TEMA
+   ACCIDENTES - UBICACIÓN Y MAPA
+
+   IMPORTANTE:
+   En computadora:
+   coordenadas IZQUIERDA
+   mapa DERECHA.
    ========================================================= */
 
-@media (max-width: 600px) {
-
-    .theme-toggle-btn {
-        padding: 7px 10px;
-
-        font-size: 12px;
-    }
-
-}
-
-/* =========================================================
-   DAÑOS Y ACCIDENTES
-   UBICACIÓN Y MAPA
-   ========================================================= */
-
-.accident-location-actions {
-    margin-top: 18px;
-    margin-bottom: 12px;
-}
-
-
-.accident-location-layout {
+.accident-geo-layout {
     display: grid;
 
     grid-template-columns:
-        minmax(240px, 320px) minmax(0, 1fr);
+        minmax(220px, 280px) minmax(0, 1fr);
 
-    gap: 24px;
-
-    margin-top: 22px;
+    gap: 26px;
 
     align-items: stretch;
+
+    margin-top: 18px;
 }
 
 
-.accident-coordinate-panel {
+/* =========================================================
+   COLUMNA IZQUIERDA - COORDENADAS
+   ========================================================= */
+
+.accident-geo-coordinates {
     display: flex;
 
     flex-direction: column;
 
-    gap: 17px;
+    gap: 18px;
 
-    padding-right: 24px;
+    padding-right: 26px;
 
     border-right:
-        1px solid #34373b;
+        1px solid #3b3e42;
+}
+
+.accident-geo-coordinates label,
+.accident-map-search-label {
+    margin: 0;
+}
+
+.accident-geo-divider {
+    width: 100%;
+
+    height: 1px;
+
+    margin: 2px 0 3px;
+
+    background: #3b3e42;
 }
 
 
-.accident-map-panel {
+/* =========================================================
+   COLUMNA DERECHA - MAPA
+   ========================================================= */
+
+.accident-geo-map-area {
     min-width: 0;
 
-    border:
-        1px solid #3c4045;
-
-    border-radius: 14px;
-
-    overflow: hidden;
-
-    background: #151719;
-}
-
-
-#accidentMap {
-    width: 100%;
-
-    height: 390px;
-
-    min-height: 390px;
-}
-
-
-.accident-photo-preview-item {
-    width: 100%;
-}
-
-
-.accident-photo-preview-item img {
-    width: 100%;
-
-    height: 150px;
-
-    object-fit: cover;
-
-    border-radius: 10px;
-
-    border:
-        1px solid #3c4045;
-}
-
-
-/* =========================================================
-   MODO CLARO
-   ========================================================= */
-
-html[data-theme="light"] .accident-coordinate-panel {
-    border-right-color:
-        #d8dfe2;
-}
-
-
-html[data-theme="light"] .accident-map-panel {
-    background:
-        #ffffff;
-
-    border-color:
-        #ccd5d9;
-}
-
-
-html[data-theme="light"] .accident-photo-preview-item img {
-    border-color:
-        #ccd5d9;
-}
-
-
-/* =========================================================
-   LEAFLET
-   ========================================================= */
-
-.leaflet-container {
-    font-family: inherit;
-}
-
-
-.leaflet-control-attribution {
-    font-size: 10px;
-}
-
-
-/* =========================================================
-   CELULAR
-   ========================================================= */
-
-@media (max-width: 760px) {
-
-    .accident-location-layout {
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .accident-coordinate-panel {
-        padding-right:
-            0;
-
-        padding-bottom:
-            22px;
-
-        border-right:
-            0;
-
-        border-bottom:
-            1px solid #34373b;
-    }
-
-
-    html[data-theme="light"] .accident-coordinate-panel {
-        border-bottom-color:
-            #d8dfe2;
-    }
-
-
-    #accidentMap {
-        height:
-            320px;
-
-        min-height:
-            320px;
-    }
-
-}
-
-/* =========================================================
-   MAPA DE DAÑOS Y ACCIDENTES
-   ========================================================= */
-
-.accident-location-actions {
-    margin-top: 18px;
-    margin-bottom: 12px;
-}
-
-
-.accident-location-layout {
-    display: grid;
-
-    grid-template-columns:
-        minmax(250px, 320px) minmax(0, 1fr);
-
-    gap: 24px;
-
-    margin-top: 22px;
-
-    align-items: stretch;
-}
-
-
-.accident-coordinate-panel {
     display: flex;
 
     flex-direction: column;
 
-    gap: 17px;
-
-    padding-right: 24px;
-
-    border-right:
-        1px solid #34373b;
-}
-
-
-.accident-map-panel {
-    width: 100%;
-
-    min-width: 0;
-
-    min-height: 390px;
-
-    overflow: hidden;
-
-    border:
-        1px solid #3c4045;
-
-    border-radius: 14px;
-
-    background: #151719;
-}
-
-
-#accidentMapFrame {
-    display: block;
-
-    width: 100%;
-
-    height: 390px;
-
-    min-height: 390px;
-
-    border: 0;
+    gap: 12px;
 }
 
 
 /* =========================================================
-   MODO CLARO
-   ========================================================= */
-
-html[data-theme="light"] .accident-coordinate-panel {
-    border-right-color:
-        #d8dfe2;
-}
-
-
-html[data-theme="light"] .accident-map-panel {
-    background:
-        #ffffff;
-
-    border-color:
-        #ccd5d9;
-}
-
-
-/* =========================================================
-   CELULAR
-   ========================================================= */
-
-@media (max-width: 760px) {
-
-    .accident-location-layout {
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .accident-coordinate-panel {
-        padding-right:
-            0;
-
-        padding-bottom:
-            22px;
-
-        border-right:
-            0;
-
-        border-bottom:
-            1px solid #34373b;
-    }
-
-
-    html[data-theme="light"] .accident-coordinate-panel {
-        border-bottom-color:
-            #d8dfe2;
-    }
-
-
-    .accident-map-panel {
-        min-height:
-            320px;
-    }
-
-
-    #accidentMapFrame {
-        height:
-            320px;
-
-        min-height:
-            320px;
-    }
-
-}
-
-/* =========================================================
-   MAPA INTERACTIVO - ACCIDENTES
-   ========================================================= */
-
-#accidentInteractiveMap {
-    width: 100%;
-    height: 360px;
-    min-height: 360px;
-    border: 0;
-}
-
-
-.accident-map-large {
-    width: 100%;
-    overflow: hidden;
-
-    border:
-        1px solid #45494e;
-
-    border-radius: 12px;
-
-    background: #151719;
-}
-
-
-/* =========================================================
-   BUSCADOR
+   BUSCADOR DEL MAPA
    ========================================================= */
 
 .accident-map-search-row {
@@ -2648,12 +1671,6 @@ html[data-theme="light"] .accident-map-panel {
 
     align-items: end;
 }
-
-
-.accident-map-search-label {
-    min-width: 0;
-}
-
 
 .accident-map-search-row .btn {
     min-height: 43px;
@@ -2675,14 +1692,16 @@ html[data-theme="light"] .accident-map-panel {
 
     padding: 8px;
 
-    border:
-        1px solid #45494e;
+    border: 1px solid #45494e;
 
     border-radius: 10px;
 
     background: #17191c;
 }
 
+.accident-search-results.hidden {
+    display: none !important;
+}
 
 .accident-search-result {
     width: 100%;
@@ -2699,8 +1718,6 @@ html[data-theme="light"] .accident-map-panel {
 
     text-align: left;
 
-    font-family: inherit;
-
     font-size: 13px;
 
     line-height: 1.45;
@@ -2708,95 +1725,426 @@ html[data-theme="light"] .accident-map-panel {
     cursor: pointer;
 }
 
-
 .accident-search-result:hover,
 .accident-search-result:focus-visible {
-    background:
-        #292d31;
+    background: #292d31;
 
     outline:
-        none;
-}
+        2px solid #20cdb0;
 
+    outline-offset: 1px;
+}
 
 .accident-search-empty {
-    padding:
-        10px;
+    padding: 10px;
 
-    color:
-        #aeb3ba;
+    color: #aeb3ba;
 
-    font-size:
-        13px;
+    font-size: 13px;
 }
 
+
+/* =========================================================
+   ESTADO GPS
+   ========================================================= */
+
+#accidentGpsStatus {
+    margin: 0 0 2px;
+}
+
+
+/* =========================================================
+   CUADRO DEL MAPA
+   ========================================================= */
+
+.accident-map-large {
+    width: 100%;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid #45494e;
+
+    border-radius: 14px;
+
+    background: #151719;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, .15);
+}
+
+#accidentInteractiveMap {
+    display: block;
+
+    width: 100%;
+
+    height: 410px;
+
+    min-height: 410px;
+
+    border: 0;
+
+    cursor: crosshair;
+}
 
 .accident-map-help {
-    margin:
-        0;
+    margin: 0;
 }
 
 
 /* =========================================================
-   LEAFLET EN MODO OSCURO
+   LEAFLET
    ========================================================= */
 
-html[data-theme="dark"] .leaflet-container {
-    background:
-        #191c1f;
+.leaflet-container {
+    background: #181a1d;
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+.leaflet-control-attribution {
+    font-size: 10px;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+}
+
+.leaflet-popup-content {
+    margin: 12px 14px;
+
+    min-width: 170px;
+
+    text-align: center;
+
+    line-height: 1.4;
+}
+
+
+/*
+   El nuevo marcador es un SVG propio.
+   Por eso dejamos transparente cualquier
+   fondo que pueda agregar Leaflet.
+*/
+
+.leaflet-marker-icon {
+    background: transparent !important;
+
+    border: 0 !important;
 }
 
 
 /* =========================================================
-   MODO CLARO
+   CÍRCULO DE PRECISIÓN DEL GPS
    ========================================================= */
+
+.leaflet-interactive {
+    transition:
+        opacity .2s ease;
+}
+
+
+/* =========================================================
+   MAPAS ANTIGUOS - COMPATIBILIDAD
+   ========================================================= */
+
+.accident-location-actions {
+    margin: 18px 0 12px;
+}
+
+.accident-location-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(240px, 320px) minmax(0, 1fr);
+
+    gap: 24px;
+
+    margin-top: 22px;
+}
+
+.accident-coordinate-panel {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 17px;
+
+    padding-right: 24px;
+
+    border-right:
+        1px solid #34373b;
+}
+
+.accident-map-panel {
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid #3c4045;
+
+    border-radius: 14px;
+
+    background: #151719;
+}
+
+#accidentMap,
+#accidentMapFrame {
+    width: 100%;
+
+    height: 390px;
+
+    min-height: 390px;
+
+    border: 0;
+}
+
+
+/* =========================================================
+   ACCIDENTES - MODO CLARO
+   ========================================================= */
+
+html[data-theme="light"] .accident-geo-coordinates,
+
+html[data-theme="light"] .accident-coordinate-panel {
+    border-color: #ccd4d8;
+}
+
+html[data-theme="light"] .accident-geo-divider {
+    background: #ccd4d8;
+}
+
+html[data-theme="light"] .accident-map-large,
+
+html[data-theme="light"] .accident-map-panel,
 
 html[data-theme="light"] .accident-search-results {
-    background:
-        #ffffff;
+    border-color: #cbd4d8;
 
-    border-color:
-        #ccd4d8;
+    background: #ffffff;
 }
-
 
 html[data-theme="light"] .accident-search-result {
-    color:
-        #172027;
+    color: #172027;
 }
 
-
 html[data-theme="light"] .accident-search-result:hover,
+
 html[data-theme="light"] .accident-search-result:focus-visible {
-    background:
-        #edf2f3;
+    background: #edf2f3;
 }
 
 
 /* =========================================================
-   CELULAR
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .vehicle-selection-grid,
+    .record-data-grid,
+    .record-filter-grid,
+    .vehicle-info-grid,
+    .detail-grid,
+    .detail-two-columns,
+    .detail-check-list {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .photo-detail {
+
+        grid-template-columns:
+            repeat(2,
+                minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE DEL MAPA
+
+   SOLO debajo de 760 px el mapa pasa debajo
+   de las coordenadas.
    ========================================================= */
 
 @media (max-width: 760px) {
 
+    .accident-geo-layout,
+    .accident-location-layout {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .accident-geo-coordinates,
+    .accident-coordinate-panel {
+
+        padding-right: 0;
+
+        padding-bottom: 24px;
+
+        border-right: 0;
+
+        border-bottom:
+            1px solid #3b3e42;
+    }
+
+
     .accident-map-search-row {
+
         grid-template-columns:
             1fr;
     }
 
 
     .accident-map-search-row .btn {
-        width:
-            100%;
+
+        width: 100%;
     }
 
 
     #accidentInteractiveMap {
-        height:
-            320px;
 
-        min-height:
-            320px;
+        height: 340px;
+
+        min-height: 340px;
+    }
+
+
+    #accidentMap,
+    #accidentMapFrame {
+
+        height: 320px;
+
+        min-height: 320px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE GENERAL
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .page {
+
+        padding:
+            22px 14px 60px;
+    }
+
+
+    .menu-grid,
+    .form-grid,
+    .detail-list {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .menu-card.wide {
+
+        grid-column: auto;
+    }
+
+
+    .hero {
+
+        padding: 25px;
+    }
+
+
+    .hero h1,
+    .page-head h1 {
+
+        font-size: 28px;
+    }
+
+
+    .form-section {
+
+        padding: 20px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .confirmation-actions {
+
+        flex-direction: column;
+    }
+
+
+    .confirmation-actions .btn {
+
+        width: 100%;
+    }
+
+
+    .record-card-top {
+
+        flex-direction: column;
+    }
+
+
+    .record-vehicle {
+
+        align-items: flex-start;
+    }
+
+
+    .photo-detail {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .detail-card,
+    .detail-section {
+
+        padding: 20px;
+    }
+
+
+    .detail-card-actions,
+    .detail-actions,
+    .photo-folder-action {
+
+        justify-content: stretch;
+    }
+
+
+    .detail-card-actions .btn,
+    .detail-actions .btn,
+    .photo-folder-action .btn {
+
+        width: 100%;
+
+        text-align: center;
+    }
+
+
+    .theme-toggle-btn {
+
+        padding:
+            7px 10px;
+
+        font-size: 12px;
     }
 
 }
