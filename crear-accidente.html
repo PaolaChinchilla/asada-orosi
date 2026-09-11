@@ -5,30 +5,17 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="theme-color"
-        content="#16181c">
+    <meta name="theme-color" content="#16181c">
 
-    <meta
-        name="description"
-        content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
+    <meta name="description" content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
 
-    <link
-        rel="manifest"
-        href="manifest.json">
+    <link rel="manifest" href="manifest.json">
 
-    <link
-        rel="stylesheet"
-        href="css/style.css?v=20260911-18">
+    <link rel="stylesheet" href="css/style.css?v=20260911-18">
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <title>
         Crear registro de daño y accidente | ASADA Orosi
@@ -47,11 +34,7 @@
     <header class="topbar">
 
 
-        <button
-            type="button"
-            class="menu-btn"
-            onclick="toggleMenu()"
-            aria-label="Abrir menú de navegación">
+        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
 
             ☰
 
@@ -61,10 +44,7 @@
         <div class="brand">
 
 
-            <img
-                src="img/asadalogo.png"
-                alt="Logo ASADA Orosi"
-                class="brand-logo">
+            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
 
 
             <span>
@@ -83,9 +63,7 @@
          MENÚ
          ===================================================== -->
 
-    <aside
-        id="sideMenu"
-        class="side-menu">
+    <aside id="sideMenu" class="side-menu">
 
 
         <a href="index.html">
@@ -109,18 +87,14 @@
         </a>
 
 
-        <a
-            id="menuCreateAccident"
-            href="crear-accidente.html">
+        <a id="menuCreateAccident" href="crear-accidente.html">
 
             Crear registro de daño y accidente
 
         </a>
 
 
-        <a
-            id="menuAccidentList"
-            href="accidentes.html">
+        <a id="menuAccidentList" href="accidentes.html">
 
             Listado de daños y accidentes
 
@@ -148,9 +122,7 @@
         <div class="nav-actions">
 
 
-            <a
-                href="index.html"
-                class="btn-back">
+            <a href="index.html" class="btn-back">
 
                 Volver al inicio
 
@@ -200,14 +172,10 @@
              FORMULARIO
              ================================================= -->
 
-        <form
-            id="accidentForm"
-            class="form-shell">
+        <form id="accidentForm" class="form-shell">
 
 
-            <input
-                type="hidden"
-                id="accidentId">
+            <input type="hidden" id="accidentId">
 
 
 
@@ -234,11 +202,7 @@
 
                         Chofer
 
-                        <input
-                            type="text"
-                            id="accidentDriver"
-                            required
-                            autocomplete="name"
+                        <input type="text" id="accidentDriver" required autocomplete="name"
                             placeholder="Nombre y apellidos del chofer">
 
                     </label>
@@ -251,10 +215,7 @@
 
                         Fecha y hora
 
-                        <input
-                            type="text"
-                            id="accidentDateTime"
-                            readonly>
+                        <input type="text" id="accidentDateTime" readonly>
 
                     </label>
 
@@ -267,9 +228,7 @@
                         Vehículo
 
 
-                        <select
-                            id="accidentVehicle"
-                            required>
+                        <select id="accidentVehicle" required>
 
 
                             <option value="">
@@ -313,11 +272,7 @@
 
                         Placa
 
-                        <input
-                            type="text"
-                            id="accidentPlate"
-                            readonly
-                            placeholder="Se selecciona automáticamente">
+                        <input type="text" id="accidentPlate" readonly placeholder="Se selecciona automáticamente">
 
                     </label>
 
@@ -347,10 +302,7 @@
 
                     Describa lo sucedido
 
-                    <textarea
-                        id="accidentDescription"
-                        rows="6"
-                        required
+                    <textarea id="accidentDescription" rows="6" required
                         placeholder="Describa de forma detallada el daño o accidente"></textarea>
 
                 </label>
@@ -379,10 +331,7 @@
                     Nombre y apellidos de los ocupantes
 
 
-                    <textarea
-                        id="accidentOccupants"
-                        rows="4"
-                        placeholder="Escriba una persona por línea"></textarea>
+                    <textarea id="accidentOccupants" rows="4" placeholder="Escriba una persona por línea"></textarea>
 
 
                     <small>
@@ -432,11 +381,7 @@
 
                             Coordenada Y - Latitud
 
-                            <input
-                                type="text"
-                                id="accidentLatitude"
-                                readonly
-                                placeholder="Sin obtener">
+                            <input type="text" id="accidentLatitude" readonly placeholder="Sin obtener">
 
                         </label>
 
@@ -446,18 +391,13 @@
 
                             Coordenada X - Longitud
 
-                            <input
-                                type="text"
-                                id="accidentLongitude"
-                                readonly
-                                placeholder="Sin obtener">
+                            <input type="text" id="accidentLongitude" readonly placeholder="Sin obtener">
 
                         </label>
 
 
 
-                        <div
-                            class="accident-geo-divider">
+                        <div class="accident-geo-divider">
                         </div>
 
 
@@ -466,11 +406,7 @@
 
                             Altitud (m)
 
-                            <input
-                                type="text"
-                                id="accidentAltitude"
-                                readonly
-                                placeholder="Sin obtener">
+                            <input type="text" id="accidentAltitude" readonly placeholder="Sin obtener">
 
                         </label>
 
@@ -480,11 +416,7 @@
 
                             Precisión (m)
 
-                            <input
-                                type="text"
-                                id="accidentAccuracy"
-                                readonly
-                                placeholder="Sin obtener">
+                            <input type="text" id="accidentAccuracy" readonly placeholder="Sin obtener">
 
                         </label>
 
@@ -507,21 +439,14 @@
 
                                 Buscar lugar, dirección o referencia
 
-                                <input
-                                    type="search"
-                                    id="accidentLocation"
-                                    required
-                                    autocomplete="off"
+                                <input type="search" id="accidentLocation" required autocomplete="off"
                                     placeholder="Ejemplo: Escuela de Orosi">
 
                             </label>
 
 
 
-                            <button
-                                type="button"
-                                class="btn secondary"
-                                id="accidentSearchButton">
+                            <button type="button" class="btn secondary" id="accidentSearchButton">
 
                                 Buscar
 
@@ -529,10 +454,7 @@
 
 
 
-                            <button
-                                type="button"
-                                class="btn secondary"
-                                id="accidentGpsButton">
+                            <button type="button" class="btn secondary" id="accidentGpsButton">
 
                                 Mi ubicación
 
@@ -545,19 +467,14 @@
 
                         <!-- RESULTADOS -->
 
-                        <div
-                            id="accidentSearchResults"
-                            class="accident-search-results hidden">
+                        <div id="accidentSearchResults" class="accident-search-results hidden">
                         </div>
 
 
 
                         <!-- MENSAJE -->
 
-                        <p
-                            id="accidentGpsStatus"
-                            class="note"
-                            aria-live="polite">
+                        <p id="accidentGpsStatus" class="note" aria-live="polite">
 
                             Puede buscar una referencia,
                             usar su ubicación o seleccionar
@@ -572,8 +489,7 @@
                         <div class="accident-map-large">
 
 
-                            <div
-                                id="accidentInteractiveMap"
+                            <div id="accidentInteractiveMap"
                                 aria-label="Mapa interactivo para seleccionar la ubicación del daño o accidente">
                             </div>
 
@@ -627,11 +543,7 @@
                 <label class="upload-box">
 
 
-                    <input
-                        id="accidentPhotos"
-                        type="file"
-                        accept="image/*"
-                        multiple>
+                    <input id="accidentPhotos" type="file" accept="image/*" multiple>
 
 
                     <span>
@@ -651,9 +563,7 @@
                 </label>
 
 
-                <div
-                    id="accidentPhotoPreview"
-                    class="photo-grid">
+                <div id="accidentPhotoPreview" class="photo-grid">
                 </div>
 
 
@@ -680,11 +590,7 @@
 
                     Persona a quien se le reportó
 
-                    <input
-                        type="text"
-                        id="accidentReportedTo"
-                        required
-                        autocomplete="name"
+                    <input type="text" id="accidentReportedTo" required autocomplete="name"
                         placeholder="Nombre y apellidos">
 
                 </label>
@@ -696,9 +602,7 @@
                     ¿El vehículo puede continuar en uso?
 
 
-                    <select
-                        id="accidentCanContinueUse"
-                        required>
+                    <select id="accidentCanContinueUse" required>
 
 
                         <option value="">
@@ -748,9 +652,7 @@
             <div class="form-actions">
 
 
-                <a
-                    href="index.html"
-                    class="btn secondary">
+                <a href="index.html" class="btn secondary">
 
                     Cancelar
 
@@ -758,9 +660,7 @@
 
 
 
-                <button
-                    type="submit"
-                    class="btn primary">
+                <button type="submit" class="btn primary">
 
                     Guardar registro
 
@@ -781,8 +681,7 @@
          LEAFLET
          ===================================================== -->
 
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
 
 
@@ -896,7 +795,37 @@
             let gpsFinishTimer =
                 null;
 
+            /*
+                PRECISIÓN GPS
+            
+                Si la ubicación tiene más de 75 metros
+                de margen de error, NO la aceptamos
+                automáticamente.
+            
+                Así evitamos registrar Cartago como
+                San José, Orosi como Heredia, etc.
+            */
 
+            const GPS_REQUIRED_ACCURACY_METERS =
+                75;
+
+
+            /*
+                Si conseguimos 25 metros o menos,
+                consideramos que ya es una ubicación
+                suficientemente buena y dejamos de buscar.
+            */
+
+            const GPS_EXCELLENT_ACCURACY_METERS =
+                25;
+
+
+            /*
+                Máximo tiempo buscando una lectura mejor.
+            */
+
+            const GPS_MAX_WAIT_MS =
+                25000;
 
             /* =================================================
                PROTEGER TEXTO
@@ -1036,7 +965,7 @@
                 plate.value =
 
                     VEHICLE_PLATES[
-                        vehicle.value
+                    vehicle.value
                     ] ||
 
                     "";
@@ -1062,7 +991,7 @@
                 if (
                     !Leaflet ||
                     typeof Leaflet.icon !==
-                        "function"
+                    "function"
                 ) {
 
                     return null;
@@ -1219,13 +1148,13 @@
                 if (
                     !Leaflet ||
                     typeof Leaflet.map !==
-                        "function" ||
+                    "function" ||
                     typeof Leaflet.tileLayer !==
-                        "function" ||
+                    "function" ||
                     typeof Leaflet.marker !==
-                        "function" ||
+                    "function" ||
                     typeof Leaflet.icon !==
-                        "function"
+                    "function"
                 ) {
 
                     if (
@@ -1429,7 +1358,7 @@
                     map &&
                     accuracyCircle &&
                     typeof map.removeLayer ===
-                        "function"
+                    "function"
                 ) {
 
                     map.removeLayer(
@@ -1476,12 +1405,12 @@
                     !map ||
                     !Leaflet ||
                     typeof Leaflet.circle !==
-                        "function" ||
+                    "function" ||
                     !Number.isFinite(
                         radius
                     ) ||
                     radius <=
-                        0
+                    0
                 ) {
 
                     return;
@@ -1661,7 +1590,7 @@
                     !map ||
                     !Leaflet ||
                     typeof Leaflet.marker !==
-                        "function"
+                    "function"
                 ) {
 
                     return false;
@@ -2225,7 +2154,7 @@
                         if (
                             accuracyText &&
                             accuracyText !==
-                                "No disponible"
+                            "No disponible"
                         ) {
 
                             status.textContent =
@@ -2247,7 +2176,7 @@
 
 
                 } catch (
-                    error
+                error
                 ) {
 
 
@@ -2440,8 +2369,8 @@
                                     data-index="${index}">
 
                                     ${escapeHtml(
-                                        result.display_name
-                                    )}
+                                result.display_name
+                            )}
 
                                 </button>
 
@@ -2482,9 +2411,9 @@
                                         const result =
 
                                             results[
-                                                Number(
-                                                    resultButton.dataset.index
-                                                )
+                                            Number(
+                                                resultButton.dataset.index
+                                            )
                                             ];
 
 
@@ -2557,7 +2486,7 @@
 
 
                 } catch (
-                    error
+                error
                 ) {
 
 
@@ -2651,7 +2580,7 @@
 
                 if (
                     gpsWatchId !==
-                        null &&
+                    null &&
                     navigator.geolocation
                 ) {
 
@@ -2801,14 +2730,14 @@
                         coordinates.altitude !==
                             null &&
 
-                        coordinates.altitude !==
+                            coordinates.altitude !==
                             undefined &&
 
-                        Number.isFinite(
-                            Number(
-                                coordinates.altitude
+                            Number.isFinite(
+                                Number(
+                                    coordinates.altitude
+                                )
                             )
-                        )
 
                             ? Number(
                                 coordinates.altitude
@@ -2866,7 +2795,7 @@
                             accuracyValue
                         ) &&
                         accuracyValue <=
-                            25
+                        25
                     ) {
 
                         status.textContent =
@@ -2885,7 +2814,7 @@
                             accuracyValue
                         ) &&
                         accuracyValue <=
-                            100
+                        100
                     ) {
 
                         status.textContent =
@@ -3204,7 +3133,7 @@
                                         accuracy
                                     ) &&
                                     accuracy <
-                                        bestAccuracy
+                                    bestAccuracy
                                 )
                             ) {
 
@@ -3267,7 +3196,7 @@
                                     accuracy
                                 ) &&
                                 accuracy <=
-                                    20
+                                20
                             ) {
 
                                 finish();
@@ -3294,7 +3223,7 @@
                             if (
                                 error &&
                                 error.code ===
-                                    1
+                                1
                             ) {
 
 
@@ -3475,7 +3404,7 @@
 
                             if (
                                 event.key ===
-                                    "Enter"
+                                "Enter"
                             ) {
 
                                 event.preventDefault();
@@ -3506,7 +3435,7 @@
                     if (
                         photoInput &&
                         typeof previewAccidentPhotos ===
-                            "function"
+                        "function"
                     ) {
 
                         photoInput.addEventListener(
@@ -3574,7 +3503,7 @@
 
                             if (
                                 typeof saveAccidentRecord ===
-                                    "function"
+                                "function"
                             ) {
 
                                 saveAccidentRecord(
