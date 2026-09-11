@@ -5,412 +5,34 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="theme-color" content="#16181c">
+    <meta
+        name="theme-color"
+        content="#16181c">
 
-    <meta name="description" content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
+    <meta
+        name="description"
+        content="Registro de daños y accidentes de vehículos de ASADA Orosi.">
 
-    <link rel="manifest" href="manifest.json">
+    <link
+        rel="manifest"
+        href="manifest.json">
 
-    <link rel="stylesheet" href="css/style.css?v=20260911-16">
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260911-17">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 
     <title>
         Crear registro de daño y accidente | ASADA Orosi
     </title>
-
-
-    <style>
-        /* =====================================================
-           UBICACIÓN
-           ===================================================== */
-
-        .accident-geo-layout {
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(220px, 280px) minmax(0, 1fr);
-
-            gap: 26px;
-
-            align-items: stretch;
-
-            margin-top: 18px;
-
-        }
-
-
-        .accident-geo-coordinates {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 18px;
-
-            padding-right: 26px;
-
-            border-right:
-                1px solid #3b3e42;
-
-        }
-
-
-        .accident-geo-coordinates label,
-        .accident-map-search-label {
-
-            margin: 0;
-
-        }
-
-
-        .accident-geo-divider {
-
-            width: 100%;
-
-            height: 1px;
-
-            margin:
-                2px 0 3px;
-
-            background:
-                #3b3e42;
-
-        }
-
-
-        .accident-geo-map-area {
-
-            min-width: 0;
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 12px;
-
-        }
-
-
-
-        /* =====================================================
-           BUSCADOR
-           ===================================================== */
-
-        .accident-map-search-row {
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1fr) auto auto;
-
-            gap: 10px;
-
-            align-items: end;
-
-        }
-
-
-        .accident-map-search-row .btn {
-
-            min-height: 43px;
-
-            white-space: nowrap;
-
-        }
-
-
-        .accident-search-results {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 6px;
-
-            padding: 8px;
-
-            border:
-                1px solid #45494e;
-
-            border-radius: 10px;
-
-            background:
-                #17191c;
-
-        }
-
-
-        .accident-search-results.hidden {
-
-            display: none;
-
-        }
-
-
-        .accident-search-result {
-
-            width: 100%;
-
-            padding:
-                11px 12px;
-
-            border: 0;
-
-            border-radius: 8px;
-
-            background:
-                transparent;
-
-            color:
-                #e8ebee;
-
-            text-align: left;
-
-            font-family:
-                inherit;
-
-            font-size: 13px;
-
-            line-height: 1.45;
-
-            cursor: pointer;
-
-        }
-
-
-        .accident-search-result:hover,
-        .accident-search-result:focus-visible {
-
-            background:
-                #292d31;
-
-            outline:
-                2px solid #20cdb0;
-
-            outline-offset:
-                1px;
-
-        }
-
-
-        .accident-search-empty {
-
-            padding: 10px;
-
-            color:
-                #aeb3ba;
-
-            font-size: 13px;
-
-        }
-
-
-
-        /* =====================================================
-           ESTADO DEL GPS
-           ===================================================== */
-
-        #accidentGpsStatus {
-
-            margin:
-                0 0 2px;
-
-        }
-
-
-
-        /* =====================================================
-           MAPA
-           ===================================================== */
-
-        .accident-map-large {
-
-            width: 100%;
-
-            min-width: 0;
-
-            overflow: hidden;
-
-            border:
-                1px solid #45494e;
-
-            border-radius: 12px;
-
-            background:
-                #151719;
-
-        }
-
-
-        #accidentInteractiveMap {
-
-            width: 100%;
-
-            height: 360px;
-
-            min-height: 360px;
-
-            cursor: crosshair;
-
-        }
-
-
-        .accident-map-help {
-
-            margin: 0;
-
-        }
-
-
-        .leaflet-container {
-
-            font-family:
-                Inter,
-                "Segoe UI",
-                Arial,
-                sans-serif;
-
-            background:
-                #181a1d;
-
-        }
-
-
-        .leaflet-control-attribution {
-
-            font-size: 10px;
-
-        }
-
-
-
-        /* =====================================================
-           MODO CLARO
-           ===================================================== */
-
-        html[data-theme="light"] .accident-geo-coordinates {
-
-            border-right-color:
-                #ccd4d8;
-
-        }
-
-
-        html[data-theme="light"] .accident-geo-divider {
-
-            background:
-                #ccd4d8;
-
-        }
-
-
-        html[data-theme="light"] .accident-map-large,
-
-        html[data-theme="light"] .accident-search-results {
-
-            background:
-                #ffffff;
-
-            border-color:
-                #cbd4d8;
-
-        }
-
-
-        html[data-theme="light"] .accident-search-result {
-
-            color:
-                #172027;
-
-        }
-
-
-        html[data-theme="light"] .accident-search-result:hover,
-
-        html[data-theme="light"] .accident-search-result:focus-visible {
-
-            background:
-                #edf2f3;
-
-        }
-
-
-
-        /* =====================================================
-           RESPONSIVE
-           ===================================================== */
-
-        @media (max-width: 760px) {
-
-            .accident-geo-layout {
-
-                grid-template-columns:
-                    1fr;
-
-                gap:
-                    22px;
-
-            }
-
-
-            .accident-geo-coordinates {
-
-                padding-right:
-                    0;
-
-                padding-bottom:
-                    24px;
-
-                border-right:
-                    0;
-
-                border-bottom:
-                    1px solid #3b3e42;
-
-            }
-
-
-            html[data-theme="light"] .accident-geo-coordinates {
-
-                border-bottom-color:
-                    #ccd4d8;
-
-            }
-
-
-            .accident-map-search-row {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-
-            .accident-map-search-row .btn {
-
-                width:
-                    100%;
-
-            }
-
-
-            #accidentInteractiveMap {
-
-                height:
-                    320px;
-
-                min-height:
-                    320px;
-
-            }
-
-        }
-    </style>
 
 </head>
 
@@ -424,7 +46,12 @@
 
     <header class="topbar">
 
-        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
+
+        <button
+            type="button"
+            class="menu-btn"
+            onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">
 
             ☰
 
@@ -433,14 +60,20 @@
 
         <div class="brand">
 
-            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
+
+            <img
+                src="img/asadalogo.png"
+                alt="Logo ASADA Orosi"
+                class="brand-logo">
 
 
             <span>
                 ASADA OROSI
             </span>
 
+
         </div>
+
 
     </header>
 
@@ -450,7 +83,9 @@
          MENÚ
          ===================================================== -->
 
-    <aside id="sideMenu" class="side-menu">
+    <aside
+        id="sideMenu"
+        class="side-menu">
 
 
         <a href="index.html">
@@ -474,14 +109,18 @@
         </a>
 
 
-        <a id="menuCreateAccident" href="crear-accidente.html">
+        <a
+            id="menuCreateAccident"
+            href="crear-accidente.html">
 
             Crear registro de daño y accidente
 
         </a>
 
 
-        <a id="menuAccidentList" href="accidentes.html">
+        <a
+            id="menuAccidentList"
+            href="accidentes.html">
 
             Listado de daños y accidentes
 
@@ -493,6 +132,7 @@
             Descargar Excel
 
         </a>
+
 
     </aside>
 
@@ -507,17 +147,22 @@
 
         <div class="nav-actions">
 
-            <a href="index.html" class="btn-back">
+
+            <a
+                href="index.html"
+                class="btn-back">
 
                 Volver al inicio
 
             </a>
+
 
         </div>
 
 
 
         <div class="page-head">
+
 
             <div>
 
@@ -546,6 +191,7 @@
 
             </div>
 
+
         </div>
 
 
@@ -554,10 +200,14 @@
              FORMULARIO
              ================================================= -->
 
-        <form id="accidentForm" class="form-shell">
+        <form
+            id="accidentForm"
+            class="form-shell">
 
 
-            <input type="hidden" id="accidentId">
+            <input
+                type="hidden"
+                id="accidentId">
 
 
 
@@ -584,7 +234,11 @@
 
                         Chofer
 
-                        <input type="text" id="accidentDriver" required autocomplete="name"
+                        <input
+                            type="text"
+                            id="accidentDriver"
+                            required
+                            autocomplete="name"
                             placeholder="Nombre y apellidos del chofer">
 
                     </label>
@@ -597,7 +251,10 @@
 
                         Fecha y hora
 
-                        <input type="text" id="accidentDateTime" readonly>
+                        <input
+                            type="text"
+                            id="accidentDateTime"
+                            readonly>
 
                     </label>
 
@@ -609,7 +266,10 @@
 
                         Vehículo
 
-                        <select id="accidentVehicle" required>
+
+                        <select
+                            id="accidentVehicle"
+                            required>
 
 
                             <option value="">
@@ -642,6 +302,7 @@
 
                         </select>
 
+
                     </label>
 
 
@@ -652,12 +313,17 @@
 
                         Placa
 
-                        <input type="text" id="accidentPlate" readonly placeholder="Se selecciona automáticamente">
+                        <input
+                            type="text"
+                            id="accidentPlate"
+                            readonly
+                            placeholder="Se selecciona automáticamente">
 
                     </label>
 
 
                 </div>
+
 
             </section>
 
@@ -681,7 +347,10 @@
 
                     Describa lo sucedido
 
-                    <textarea id="accidentDescription" rows="6" required
+                    <textarea
+                        id="accidentDescription"
+                        rows="6"
+                        required
                         placeholder="Describa de forma detallada el daño o accidente"></textarea>
 
                 </label>
@@ -709,7 +378,11 @@
 
                     Nombre y apellidos de los ocupantes
 
-                    <textarea id="accidentOccupants" rows="4" placeholder="Escriba una persona por línea"></textarea>
+
+                    <textarea
+                        id="accidentOccupants"
+                        rows="4"
+                        placeholder="Escriba una persona por línea"></textarea>
 
 
                     <small>
@@ -721,6 +394,7 @@
                         dejar este espacio vacío.
 
                     </small>
+
 
                 </label>
 
@@ -743,6 +417,7 @@
                 </h2>
 
 
+
                 <div class="accident-geo-layout">
 
 
@@ -757,7 +432,11 @@
 
                             Coordenada Y - Latitud
 
-                            <input type="text" id="accidentLatitude" readonly placeholder="Sin obtener">
+                            <input
+                                type="text"
+                                id="accidentLatitude"
+                                readonly
+                                placeholder="Sin obtener">
 
                         </label>
 
@@ -767,13 +446,18 @@
 
                             Coordenada X - Longitud
 
-                            <input type="text" id="accidentLongitude" readonly placeholder="Sin obtener">
+                            <input
+                                type="text"
+                                id="accidentLongitude"
+                                readonly
+                                placeholder="Sin obtener">
 
                         </label>
 
 
 
-                        <div class="accident-geo-divider">
+                        <div
+                            class="accident-geo-divider">
                         </div>
 
 
@@ -782,7 +466,11 @@
 
                             Altitud (m)
 
-                            <input type="text" id="accidentAltitude" readonly placeholder="Sin obtener">
+                            <input
+                                type="text"
+                                id="accidentAltitude"
+                                readonly
+                                placeholder="Sin obtener">
 
                         </label>
 
@@ -792,7 +480,11 @@
 
                             Precisión (m)
 
-                            <input type="text" id="accidentAccuracy" readonly placeholder="Sin obtener">
+                            <input
+                                type="text"
+                                id="accidentAccuracy"
+                                readonly
+                                placeholder="Sin obtener">
 
                         </label>
 
@@ -815,14 +507,21 @@
 
                                 Buscar lugar, dirección o referencia
 
-                                <input type="search" id="accidentLocation" required autocomplete="off"
+                                <input
+                                    type="search"
+                                    id="accidentLocation"
+                                    required
+                                    autocomplete="off"
                                     placeholder="Ejemplo: Escuela de Orosi">
 
                             </label>
 
 
 
-                            <button type="button" class="btn secondary" id="accidentSearchButton">
+                            <button
+                                type="button"
+                                class="btn secondary"
+                                id="accidentSearchButton">
 
                                 Buscar
 
@@ -830,7 +529,10 @@
 
 
 
-                            <button type="button" class="btn secondary" id="accidentGpsButton">
+                            <button
+                                type="button"
+                                class="btn secondary"
+                                id="accidentGpsButton">
 
                                 Mi ubicación
 
@@ -843,14 +545,19 @@
 
                         <!-- RESULTADOS -->
 
-                        <div id="accidentSearchResults" class="accident-search-results hidden">
+                        <div
+                            id="accidentSearchResults"
+                            class="accident-search-results hidden">
                         </div>
 
 
 
                         <!-- MENSAJE -->
 
-                        <p id="accidentGpsStatus" class="note" aria-live="polite">
+                        <p
+                            id="accidentGpsStatus"
+                            class="note"
+                            aria-live="polite">
 
                             Puede buscar una referencia,
                             usar su ubicación o seleccionar
@@ -864,9 +571,12 @@
 
                         <div class="accident-map-large">
 
-                            <div id="accidentInteractiveMap"
+
+                            <div
+                                id="accidentInteractiveMap"
                                 aria-label="Mapa interactivo para seleccionar la ubicación del daño o accidente">
                             </div>
+
 
                         </div>
 
@@ -885,6 +595,7 @@
 
 
                 </div>
+
 
             </section>
 
@@ -916,7 +627,11 @@
                 <label class="upload-box">
 
 
-                    <input id="accidentPhotos" type="file" accept="image/*" multiple>
+                    <input
+                        id="accidentPhotos"
+                        type="file"
+                        accept="image/*"
+                        multiple>
 
 
                     <span>
@@ -936,8 +651,9 @@
                 </label>
 
 
-
-                <div id="accidentPhotoPreview" class="photo-grid">
+                <div
+                    id="accidentPhotoPreview"
+                    class="photo-grid">
                 </div>
 
 
@@ -964,7 +680,11 @@
 
                     Persona a quien se le reportó
 
-                    <input type="text" id="accidentReportedTo" required autocomplete="name"
+                    <input
+                        type="text"
+                        id="accidentReportedTo"
+                        required
+                        autocomplete="name"
                         placeholder="Nombre y apellidos">
 
                 </label>
@@ -976,7 +696,9 @@
                     ¿El vehículo puede continuar en uso?
 
 
-                    <select id="accidentCanContinueUse" required>
+                    <select
+                        id="accidentCanContinueUse"
+                        required>
 
 
                         <option value="">
@@ -1026,7 +748,9 @@
             <div class="form-actions">
 
 
-                <a href="index.html" class="btn secondary">
+                <a
+                    href="index.html"
+                    class="btn secondary">
 
                     Cancelar
 
@@ -1034,7 +758,9 @@
 
 
 
-                <button type="submit" class="btn primary">
+                <button
+                    type="submit"
+                    class="btn primary">
 
                     Guardar registro
 
@@ -1055,16 +781,24 @@
          LEAFLET
          ===================================================== -->
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
 
 
 
     <!-- =====================================================
-         GUARDAMOS LEAFLET ANTES DE APP.JS
+         GUARDAR REFERENCIA DE LEAFLET
          ===================================================== -->
 
     <script>
+
+        /*
+            Guardamos Leaflet ANTES de cargar app.js.
+
+            Así evitamos que cualquier otro script
+            interfiera con la variable global L.
+        */
 
         window.ASADA_LEAFLET =
             window.L;
@@ -1075,15 +809,15 @@
 
     <!-- =====================================================
          APP.JS
-         IMPORTANTE: SOLO UNA VEZ
+         SOLO SE CARGA UNA VEZ
          ===================================================== -->
 
-    <script src="js/app.js?v=20260911-16"></script>
+    <script src="js/app.js?v=20260911-17"></script>
 
 
 
     <!-- =====================================================
-         MAPA Y FUNCIONES DE ESTA PÁGINA
+         MAPA DE ACCIDENTES
          ===================================================== -->
 
     <script>
@@ -1110,22 +844,40 @@
 
 
 
-            /*
-                Referencia segura a Leaflet.
-
-                Desde aquí NO usamos directamente window.L.
-            */
+            /* =================================================
+               LEAFLET
+               ================================================= */
 
             const Leaflet =
                 window.ASADA_LEAFLET;
 
 
 
+            /* =================================================
+               AYUDA
+               ================================================= */
+
+            const $ =
+                id =>
+                    document.getElementById(
+                        id
+                    );
+
+
+
+            /* =================================================
+               VARIABLES DEL MAPA
+               ================================================= */
+
             let map =
                 null;
 
 
             let marker =
+                null;
+
+
+            let accuracyCircle =
                 null;
 
 
@@ -1137,41 +889,12 @@
                 0;
 
 
-
-            const $ =
-                id =>
-                    document.getElementById(
-                        id
-                    );
+            let gpsWatchId =
+                null;
 
 
-
-            /* =================================================
-               IMÁGENES DEL MARCADOR
-               ================================================= */
-
-            if (
-                Leaflet &&
-                Leaflet.Icon &&
-                Leaflet.Icon.Default &&
-                typeof Leaflet.Icon.Default.mergeOptions ===
-                "function"
-            ) {
-
-                Leaflet.Icon.Default.mergeOptions({
-
-                    iconRetinaUrl:
-                        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-
-                    iconUrl:
-                        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-
-                    shadowUrl:
-                        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
-
-                });
-
-            }
+            let gpsFinishTimer =
+                null;
 
 
 
@@ -1215,10 +938,11 @@
 
 
             /* =================================================
-               FECHA
+               FECHA Y HORA
                ================================================= */
 
             function setDateTime() {
+
 
                 const input =
                     $(
@@ -1235,6 +959,7 @@
                 }
 
 
+
                 const now =
                     new Date();
 
@@ -1247,6 +972,7 @@
                             2,
                             "0"
                         );
+
 
 
                 input.value =
@@ -1283,6 +1009,7 @@
 
             function setPlate() {
 
+
                 const vehicle =
                     $(
                         "accidentVehicle"
@@ -1305,13 +1032,155 @@
                 }
 
 
+
                 plate.value =
 
                     VEHICLE_PLATES[
-                    vehicle.value
+                        vehicle.value
                     ] ||
 
                     "";
+
+            }
+
+
+
+            /* =================================================
+               MARCADOR PERSONALIZADO
+
+               Este es el pin bonito nuevo.
+
+               NO usa divIcon.
+               NO depende del PNG del marcador de Leaflet.
+
+               Es un SVG creado directamente desde JavaScript.
+               ================================================= */
+
+            function createAccidentMarkerIcon() {
+
+
+                if (
+                    !Leaflet ||
+                    typeof Leaflet.icon !==
+                        "function"
+                ) {
+
+                    return null;
+
+                }
+
+
+
+                const svg = `
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="48"
+                        height="62"
+                        viewBox="0 0 48 62">
+
+                        <defs>
+
+                            <filter
+                                id="shadow"
+                                x="-50%"
+                                y="-50%"
+                                width="200%"
+                                height="200%">
+
+                                <feDropShadow
+                                    dx="0"
+                                    dy="3"
+                                    stdDeviation="3"
+                                    flood-color="#000000"
+                                    flood-opacity="0.35"/>
+
+                            </filter>
+
+                        </defs>
+
+
+                        <g filter="url(#shadow)">
+
+                            <path
+
+                                d="
+                                    M24 2
+                                    C12.4 2 3 11.4 3 23
+                                    c0 16.5 21 36 21 36
+                                    s21-19.5 21-36
+                                    C45 11.4 35.6 2 24 2z
+                                "
+
+                                fill="#20cdb0"
+
+                                stroke="#ffffff"
+
+                                stroke-width="3"/>
+
+
+                            <circle
+
+                                cx="24"
+
+                                cy="23"
+
+                                r="8"
+
+                                fill="#123d36"
+
+                                stroke="#ffffff"
+
+                                stroke-width="2"/>
+
+                        </g>
+
+                    </svg>
+
+                `;
+
+
+
+                const iconUrl =
+
+                    "data:image/svg+xml;charset=UTF-8," +
+
+                    encodeURIComponent(
+                        svg
+                    );
+
+
+
+                return Leaflet.icon({
+
+                    iconUrl:
+                        iconUrl,
+
+                    iconSize:
+                        [
+                            48,
+                            62
+                        ],
+
+                    iconAnchor:
+                        [
+                            24,
+                            59
+                        ],
+
+                    popupAnchor:
+                        [
+                            0,
+                            -54
+                        ],
+
+                    tooltipAnchor:
+                        [
+                            0,
+                            -48
+                        ]
+
+                });
 
             }
 
@@ -1322,6 +1191,7 @@
                ================================================= */
 
             function initMap() {
+
 
                 const container =
                     $(
@@ -1335,6 +1205,7 @@
                     );
 
 
+
                 if (
                     !container
                 ) {
@@ -1345,19 +1216,16 @@
 
 
 
-                /*
-                    Revisamos que realmente tenemos
-                    Leaflet y sus funciones.
-                */
-
                 if (
                     !Leaflet ||
                     typeof Leaflet.map !==
-                    "function" ||
+                        "function" ||
                     typeof Leaflet.tileLayer !==
-                    "function" ||
+                        "function" ||
                     typeof Leaflet.marker !==
-                    "function"
+                        "function" ||
+                    typeof Leaflet.icon !==
+                        "function"
                 ) {
 
                     if (
@@ -1382,16 +1250,11 @@
 
 
 
-                /*
-                    Si ya existe, no lo volvemos a crear.
-                */
-
                 if (
                     map
                 ) {
 
                     map.invalidateSize();
-
 
                     return;
 
@@ -1400,23 +1263,27 @@
 
 
                 /*
-                    Centro inicial de Orosi.
+                    Centro inicial:
+                    Orosi, Cartago.
                 */
 
                 map =
                     Leaflet.map(
                         container,
                         {
+
                             zoomControl:
                                 true
+
                         }
-                    ).setView(
-                        [
-                            9.7965,
-                            -83.8538
-                        ],
-                        14
-                    );
+                    )
+                        .setView(
+                            [
+                                9.7965,
+                                -83.8538
+                            ],
+                            14
+                        );
 
 
 
@@ -1444,9 +1311,9 @@
 
 
 
-                /* =============================================
+                /* =========================================
                    CLIC MANUAL
-                   ============================================= */
+                   ========================================= */
 
                 map.on(
                     "click",
@@ -1461,11 +1328,13 @@
                                 event.latlng.lng,
 
                                 {
+
                                     manual:
                                         true,
 
                                     centerMap:
                                         false
+
                                 }
 
                             );
@@ -1509,22 +1378,39 @@
 
 
                 /*
-                    Leaflet a veces necesita recalcular
-                    el tamaño después de dibujarse.
+                    Leaflet puede necesitar recalcular
+                    el tamaño después de que se termine
+                    de pintar la página.
                 */
 
-                setTimeout(
-                    () =>
-                        map &&
-                        map.invalidateSize(),
+                window.setTimeout(
+                    () => {
+
+                        if (
+                            map
+                        ) {
+
+                            map.invalidateSize();
+
+                        }
+
+                    },
                     250
                 );
 
 
-                setTimeout(
-                    () =>
-                        map &&
-                        map.invalidateSize(),
+                window.setTimeout(
+                    () => {
+
+                        if (
+                            map
+                        ) {
+
+                            map.invalidateSize();
+
+                        }
+
+                    },
                     900
                 );
 
@@ -1533,7 +1419,193 @@
 
 
             /* =================================================
-               COLOCAR PUNTO
+               QUITAR CÍRCULO DE PRECISIÓN
+               ================================================= */
+
+            function clearAccuracyCircle() {
+
+
+                if (
+                    map &&
+                    accuracyCircle &&
+                    typeof map.removeLayer ===
+                        "function"
+                ) {
+
+                    map.removeLayer(
+                        accuracyCircle
+                    );
+
+                }
+
+
+                accuracyCircle =
+                    null;
+
+            }
+
+
+
+            /* =================================================
+               CÍRCULO DE PRECISIÓN GPS
+               ================================================= */
+
+            function drawAccuracyCircle(
+
+                latitude,
+
+                longitude,
+
+                accuracy
+
+            ) {
+
+
+                clearAccuracyCircle();
+
+
+
+                const radius =
+                    Number(
+                        accuracy
+                    );
+
+
+
+                if (
+                    !map ||
+                    !Leaflet ||
+                    typeof Leaflet.circle !==
+                        "function" ||
+                    !Number.isFinite(
+                        radius
+                    ) ||
+                    radius <=
+                        0
+                ) {
+
+                    return;
+
+                }
+
+
+
+                accuracyCircle =
+                    Leaflet.circle(
+                        [
+                            latitude,
+                            longitude
+                        ],
+                        {
+
+                            radius:
+                                radius,
+
+                            color:
+                                "#20cdb0",
+
+                            fillColor:
+                                "#20cdb0",
+
+                            fillOpacity:
+                                0.10,
+
+                            opacity:
+                                0.65,
+
+                            weight:
+                                2,
+
+                            interactive:
+                                false
+
+                        }
+                    )
+                        .addTo(
+                            map
+                        );
+
+            }
+
+
+
+            /* =================================================
+               ZOOM SEGÚN LA PRECISIÓN
+
+               Entre mejor sea la precisión, más cerca
+               podemos colocar el mapa.
+               ================================================= */
+
+            function zoomForAccuracy(
+                accuracy
+            ) {
+
+
+                const value =
+                    Number(
+                        accuracy
+                    );
+
+
+                if (
+                    !Number.isFinite(
+                        value
+                    )
+                ) {
+
+                    return 18;
+
+                }
+
+
+                if (
+                    value <=
+                    15
+                ) {
+
+                    return 19;
+
+                }
+
+
+                if (
+                    value <=
+                    35
+                ) {
+
+                    return 18;
+
+                }
+
+
+                if (
+                    value <=
+                    80
+                ) {
+
+                    return 17;
+
+                }
+
+
+                if (
+                    value <=
+                    200
+                ) {
+
+                    return 16;
+
+                }
+
+
+                return 15;
+
+            }
+
+
+
+            /* =================================================
+               COLOCAR / MOVER EL PUNTO
                ================================================= */
 
             function setMapPoint(
@@ -1589,7 +1661,7 @@
                     !map ||
                     !Leaflet ||
                     typeof Leaflet.marker !==
-                    "function"
+                        "function"
                 ) {
 
                     return false;
@@ -1599,18 +1671,12 @@
 
 
                 /* =========================================
-                   LATITUD / LONGITUD
+                   LATITUD
                    ========================================= */
 
                 const latitudeInput =
                     $(
                         "accidentLatitude"
-                    );
-
-
-                const longitudeInput =
-                    $(
-                        "accidentLongitude"
                     );
 
 
@@ -1624,6 +1690,17 @@
                         );
 
                 }
+
+
+
+                /* =========================================
+                   LONGITUD
+                   ========================================= */
+
+                const longitudeInput =
+                    $(
+                        "accidentLongitude"
+                    );
 
 
                 if (
@@ -1640,14 +1717,20 @@
 
 
                 /*
-                    Cuando el punto es manual o buscado,
-                    no inventamos altitud ni precisión.
+                    Cuando el punto se puso con clic manual
+                    o mediante Buscar, no inventamos
+                    altitud ni precisión.
                 */
 
                 if (
                     options.manual ||
                     options.fromSearch
                 ) {
+
+
+                    clearAccuracyCircle();
+
+
 
                     const altitude =
                         $(
@@ -1685,21 +1768,48 @@
 
 
                 /* =========================================
-                   MARCADOR
+                   CREAR MARCADOR
                    ========================================= */
 
                 if (
                     !marker
                 ) {
 
+
+                    const markerOptions = {
+
+                        draggable:
+                            true,
+
+                        keyboard:
+                            true,
+
+                        title:
+                            "Ubicación del daño o accidente"
+
+                    };
+
+
+
                     /*
-                        IMPORTANTE:
-
-                        Usamos el marcador estándar
-                        de Leaflet.
-
-                        NO usamos divIcon.
+                        Creamos nuestro marcador SVG.
                     */
+
+                    const customIcon =
+                        createAccidentMarkerIcon();
+
+
+
+                    if (
+                        customIcon
+                    ) {
+
+                        markerOptions.icon =
+                            customIcon;
+
+                    }
+
+
 
                     marker =
                         Leaflet.marker(
@@ -1707,26 +1817,29 @@
                                 lat,
                                 lng
                             ],
-                            {
-
-                                draggable:
-                                    true,
-
-                                keyboard:
-                                    true,
-
-                                title:
-                                    "Ubicación del daño o accidente"
-
-                            }
-                        ).addTo(
-                            map
-                        );
+                            markerOptions
+                        )
+                            .addTo(
+                                map
+                            );
 
 
+
+                    /*
+                        El popup existe, pero NO lo abrimos
+                        automáticamente.
+
+                        Así no tapa el marcador.
+                    */
 
                     marker.bindPopup(
-                        "Ubicación del daño o accidente"
+
+                        "<strong>Ubicación del daño o accidente</strong>" +
+
+                        "<br>" +
+
+                        "Puede arrastrar el marcador para ajustarla."
+
                     );
 
 
@@ -1797,10 +1910,6 @@
 
                 } else {
 
-                    /*
-                        Si ya existe, solamente
-                        movemos el marcador.
-                    */
 
                     marker.setLatLng(
                         [
@@ -1817,29 +1926,51 @@
 
 
 
-                /*
-                    Si la ubicación vino de GPS
-                    o Buscar, centramos el mapa.
-                */
+                /* =========================================
+                   CENTRAR MAPA
+                   ========================================= */
 
                 if (
                     options.centerMap !==
                     false
                 ) {
 
-                    map.setView(
+
+                    const zoom =
+
+                        Number.isFinite(
+                            Number(
+                                options.zoom
+                            )
+                        )
+
+                            ? Number(
+                                options.zoom
+                            )
+
+                            : 18;
+
+
+
+                    map.flyTo(
                         [
                             lat,
                             lng
                         ],
-                        17
+                        zoom,
+                        {
+
+                            animate:
+                                true,
+
+                            duration:
+                                0.65
+
+                        }
                     );
 
                 }
 
-
-
-                marker.openPopup();
 
 
                 return true;
@@ -1856,13 +1987,27 @@
                 url
             ) {
 
+
+                /*
+                    No realizamos autocompletado.
+
+                    Solamente se consulta al presionar
+                    Buscar o después de seleccionar un
+                    punto.
+
+                    Además dejamos al menos 1.1 segundos
+                    entre solicitudes.
+                */
+
                 const minimumDelay =
                     1100;
+
 
 
                 const elapsed =
 
                     Date.now() -
+
                     lastNominatimRequestAt;
 
 
@@ -1872,16 +2017,21 @@
                     minimumDelay
                 ) {
 
+
                     await new Promise(
-                        resolve =>
-                            setTimeout(
+                        resolve => {
+
+
+                            window.setTimeout(
 
                                 resolve,
 
                                 minimumDelay -
                                 elapsed
 
-                            )
+                            );
+
+                        }
                     );
 
                 }
@@ -1941,28 +2091,35 @@
 
             ) {
 
+
                 if (
                     reverseTimer
                 ) {
 
-                    clearTimeout(
+                    window.clearTimeout(
                         reverseTimer
                     );
 
                 }
 
 
+
                 reverseTimer =
 
-                    setTimeout(
-                        () =>
+                    window.setTimeout(
+                        () => {
+
+
                             reverseGeocode(
 
                                 latitude,
 
                                 longitude
 
-                            ),
+                            );
+
+
+                        },
                         1200
                     );
 
@@ -1971,7 +2128,7 @@
 
 
             /* =================================================
-               BUSCAR REFERENCIA DESDE COORDENADAS
+               COORDENADAS → DIRECCIÓN
                ================================================= */
 
             async function reverseGeocode(
@@ -1981,6 +2138,7 @@
                 longitude
 
             ) {
+
 
                 const input =
                     $(
@@ -2053,14 +2211,43 @@
                         status
                     ) {
 
-                        status.textContent =
-                            "Ubicación lista. Puede mover el marcador si necesita ajustarla.";
+
+                        const accuracyText =
+
+                            $(
+                                "accidentAccuracy"
+                            )?.value ||
+
+                            "";
+
+
+
+                        if (
+                            accuracyText &&
+                            accuracyText !==
+                                "No disponible"
+                        ) {
+
+                            status.textContent =
+
+                                "Ubicación lista. Precisión aproximada: ±" +
+
+                                accuracyText +
+
+                                " m. Puede mover el marcador si necesita ajustarla.";
+
+                        } else {
+
+                            status.textContent =
+                                "Ubicación lista. Puede mover el marcador si necesita ajustarla.";
+
+                        }
 
                     }
 
 
                 } catch (
-                error
+                    error
                 ) {
 
 
@@ -2091,6 +2278,7 @@
 
             async function searchLocation() {
 
+
                 const input =
                     $(
                         "accidentLocation"
@@ -2115,7 +2303,9 @@
                     );
 
 
+
                 const query =
+
                     String(
                         input?.value ||
                         ""
@@ -2206,13 +2396,15 @@
                         0
                     ) {
 
+
                         resultsBox.innerHTML =
 
                             '<div class="accident-search-empty">' +
 
-                            'No se encontraron lugares con esa referencia.' +
+                            "No se encontraron lugares con esa referencia." +
 
-                            '</div>';
+                            "</div>";
+
 
 
                         resultsBox.classList.remove(
@@ -2248,8 +2440,8 @@
                                     data-index="${index}">
 
                                     ${escapeHtml(
-                                result.display_name
-                            )}
+                                        result.display_name
+                                    )}
 
                                 </button>
 
@@ -2290,9 +2482,9 @@
                                         const result =
 
                                             results[
-                                            Number(
-                                                resultButton.dataset.index
-                                            )
+                                                Number(
+                                                    resultButton.dataset.index
+                                                )
                                             ];
 
 
@@ -2330,7 +2522,10 @@
                                                         true,
 
                                                     fromSearch:
-                                                        true
+                                                        true,
+
+                                                    zoom:
+                                                        18
 
                                                 }
 
@@ -2362,7 +2557,7 @@
 
 
                 } catch (
-                error
+                    error
                 ) {
 
 
@@ -2401,6 +2596,7 @@
                 error
             ) {
 
+
                 if (
                     !error
                 ) {
@@ -2415,7 +2611,7 @@
                     1
                 ) {
 
-                    return "No se autorizó el acceso a la ubicación. Permita el acceso a la ubicación del navegador e intente nuevamente.";
+                    return "No se autorizó el acceso a la ubicación. Permita el acceso en el navegador e intente nuevamente.";
 
                 }
 
@@ -2447,12 +2643,60 @@
 
 
             /* =================================================
-               UTILIZAR GPS OBTENIDO
+               DETENER GPS
+               ================================================= */
+
+            function stopGpsWatch() {
+
+
+                if (
+                    gpsWatchId !==
+                        null &&
+                    navigator.geolocation
+                ) {
+
+                    navigator.geolocation.clearWatch(
+                        gpsWatchId
+                    );
+
+                }
+
+
+                gpsWatchId =
+                    null;
+
+
+
+                if (
+                    gpsFinishTimer
+                ) {
+
+                    window.clearTimeout(
+                        gpsFinishTimer
+                    );
+
+                }
+
+
+                gpsFinishTimer =
+                    null;
+
+            }
+
+
+
+            /* =================================================
+               MOSTRAR UNA LECTURA GPS
                ================================================= */
 
             async function useGpsPosition(
-                position
+
+                position,
+
+                options = {}
+
             ) {
+
 
                 const button =
                     $(
@@ -2471,6 +2715,22 @@
 
 
 
+                const accuracyValue =
+
+                    Number(
+                        coordinates.accuracy
+                    );
+
+
+
+                const zoom =
+
+                    zoomForAccuracy(
+                        accuracyValue
+                    );
+
+
+
                 const ok =
 
                     setMapPoint(
@@ -2482,7 +2742,10 @@
                         {
 
                             centerMap:
-                                true
+                                true,
+
+                            zoom:
+                                zoom
 
                         }
 
@@ -2499,6 +2762,23 @@
                     );
 
                 }
+
+
+
+                /*
+                    Dibujamos el radio de precisión
+                    alrededor del punto.
+                */
+
+                drawAccuracyCircle(
+
+                    coordinates.latitude,
+
+                    coordinates.longitude,
+
+                    accuracyValue
+
+                );
 
 
 
@@ -2521,14 +2801,14 @@
                         coordinates.altitude !==
                             null &&
 
-                            coordinates.altitude !==
+                        coordinates.altitude !==
                             undefined &&
 
-                            Number.isFinite(
-                                Number(
-                                    coordinates.altitude
-                                )
+                        Number.isFinite(
+                            Number(
+                                coordinates.altitude
                             )
+                        )
 
                             ? Number(
                                 coordinates.altitude
@@ -2559,14 +2839,10 @@
                     accuracy.value =
 
                         Number.isFinite(
-                            Number(
-                                coordinates.accuracy
-                            )
+                            accuracyValue
                         )
 
-                            ? Number(
-                                coordinates.accuracy
-                            ).toFixed(
+                            ? accuracyValue.toFixed(
                                 1
                             )
 
@@ -2576,37 +2852,112 @@
 
 
 
+                /* =========================================
+                   MENSAJE SEGÚN PRECISIÓN
+                   ========================================= */
+
                 if (
                     status
                 ) {
 
-                    status.textContent =
-                        "Ubicación obtenida correctamente.";
+
+                    if (
+                        Number.isFinite(
+                            accuracyValue
+                        ) &&
+                        accuracyValue <=
+                            25
+                    ) {
+
+                        status.textContent =
+
+                            "Ubicación GPS de buena precisión: ±" +
+
+                            accuracyValue.toFixed(
+                                0
+                            ) +
+
+                            " m.";
+
+
+                    } else if (
+                        Number.isFinite(
+                            accuracyValue
+                        ) &&
+                        accuracyValue <=
+                            100
+                    ) {
+
+                        status.textContent =
+
+                            "Ubicación GPS obtenida con precisión aproximada de ±" +
+
+                            accuracyValue.toFixed(
+                                0
+                            ) +
+
+                            " m. Esperando unos segundos por una lectura mejor...";
+
+
+                    } else if (
+                        Number.isFinite(
+                            accuracyValue
+                        )
+                    ) {
+
+                        status.textContent =
+
+                            "La ubicación es aproximada (±" +
+
+                            accuracyValue.toFixed(
+                                0
+                            ) +
+
+                            " m). Si el punto está lejos, ajústelo manualmente en el mapa.";
+
+
+                    } else {
+
+                        status.textContent =
+                            "Ubicación GPS obtenida.";
+
+                    }
 
                 }
 
 
 
-                scheduleReverseGeocode(
-
-                    coordinates.latitude,
-
-                    coordinates.longitude
-
-                );
-
-
+                /*
+                    Solo cuando terminemos de buscar
+                    la mejor posición, obtenemos la dirección.
+                */
 
                 if (
-                    button
+                    options.final
                 ) {
 
-                    button.disabled =
-                        false;
+
+                    scheduleReverseGeocode(
+
+                        coordinates.latitude,
+
+                        coordinates.longitude
+
+                    );
 
 
-                    button.textContent =
-                        "Actualizar ubicación";
+                    if (
+                        button
+                    ) {
+
+                        button.disabled =
+                            false;
+
+
+                        button.textContent =
+                            "Actualizar ubicación";
+
+                    }
 
                 }
 
@@ -2616,9 +2967,24 @@
 
             /* =================================================
                MI UBICACIÓN
+
+               No aceptamos inmediatamente la primera posición.
+
+               watchPosition puede ir recibiendo mejores lecturas.
+
+               Guardamos la lectura con el número de precisión
+               más pequeño.
+
+               Ejemplo:
+
+               800 m → mala
+               150 m → mejor
+               40 m  → mejor
+               12 m  → muy buena
                ================================================= */
 
             function getMyLocation() {
+
 
                 const button =
                     $(
@@ -2661,17 +3027,38 @@
 
 
 
+                /*
+                    Si había una búsqueda GPS anterior,
+                    la detenemos.
+                */
+
+                stopGpsWatch();
+
+
+
                 button.disabled =
                     true;
 
 
                 button.textContent =
-                    "Obteniendo...";
+                    "Buscando GPS...";
 
 
                 status.textContent =
-                    "Obteniendo ubicación. Espere unos segundos...";
+                    "Buscando la mejor ubicación disponible. Espere unos segundos...";
 
+
+
+                let bestPosition =
+                    null;
+
+
+                let bestAccuracy =
+                    Infinity;
+
+
+                let receivedPosition =
+                    false;
 
 
                 let finished =
@@ -2680,11 +3067,11 @@
 
 
                 /* =========================================
-                   ÉXITO
+                   TERMINAR
                    ========================================= */
 
-                const success =
-                    position => {
+                const finish =
+                    () => {
 
 
                         if (
@@ -2701,8 +3088,48 @@
 
 
 
+                        stopGpsWatch();
+
+
+
+                        if (
+                            !bestPosition
+                        ) {
+
+                            button.disabled =
+                                false;
+
+
+                            button.textContent =
+                                "Mi ubicación";
+
+
+                            status.textContent =
+                                "No fue posible obtener una ubicación. Puede seleccionar el punto manualmente en el mapa.";
+
+
+                            return;
+
+                        }
+
+
+
+                        /*
+                            Usamos finalmente la mejor
+                            posición que recibimos.
+                        */
+
                         useGpsPosition(
-                            position
+
+                            bestPosition,
+
+                            {
+
+                                final:
+                                    true
+
+                            }
+
                         ).catch(
                             error => {
 
@@ -2737,146 +3164,227 @@
 
 
                 /* =========================================
-                   ERROR / RESPALDO
+                   INICIAR WATCH
                    ========================================= */
 
-                const error =
-                    firstError => {
+                gpsWatchId =
+
+                    navigator.geolocation.watchPosition(
 
 
-                        if (
-                            finished
-                        ) {
+                        /* =================================
+                           ÉXITO
+                           ================================= */
 
-                            return;
-
-                        }
+                        position => {
 
 
-
-                        /*
-                            Si no fue un rechazo de permiso,
-                            probamos una ubicación menos exigente.
-                        */
-
-                        if (
-                            firstError &&
-                            firstError.code !==
-                            1
-                        ) {
-
-
-                            status.textContent =
-                                "El GPS de alta precisión no respondió. Intentando una ubicación aproximada...";
+                            receivedPosition =
+                                true;
 
 
 
-                            navigator.geolocation.getCurrentPosition(
+                            const accuracy =
 
-                                success,
+                                Number(
+                                    position.coords.accuracy
+                                );
 
-                                secondError => {
 
 
-                                    if (
-                                        finished
-                                    ) {
+                            /*
+                                Guardamos la lectura solamente
+                                cuando es mejor que la anterior.
+                            */
 
-                                        return;
+                            if (
+                                !bestPosition ||
+                                (
+                                    Number.isFinite(
+                                        accuracy
+                                    ) &&
+                                    accuracy <
+                                        bestAccuracy
+                                )
+                            ) {
+
+
+                                bestPosition =
+                                    position;
+
+
+                                bestAccuracy =
+
+                                    Number.isFinite(
+                                        accuracy
+                                    )
+
+                                        ? accuracy
+
+                                        : bestAccuracy;
+
+
+
+                                /*
+                                    Mostramos la nueva mejor lectura
+                                    provisionalmente.
+                                */
+
+                                useGpsPosition(
+
+                                    position,
+
+                                    {
+
+                                        final:
+                                            false
 
                                     }
 
+                                ).catch(
+                                    error => {
 
-                                    finished =
-                                        true;
-
-
-                                    status.textContent =
-                                        gpsErrorMessage(
-                                            secondError
+                                        console.warn(
+                                            "No fue posible mostrar una lectura provisional del GPS.",
+                                            error
                                         );
 
+                                    }
+                                );
 
-                                    button.disabled =
-                                        false;
-
-
-                                    button.textContent =
-                                        "Mi ubicación";
+                            }
 
 
-                                },
 
-                                {
+                            /*
+                                Si ya conseguimos 20 metros
+                                o menos, es suficientemente bueno
+                                y no esperamos los 15 segundos.
+                            */
 
-                                    enableHighAccuracy:
-                                        false,
+                            if (
+                                Number.isFinite(
+                                    accuracy
+                                ) &&
+                                accuracy <=
+                                    20
+                            ) {
 
-                                    timeout:
-                                        15000,
+                                finish();
 
-                                    maximumAge:
-                                        60000
-
-                                }
-
-                            );
+                            }
 
 
-                            return;
+                        },
+
+
+
+                        /* =================================
+                           ERROR
+                           ================================= */
+
+                        error => {
+
+
+                            /*
+                                Si negó el permiso,
+                                detenemos inmediatamente.
+                            */
+
+                            if (
+                                error &&
+                                error.code ===
+                                    1
+                            ) {
+
+
+                                stopGpsWatch();
+
+
+                                finished =
+                                    true;
+
+
+                                status.textContent =
+                                    gpsErrorMessage(
+                                        error
+                                    );
+
+
+                                button.disabled =
+                                    false;
+
+
+                                button.textContent =
+                                    "Mi ubicación";
+
+
+                                return;
+
+                            }
+
+
+
+                            /*
+                                Si todavía no tenemos ninguna
+                                lectura, seguimos intentando.
+                            */
+
+                            if (
+                                !receivedPosition
+                            ) {
+
+                                status.textContent =
+                                    "Todavía no hay una lectura precisa. Seguimos intentando...";
+
+                            }
+
+
+                        },
+
+
+
+                        /* =================================
+                           CONFIGURACIÓN
+                           ================================= */
+
+                        {
+
+                            enableHighAccuracy:
+                                true,
+
+                            timeout:
+                                30000,
+
+                            maximumAge:
+                                0
 
                         }
 
-
-
-                        finished =
-                            true;
-
-
-                        status.textContent =
-                            gpsErrorMessage(
-                                firstError
-                            );
-
-
-                        button.disabled =
-                            false;
-
-
-                        button.textContent =
-                            "Mi ubicación";
-
-
-                    };
+                    );
 
 
 
-                /* =========================================
-                   PRIMER INTENTO GPS
-                   ========================================= */
+                /*
+                    Esperamos como máximo 15 segundos.
 
-                navigator.geolocation.getCurrentPosition(
+                    Al terminar usamos la MEJOR lectura
+                    recibida durante ese período.
+                */
 
-                    success,
+                gpsFinishTimer =
 
-                    error,
+                    window.setTimeout(
 
-                    {
+                        finish,
 
-                        enableHighAccuracy:
-                            true,
+                        15000
 
-                        timeout:
-                            12000,
-
-                        maximumAge:
-                            0
-
-                    }
-
-                );
+                    );
 
             }
+
+
 
             /* =================================================
                INICIAR PÁGINA
@@ -2893,18 +3401,26 @@
 
                     setDateTime();
 
+
+
                     /* =====================================
                        PLACA
                        ===================================== */
 
                     setPlate();
 
+
                     $(
                         "accidentVehicle"
                     )?.addEventListener(
+
                         "change",
+
                         setPlate
+
                     );
+
+
 
                     /* =====================================
                        MAPA
@@ -2912,26 +3428,36 @@
 
                     initMap();
 
+
+
                     /* =====================================
                        BUSCAR
                        ===================================== */
+
                     $(
                         "accidentSearchButton"
                     )?.addEventListener(
+
                         "click",
+
                         searchLocation
+
                     );
 
 
+
                     /* =====================================
-                       GPS
+                       MI UBICACIÓN
                        ===================================== */
 
                     $(
                         "accidentGpsButton"
                     )?.addEventListener(
+
                         "click",
+
                         getMyLocation
+
                     );
 
 
@@ -2949,32 +3475,38 @@
 
                             if (
                                 event.key ===
-                                "Enter"
+                                    "Enter"
                             ) {
 
                                 event.preventDefault();
+
+
                                 searchLocation();
 
                             }
+
 
                         }
                     );
 
 
+
                     /* =====================================
-                       FOTOS
+                       FOTOGRAFÍAS
                        ===================================== */
 
                     const photoInput =
+
                         $(
                             "accidentPhotos"
                         );
 
 
+
                     if (
                         photoInput &&
                         typeof previewAccidentPhotos ===
-                        "function"
+                            "function"
                     ) {
 
                         photoInput.addEventListener(
@@ -2984,7 +3516,9 @@
                             previewAccidentPhotos
 
                         );
+
                     }
+
 
 
                     /* =====================================
@@ -3000,6 +3534,8 @@
 
                             event.preventDefault();
 
+
+
                             const latitude =
 
                                 $(
@@ -3008,6 +3544,8 @@
 
                                 "";
 
+
+
                             const longitude =
 
                                 $(
@@ -3015,6 +3553,8 @@
                                 )?.value ||
 
                                 "";
+
+
 
                             if (
                                 !latitude ||
@@ -3025,36 +3565,57 @@
                                     "Seleccione la ubicación en el mapa, busque una referencia o utilice Mi ubicación."
                                 );
 
+
                                 return;
 
                             }
 
+
+
                             if (
                                 typeof saveAccidentRecord ===
-                                "function"
+                                    "function"
                             ) {
 
                                 saveAccidentRecord(
                                     event
                                 );
 
+
                                 return;
 
                             }
+
+
 
                             alert(
                                 "No se encontró la función para guardar el daño o accidente."
                             );
 
+
                         }
                     );
+
 
                 }
             );
 
+
+
+            /* =================================================
+               DETENER GPS AL SALIR
+               ================================================= */
+
+            window.addEventListener(
+                "beforeunload",
+                stopGpsWatch
+            );
+
+
         })();
 
     </script>
+
 
 </body>
 
