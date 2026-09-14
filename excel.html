@@ -23,7 +23,7 @@
 
     <link
         rel="stylesheet"
-        href="css/style.css?v=20260914-04">
+        href="css/style.css?v=20260914-05">
 
     <title>
         Descargar Excel | ASADA Orosi
@@ -114,7 +114,7 @@
 
         </a>
 
-        <a href="excel.html">
+        <a href="excel.html?v=20260914-05">
             Descargar Excel
         </a>
 
@@ -151,14 +151,16 @@
                     EXPORTACIÓN
                 </span>
 
+
                 <h1>
                     Descargar Excel
                 </h1>
 
+
                 <p>
 
-                    Seleccione los registros que desea incluir
-                    en el archivo.
+                    El archivo Excel incluirá una hoja de revisiones
+                    y otra hoja de daños y accidentes.
 
                 </p>
 
@@ -169,7 +171,7 @@
 
 
         <!-- =================================================
-             TARJETA DE EXPORTACIÓN
+             EXPORTACIÓN
              ================================================= -->
 
         <section class="export-card">
@@ -181,13 +183,14 @@
 
                 <select
                     id="exportScope"
-                    onchange="toggleVehicleExport()">
+                    onchange="toggleVehicleExportASADA()">
 
                     <option value="all">
 
                         Todos los registros
 
                     </option>
+
 
                     <option value="vehicle">
 
@@ -209,6 +212,7 @@
                 id="exportVehicleWrap"
                 class="export-vehicle-wrap hidden">
 
+
                 <label for="exportVehicle">
 
                     Vehículo
@@ -221,17 +225,20 @@
 
                         </option>
 
+
                         <option value="Toyota Rush">
 
                             Toyota Rush - BPW199
 
                         </option>
 
+
                         <option value="Isuzu D-Max Gris">
 
                             Isuzu D-Max Gris - CL376760
 
                         </option>
+
 
                         <option value="Isuzu D-Max Blanco">
 
@@ -242,6 +249,7 @@
                     </select>
 
                 </label>
+
 
             </div>
 
@@ -255,8 +263,8 @@
 
                 <p id="exportDescription">
 
-                    El archivo incluirá las revisiones
-                    y los daños o accidentes registrados.
+                    Se descargarán todas las revisiones
+                    y todos los daños o accidentes registrados.
 
                 </p>
 
@@ -266,13 +274,16 @@
 
             <!-- =================================================
                  BOTÓN
+
+                 IMPORTANTE:
+                 YA NO LLAMA exportExcel()
                  ================================================= -->
 
             <button
                 id="downloadExcelButton"
                 type="button"
                 class="btn primary"
-                onclick="exportExcel()">
+                onclick="exportExcelASADA()">
 
                 Descargar archivo
 
@@ -296,14 +307,19 @@
 
     <!-- =====================================================
          APP.JS
+
+         Lo necesitamos para las llamadas al servidor,
+         menú, tema, accesibilidad, etc.
+
+         Pero NO utilizamos su exportExcel() viejo.
          ===================================================== -->
 
-    <script src="js/app.js?v=20260914-04"></script>
+    <script src="js/app.js?v=20260914-05"></script>
 
 
 
     <!-- =====================================================
-         EXCEL
+         EXCEL NUEVO
          ===================================================== -->
 
     <script>
@@ -312,11 +328,12 @@
 
 
             /* =================================================
-               MOSTRAR / OCULTAR VEHÍCULO
+               MOSTRAR VEHÍCULO
                ================================================= */
 
-            window.toggleVehicleExport =
+            window.toggleVehicleExportASADA =
                 function () {
+
 
                     const scope =
                         document.getElementById(
@@ -401,7 +418,7 @@
 
                         description.textContent =
 
-                            "El archivo incluirá todas las revisiones y todos los daños o accidentes registrados.";
+                            "Se descargarán todas las revisiones y todos los daños o accidentes registrados.";
 
                     }
 
@@ -410,10 +427,10 @@
 
 
             /* =================================================
-               PUNTOS DE REVISIÓN
+               NORMALIZAR PUNTOS DE REVISIÓN
                ================================================= */
 
-            function getReviewPoints(
+            function normalizeExcelReviewPoints(
                 points
             ) {
 
@@ -425,9 +442,9 @@
 
                     return points
                         .map(
-                            item =>
+                            point =>
                                 String(
-                                    item ||
+                                    point ||
                                     ""
                                 ).trim()
                         )
@@ -448,8 +465,8 @@
                             "|"
                         )
                         .map(
-                            item =>
-                                item.trim()
+                            point =>
+                                point.trim()
                         )
                         .filter(
                             Boolean
@@ -465,10 +482,10 @@
 
 
             /* =================================================
-               ¿TIENE FOTOGRAFÍAS?
+               REVISIÓN CON FOTOS
                ================================================= */
 
-            function recordHasPhotos(
+            function excelReviewHasPhotos(
                 record
             ) {
 
@@ -481,7 +498,7 @@
                 }
 
 
-                const images =
+                const photos =
                     Array.isArray(
                         record.imagenes
                     )
@@ -491,7 +508,7 @@
                         : [];
 
 
-                const folderUrl =
+                const folder =
                     String(
                         record.carpetaFotosUrl ||
                         ""
@@ -500,8 +517,8 @@
 
                 return (
 
-                    images.length > 0 &&
-                    folderUrl !== ""
+                    photos.length > 0 &&
+                    folder !== ""
 
                 );
 
@@ -510,10 +527,10 @@
 
 
             /* =================================================
-               FECHA PARA NOMBRE DEL ARCHIVO
+               FECHA DEL ARCHIVO
                ================================================= */
 
-            function getExcelDate() {
+            function excelFileDate() {
 
                 const now =
                     new Date();
@@ -553,10 +570,10 @@
 
 
             /* =================================================
-               NOMBRE SEGURO
+               NOMBRE DE ARCHIVO
                ================================================= */
 
-            function safeFileName(
+            function excelSafeName(
                 value
             ) {
 
@@ -581,16 +598,51 @@
 
 
             /* =================================================
-               ESTILO GENERAL DE UNA HOJA
+               BORDES
                ================================================= */
 
-            function styleWorksheet(
+            function getExcelBorder() {
+
+                return {
+
+                    top: {
+                        style:
+                            "thin"
+                    },
+
+                    left: {
+                        style:
+                            "thin"
+                    },
+
+                    bottom: {
+                        style:
+                            "thin"
+                    },
+
+                    right: {
+                        style:
+                            "thin"
+                    }
+
+                };
+
+            }
+
+
+
+            /* =================================================
+               ESTILO GENERAL
+               ================================================= */
+
+            function styleExcelSheet(
                 sheet,
-                lastColumn
+                lastColumnLetter
             ) {
 
+
                 /* =============================================
-                   ENCABEZADO
+                   CABECERA
                    ============================================= */
 
                 const header =
@@ -605,6 +657,7 @@
 
                 header.eachCell(
                     cell => {
+
 
                         cell.fill = {
 
@@ -653,37 +706,8 @@
                         };
 
 
-                        cell.border = {
-
-                            top: {
-
-                                style:
-                                    "thin"
-
-                            },
-
-                            left: {
-
-                                style:
-                                    "thin"
-
-                            },
-
-                            bottom: {
-
-                                style:
-                                    "thin"
-
-                            },
-
-                            right: {
-
-                                style:
-                                    "thin"
-
-                            }
-
-                        };
+                        cell.border =
+                            getExcelBorder();
 
                     }
                 );
@@ -691,7 +715,7 @@
 
 
                 /* =============================================
-                   FILAS
+                   DATOS
                    ============================================= */
 
                 sheet.eachRow(
@@ -699,6 +723,7 @@
                         row,
                         rowNumber
                     ) => {
+
 
                         if (
                             rowNumber ===
@@ -717,6 +742,7 @@
                             },
                             cell => {
 
+
                                 cell.alignment = {
 
                                     vertical:
@@ -728,37 +754,8 @@
                                 };
 
 
-                                cell.border = {
-
-                                    top: {
-
-                                        style:
-                                            "thin"
-
-                                    },
-
-                                    left: {
-
-                                        style:
-                                            "thin"
-
-                                    },
-
-                                    bottom: {
-
-                                        style:
-                                            "thin"
-
-                                    },
-
-                                    right: {
-
-                                        style:
-                                            "thin"
-
-                                    }
-
-                                };
+                                cell.border =
+                                    getExcelBorder();
 
                             }
                         );
@@ -769,7 +766,24 @@
 
 
                 /* =============================================
-                   CONGELAR ENCABEZADO
+                   FILTRO
+                   ============================================= */
+
+                sheet.autoFilter = {
+
+                    from:
+                        "A1",
+
+                    to:
+                        lastColumnLetter +
+                        "1"
+
+                };
+
+
+
+                /* =============================================
+                   CONGELAR PRIMERA FILA
                    ============================================= */
 
                 sheet.views = [
@@ -786,40 +800,19 @@
 
                 ];
 
-
-
-                /* =============================================
-                   FILTROS
-                   ============================================= */
-
-                sheet.autoFilter = {
-
-                    from:
-                        "A1",
-
-                    to:
-
-                        String.fromCharCode(
-                            64 +
-                            lastColumn
-                        ) +
-
-                        "1"
-
-                };
-
             }
 
 
 
             /* =================================================
-               CREAR HOJA DE REVISIONES
+               HOJA 1 - REVISIONES
                ================================================= */
 
-            function createReviewsSheet(
+            function addReviewsSheetASADA(
                 workbook,
                 records
             ) {
+
 
                 const sheet =
                     workbook.addWorksheet(
@@ -827,12 +820,8 @@
                     );
 
 
-                /*
-                    Dejamos la hoja que ya tenías
-                    con la misma información.
-                */
-
                 sheet.columns = [
+
 
                     {
                         header:
@@ -989,6 +978,7 @@
                             24
                     }
 
+
                 ];
 
 
@@ -996,20 +986,22 @@
                 records.forEach(
                     record => {
 
+
                         const points =
-                            getReviewPoints(
+                            normalizeExcelReviewPoints(
                                 record.puntos
                             );
 
 
                         const hasPhotos =
-                            recordHasPhotos(
+                            excelReviewHasPhotos(
                                 record
                             );
 
 
                         const row =
                             sheet.addRow({
+
 
                                 id:
                                     record.id ||
@@ -1048,7 +1040,7 @@
 
                                 puntos:
 
-                                    points.length > 0
+                                    points.length
 
                                         ? points.join(
                                             ", "
@@ -1085,27 +1077,28 @@
 
                                         : ""
 
+
                             });
 
 
 
-                        /*
-                            Hipervínculo hacia la carpeta
-                            de fotografías.
-                        */
+                        /* =====================================
+                           LINK FOTOS
+                           ===================================== */
 
                         if (
                             hasPhotos &&
                             record.carpetaFotosUrl
                         ) {
 
-                            const cell =
+
+                            const photoCell =
                                 row.getCell(
                                     13
                                 );
 
 
-                            cell.value = {
+                            photoCell.value = {
 
                                 text:
                                     "Ver fotografías",
@@ -1116,17 +1109,17 @@
                             };
 
 
-                            cell.font = {
-
-                                underline:
-                                    true,
+                            photoCell.font = {
 
                                 color: {
 
                                     argb:
                                         "FF0563C1"
 
-                                }
+                                },
+
+                                underline:
+                                    true
 
                             };
 
@@ -1136,9 +1129,9 @@
                 );
 
 
-                styleWorksheet(
+                styleExcelSheet(
                     sheet,
-                    13
+                    "M"
                 );
 
 
@@ -1149,13 +1142,23 @@
 
 
             /* =================================================
-               CREAR HOJA DE DAÑOS Y ACCIDENTES
+               HOJA 2 - DAÑOS Y ACCIDENTES
                ================================================= */
 
-            function createAccidentsSheet(
+            function addAccidentsSheetASADA(
                 workbook,
                 accidents
             ) {
+
+
+                /*
+                    IMPORTANTE:
+
+                    Esta hoja se crea SIEMPRE.
+
+                    Aunque no existan accidentes,
+                    la pestaña aparecerá.
+                */
 
                 const sheet =
                     workbook.addWorksheet(
@@ -1163,21 +1166,9 @@
                     );
 
 
-                /*
-                    AQUÍ VAN SOLAMENTE LOS CAMPOS
-                    QUE PEDISTE.
-
-                    No incluimos:
-                    - ubicación
-                    - latitud
-                    - longitud
-                    - altitud
-                    - precisión
-                    - mapa
-                    - fotos
-                */
 
                 sheet.columns = [
+
 
                     {
                         header:
@@ -1208,10 +1199,10 @@
                             "Fecha y hora",
 
                         key:
-                            "fecha",
+                            "fechaHora",
 
                         width:
-                            22
+                            23
                     },
 
 
@@ -1292,162 +1283,254 @@
                             "Descargar PDF",
 
                         key:
-                            "pdf",
+                            "reportePdf",
 
                         width:
-                            22
+                            23
                     }
+
 
                 ];
 
 
 
-                accidents.forEach(
-                    accident => {
+                /* =============================================
+                   SIN ACCIDENTES
 
-                        const pdfUrl =
-                            String(
-                                accident.reportePdfUrl ||
+                   Dejamos la hoja creada.
+                   ============================================= */
+
+                if (
+                    !Array.isArray(
+                        accidents
+                    ) ||
+                    accidents.length ===
+                    0
+                ) {
+
+
+                    const row =
+                        sheet.addRow({
+
+
+                            id:
+                                "Sin registros",
+
+
+                            chofer:
+                                "",
+
+
+                            fechaHora:
+                                "",
+
+
+                            vehiculo:
+                                "",
+
+
+                            placa:
+                                "",
+
+
+                            descripcion:
+                                "No existen daños o accidentes registrados para esta selección.",
+
+
+                            ocupantes:
+                                "",
+
+
+                            personaReportada:
+                                "",
+
+
+                            puedeContinuar:
+                                "",
+
+
+                            reportePdf:
                                 ""
-                            ).trim();
 
 
-                        const row =
-                            sheet.addRow({
-
-                                id:
-                                    accident.id ||
-                                    "",
+                        });
 
 
-                                chofer:
-                                    accident.chofer ||
-                                    "",
+                    row.height =
+                        24;
 
-
-                                fecha:
-                                    accident.fechaHora ||
-                                    "",
-
-
-                                vehiculo:
-                                    accident.vehiculo ||
-                                    "",
-
-
-                                placa:
-                                    accident.placa ||
-                                    "",
-
-
-                                descripcion:
-                                    accident.descripcion ||
-                                    "",
-
-
-                                ocupantes:
-
-                                    accident.ocupantes
-
-                                        ? accident.ocupantes
-
-                                        : "Sin acompañantes",
-
-
-                                personaReportada:
-                                    accident.personaReportada ||
-                                    "",
-
-
-                                puedeContinuar:
-                                    accident.puedeContinuarUso ||
-                                    "Sin información",
-
-
-                                pdf:
-
-                                    pdfUrl
-
-                                        ? "Descargar PDF"
-
-                                        : "Sin reporte"
-
-                            });
+                }
 
 
 
-                        /* =====================================
-                           HIPERVÍNCULO DEL PDF
-                           ===================================== */
+                /* =============================================
+                   REGISTROS
+                   ============================================= */
 
-                        if (
-                            pdfUrl
-                        ) {
-
-                            const pdfCell =
-                                row.getCell(
-                                    10
-                                );
+                if (
+                    Array.isArray(
+                        accidents
+                    )
+                ) {
 
 
-                            pdfCell.value = {
-
-                                text:
-                                    "Descargar PDF",
-
-                                hyperlink:
-                                    pdfUrl,
-
-                                tooltip:
-                                    "Descargar reporte oficial en PDF"
-
-                            };
+                    accidents.forEach(
+                        accident => {
 
 
-                            pdfCell.font = {
-
-                                underline:
-                                    true,
-
-                                color: {
-
-                                    argb:
-                                        "FF0563C1"
-
-                                },
-
-                                bold:
-                                    true
-
-                            };
+                            const pdfUrl =
+                                String(
+                                    accident.reportePdfUrl ||
+                                    ""
+                                ).trim();
 
 
-                            pdfCell.alignment = {
 
-                                vertical:
-                                    "middle",
+                            const row =
+                                sheet.addRow({
 
-                                horizontal:
-                                    "center"
 
-                            };
+                                    id:
+                                        accident.id ||
+                                        "",
+
+
+                                    chofer:
+                                        accident.chofer ||
+                                        "",
+
+
+                                    fechaHora:
+                                        accident.fechaHora ||
+                                        "",
+
+
+                                    vehiculo:
+                                        accident.vehiculo ||
+                                        "",
+
+
+                                    placa:
+                                        accident.placa ||
+                                        "",
+
+
+                                    descripcion:
+                                        accident.descripcion ||
+                                        "",
+
+
+                                    ocupantes:
+
+                                        accident.ocupantes
+
+                                            ? accident.ocupantes
+
+                                            : "Sin acompañantes",
+
+
+                                    personaReportada:
+                                        accident.personaReportada ||
+                                        "",
+
+
+                                    puedeContinuar:
+                                        accident.puedeContinuarUso ||
+                                        "Sin información",
+
+
+                                    reportePdf:
+
+                                        pdfUrl
+
+                                            ? "Descargar PDF"
+
+                                            : "Sin reporte"
+
+
+                                });
+
+
+
+                            /* =================================
+                               PDF
+                               ================================= */
+
+                            if (
+                                pdfUrl
+                            ) {
+
+
+                                const pdfCell =
+                                    row.getCell(
+                                        10
+                                    );
+
+
+                                pdfCell.value = {
+
+                                    text:
+                                        "Descargar PDF",
+
+                                    hyperlink:
+                                        pdfUrl,
+
+                                    tooltip:
+                                        "Abrir reporte oficial PDF"
+
+                                };
+
+
+                                pdfCell.font = {
+
+                                    color: {
+
+                                        argb:
+                                            "FF0563C1"
+
+                                    },
+
+                                    underline:
+                                        true,
+
+                                    bold:
+                                        true
+
+                                };
+
+
+                                pdfCell.alignment = {
+
+                                    vertical:
+                                        "middle",
+
+                                    horizontal:
+                                        "center"
+
+                                };
+
+                            }
 
                         }
+                    );
 
-                    }
-                );
+                }
 
 
 
-                styleWorksheet(
+                /* =============================================
+                   ESTILO
+                   ============================================= */
+
+                styleExcelSheet(
                     sheet,
-                    10
+                    "J"
                 );
 
 
 
                 /* =============================================
-                   CENTRAR ALGUNAS COLUMNAS
+                   CENTRADOS
                    ============================================= */
 
                 sheet
@@ -1456,11 +1539,11 @@
                     )
                     .alignment = {
 
-                        vertical:
-                            "top",
-
                         horizontal:
-                            "center"
+                            "center",
+
+                        vertical:
+                            "top"
 
                     };
 
@@ -1471,11 +1554,11 @@
                     )
                     .alignment = {
 
-                        vertical:
-                            "top",
-
                         horizontal:
-                            "center"
+                            "center",
+
+                        vertical:
+                            "top"
 
                     };
 
@@ -1486,11 +1569,11 @@
                     )
                     .alignment = {
 
-                        vertical:
-                            "top",
-
                         horizontal:
                             "center",
+
+                        vertical:
+                            "top",
 
                         wrapText:
                             true
@@ -1504,11 +1587,11 @@
                     )
                     .alignment = {
 
-                        vertical:
-                            "middle",
-
                         horizontal:
-                            "center"
+                            "center",
+
+                        vertical:
+                            "middle"
 
                     };
 
@@ -1520,10 +1603,12 @@
 
 
             /* =================================================
-               EXPORTAR EXCEL
+               DESCARGAR EXCEL NUEVO
+
+               NO SE LLAMA exportExcel()
                ================================================= */
 
-            window.exportExcel =
+            window.exportExcelASADA =
                 async function () {
 
 
@@ -1545,7 +1630,7 @@
                         );
 
 
-                    const originalButtonText =
+                    const oldButtonText =
                         button
 
                             ? button.textContent
@@ -1563,11 +1648,12 @@
                         "undefined"
                     ) {
 
+
                         alert(
 
-                            "No fue posible cargar la herramienta de Excel. " +
+                            "No fue posible cargar ExcelJS. " +
 
-                            "Revise su conexión a Internet y vuelva a cargar la página."
+                            "Revise su conexión a Internet."
 
                         );
 
@@ -1579,20 +1665,17 @@
 
 
                     /* =========================================
-                       VALIDAR API
+                       FUNCIONES API
                        ========================================= */
 
                     if (
                         typeof getAllRecordsFromServer !==
-                        "function" ||
-                        typeof getAllAccidentsFromServer !==
                         "function"
                     ) {
 
+
                         alert(
-
-                            "No fue posible encontrar las funciones necesarias para consultar los registros."
-
+                            "No se encontró la función para consultar las revisiones."
                         );
 
 
@@ -1601,13 +1684,14 @@
                     }
 
 
-
                     if (
-                        !scopeElement
+                        typeof getAllAccidentsFromServer !==
+                        "function"
                     ) {
 
+
                         alert(
-                            "No fue posible determinar los registros que desea descargar."
+                            "No se encontró la función para consultar los daños y accidentes."
                         );
 
 
@@ -1621,7 +1705,7 @@
 
 
                         /* =====================================
-                           BOTÓN
+                           INICIAR
                            ===================================== */
 
                         if (
@@ -1633,7 +1717,7 @@
 
 
                             button.textContent =
-                                "Preparando archivo...";
+                                "Consultando registros...";
 
                         }
 
@@ -1643,53 +1727,100 @@
                         ) {
 
                             status.textContent =
-                                "Consultando revisiones y daños o accidentes...";
+                                "Consultando revisiones...";
 
                         }
 
 
 
                         /* =====================================
-                           CONSULTAR AMBOS MÓDULOS
+                           REVISIONES
                            ===================================== */
 
-                        const results =
-                            await Promise.all([
-
-                                getAllRecordsFromServer(),
-
-                                getAllAccidentsFromServer()
-
-                            ]);
-
-
                         const allRecords =
-                            Array.isArray(
-                                results[0]
-                            )
-
-                                ? results[0]
-
-                                : [];
+                            await getAllRecordsFromServer();
 
 
-                        const allAccidents =
-                            Array.isArray(
-                                results[1]
-                            )
 
-                                ? results[1]
+                        if (
+                            status
+                        ) {
 
-                                : [];
+                            status.textContent =
+                                "Consultando daños y accidentes...";
+
+                        }
 
 
 
                         /* =====================================
-                           ALCANCE
+                           ACCIDENTES
+
+                           Lo hacemos DESPUÉS de revisiones,
+                           no Promise.all, para facilitar
+                           identificar cualquier fallo.
+                           ===================================== */
+
+                        let allAccidents =
+                            [];
+
+
+                        try {
+
+
+                            const result =
+                                await getAllAccidentsFromServer();
+
+
+                            allAccidents =
+
+                                Array.isArray(
+                                    result
+                                )
+
+                                    ? result
+
+                                    : [];
+
+
+                        } catch (
+                            accidentError
+                        ) {
+
+
+                            console.error(
+
+                                "Error consultando daños y accidentes:",
+
+                                accidentError
+
+                            );
+
+
+                            /*
+                                AUNQUE Google falle aquí,
+                                vamos a crear la segunda hoja.
+
+                                Así jamás vuelve a desaparecer.
+                            */
+
+                            allAccidents =
+                                [];
+
+                        }
+
+
+
+                        /* =====================================
+                           FILTRADO
                            ===================================== */
 
                         const scope =
-                            scopeElement.value;
+                            scopeElement
+
+                                ? scopeElement.value
+
+                                : "all";
 
 
                         let selectedVehicle =
@@ -1697,7 +1828,14 @@
 
 
                         let records =
-                            allRecords;
+
+                            Array.isArray(
+                                allRecords
+                            )
+
+                                ? allRecords
+
+                                : [];
 
 
                         let accidents =
@@ -1705,25 +1843,23 @@
 
 
 
-                        /* =====================================
-                           FILTRAR POR VEHÍCULO
-                           ===================================== */
-
                         if (
                             scope ===
                             "vehicle"
                         ) {
 
-                            const vehicleElement =
+
+                            const vehicleSelect =
                                 document.getElementById(
                                     "exportVehicle"
                                 );
 
 
                             selectedVehicle =
-                                vehicleElement
 
-                                    ? vehicleElement.value
+                                vehicleSelect
+
+                                    ? vehicleSelect.value
 
                                     : "";
 
@@ -1732,8 +1868,9 @@
                                 !selectedVehicle
                             ) {
 
+
                                 alert(
-                                    "Seleccione el vehículo cuyos registros desea descargar."
+                                    "Seleccione un vehículo."
                                 );
 
 
@@ -1742,57 +1879,27 @@
                             }
 
 
+
                             records =
-                                allRecords.filter(
+                                records.filter(
                                     record =>
-                                        record.vehiculo ===
+                                        String(
+                                            record.vehiculo ||
+                                            ""
+                                        ) ===
                                         selectedVehicle
                                 );
 
 
                             accidents =
-                                allAccidents.filter(
+                                accidents.filter(
                                     accident =>
-                                        accident.vehiculo ===
+                                        String(
+                                            accident.vehiculo ||
+                                            ""
+                                        ) ===
                                         selectedVehicle
                                 );
-
-                        }
-
-
-
-                        /* =====================================
-                           SIN REGISTROS
-                           ===================================== */
-
-                        if (
-                            records.length === 0 &&
-                            accidents.length === 0
-                        ) {
-
-                            alert(
-
-                                scope === "vehicle"
-
-                                    ? "El vehículo seleccionado todavía no tiene registros para descargar."
-
-                                    : "No existen registros para descargar."
-
-                            );
-
-
-                            return;
-
-                        }
-
-
-
-                        if (
-                            status
-                        ) {
-
-                            status.textContent =
-                                "Creando las hojas del archivo Excel...";
 
                         }
 
@@ -1801,6 +1908,16 @@
                         /* =====================================
                            CREAR LIBRO
                            ===================================== */
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+                                "Creando archivo Excel...";
+
+                        }
+
 
                         const workbook =
                             new ExcelJS.Workbook();
@@ -1814,12 +1931,12 @@
                             "ASADA Orosi";
 
 
-                        workbook.subject =
-                            "Registro de revisiones, daños y accidentes vehiculares";
-
-
                         workbook.title =
                             "Registros de vehículos ASADA Orosi";
+
+
+                        workbook.subject =
+                            "Revisiones, daños y accidentes";
 
 
                         workbook.created =
@@ -1829,10 +1946,9 @@
 
                         /* =====================================
                            HOJA 1
-                           REVISIONES
                            ===================================== */
 
-                        createReviewsSheet(
+                        addReviewsSheetASADA(
 
                             workbook,
 
@@ -1844,10 +1960,11 @@
 
                         /* =====================================
                            HOJA 2
-                           DAÑOS Y ACCIDENTES
+
+                           SIEMPRE SE EJECUTA.
                            ===================================== */
 
-                        createAccidentsSheet(
+                        addAccidentsSheetASADA(
 
                             workbook,
 
@@ -1858,18 +1975,81 @@
 
 
                         /* =====================================
-                           GENERAR ARCHIVO
+                           VERIFICACIÓN ANTES DE DESCARGAR
                            ===================================== */
 
+                        console.log(
+
+                            "Hojas creadas:",
+
+                            workbook.worksheets.map(
+                                worksheet =>
+                                    worksheet.name
+                            )
+
+                        );
+
+
+                        /*
+                            Esta comprobación evita descargar
+                            accidentalmente un archivo incompleto.
+                        */
+
                         if (
-                            status
+                            workbook.worksheets.length !==
+                            2
                         ) {
 
-                            status.textContent =
-                                "Generando archivo Excel...";
+
+                            throw new Error(
+
+                                "El archivo no creó las dos hojas esperadas."
+
+                            );
 
                         }
 
+
+
+                        if (
+                            workbook.worksheets[
+                                0
+                            ].name !==
+                            "Registro de revisiones"
+                        ) {
+
+
+                            throw new Error(
+
+                                "No se creó correctamente la hoja de revisiones."
+
+                            );
+
+                        }
+
+
+
+                        if (
+                            workbook.worksheets[
+                                1
+                            ].name !==
+                            "Daños y accidentes"
+                        ) {
+
+
+                            throw new Error(
+
+                                "No se creó correctamente la hoja de daños y accidentes."
+
+                            );
+
+                        }
+
+
+
+                        /* =====================================
+                           BUFFER
+                           ===================================== */
 
                         const buffer =
                             await workbook.xlsx.writeBuffer();
@@ -1877,7 +2057,7 @@
 
 
                         /* =====================================
-                           DESCARGA
+                           BLOB
                            ===================================== */
 
                         const blob =
@@ -1894,6 +2074,11 @@
                             );
 
 
+
+                        /* =====================================
+                           NOMBRE
+                           ===================================== */
+
                         const fileName =
 
                             scope ===
@@ -1903,13 +2088,13 @@
 
                                     "ASADA_" +
 
-                                    safeFileName(
+                                    excelSafeName(
                                         selectedVehicle
                                     ) +
 
                                     "_" +
 
-                                    getExcelDate() +
+                                    excelFileDate() +
 
                                     ".xlsx"
 
@@ -1919,42 +2104,47 @@
 
                                     "ASADA_Todos_los_Registros_" +
 
-                                    getExcelDate() +
+                                    excelFileDate() +
 
                                     ".xlsx"
 
                                 );
 
 
-                        const downloadUrl =
+
+                        /* =====================================
+                           DESCARGAR
+                           ===================================== */
+
+                        const url =
                             URL.createObjectURL(
                                 blob
                             );
 
 
-                        const link =
+                        const anchor =
                             document.createElement(
                                 "a"
                             );
 
 
-                        link.href =
-                            downloadUrl;
+                        anchor.href =
+                            url;
 
 
-                        link.download =
+                        anchor.download =
                             fileName;
 
 
                         document.body.appendChild(
-                            link
+                            anchor
                         );
 
 
-                        link.click();
+                        anchor.click();
 
 
-                        link.remove();
+                        anchor.remove();
 
 
 
@@ -1962,7 +2152,7 @@
                             () => {
 
                                 URL.revokeObjectURL(
-                                    downloadUrl
+                                    url
                                 );
 
                             },
@@ -1971,15 +2161,25 @@
 
 
 
+                        /* =====================================
+                           MENSAJE
+                           ===================================== */
+
                         if (
                             status
                         ) {
 
                             status.textContent =
 
-                                "Archivo generado correctamente. " +
+                                "Archivo creado correctamente: " +
 
-                                "Incluye una hoja de revisiones y otra de daños y accidentes.";
+                                records.length +
+
+                                " revisiones y " +
+
+                                accidents.length +
+
+                                " daños o accidentes.";
 
                         }
 
@@ -1988,8 +2188,9 @@
                         error
                     ) {
 
+
                         console.error(
-                            "Error generando Excel.",
+                            "Error al generar el Excel:",
                             error
                         );
 
@@ -2011,7 +2212,7 @@
 
                                 ? error.message
 
-                                : "No fue posible generar el archivo Excel."
+                                : "No fue posible generar el Excel."
 
                         );
 
@@ -2028,7 +2229,7 @@
 
 
                             button.textContent =
-                                originalButtonText;
+                                oldButtonText;
 
                         }
 
@@ -2046,7 +2247,15 @@
                 "DOMContentLoaded",
                 function () {
 
-                    toggleVehicleExport();
+
+                    toggleVehicleExportASADA();
+
+
+                    console.log(
+
+                        "Excel ASADA nuevo cargado correctamente. Versión 20260914-05."
+
+                    );
 
                 }
             );
