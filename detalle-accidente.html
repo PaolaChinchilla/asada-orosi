@@ -23,7 +23,7 @@
 
     <link
         rel="stylesheet"
-        href="css/style.css?v=20260911-23">
+        href="css/style.css?v=20260914-01">
 
     <link
         rel="stylesheet"
@@ -32,7 +32,6 @@
     <title>
         Detalle de daño o accidente | ASADA Orosi
     </title>
-
 
 
     <style>
@@ -63,8 +62,7 @@
         .accident-status-badge.yes {
 
             border:
-                1px solid
-                rgba(32, 205, 176, .35);
+                1px solid rgba(32, 205, 176, .35);
 
             background:
                 rgba(32, 205, 176, .10);
@@ -78,8 +76,7 @@
         .accident-status-badge.no {
 
             border:
-                1px solid
-                rgba(255, 107, 107, .35);
+                1px solid rgba(255, 107, 107, .35);
 
             background:
                 rgba(255, 107, 107, .10);
@@ -93,8 +90,7 @@
         .accident-status-badge.unknown {
 
             border:
-                1px solid
-                rgba(255, 255, 255, .12);
+                1px solid rgba(255, 255, 255, .12);
 
             background:
                 rgba(255, 255, 255, .06);
@@ -119,8 +115,7 @@
             margin-top: 16px;
 
             border:
-                1px solid
-                rgba(255, 255, 255, .10);
+                1px solid rgba(255, 255, 255, .10);
 
             border-radius: 14px;
 
@@ -153,10 +148,7 @@
             grid-template-columns:
                 repeat(
                     4,
-                    minmax(
-                        0,
-                        1fr
-                    )
+                    minmax(0, 1fr)
                 );
 
             gap: 14px;
@@ -171,8 +163,7 @@
             padding: 16px;
 
             border:
-                1px solid
-                rgba(255, 255, 255, .07);
+                1px solid rgba(255, 255, 255, .07);
 
             border-radius: 12px;
 
@@ -214,58 +205,31 @@
 
 
         /* =====================================================
-           FOTOS
+           FOTOGRAFÍAS
            ===================================================== */
 
-        .accident-detail-photos {
+        .accident-photo-folder-box {
 
-            display: grid;
+            margin-top: 16px;
 
-            grid-template-columns:
-                repeat(
-                    auto-fit,
-                    minmax(
-                        190px,
-                        1fr
-                    )
-                );
-
-            gap: 14px;
-
-            margin-top: 18px;
-
-        }
-
-
-        .accident-detail-photo {
-
-            display: block;
-
-            overflow: hidden;
+            padding: 20px;
 
             border:
-                1px solid
-                rgba(255, 255, 255, .10);
+                1px solid rgba(255, 255, 255, .08);
 
-            border-radius: 12px;
+            border-radius: 14px;
 
             background:
-                #101214;
-
-            text-decoration: none;
+                rgba(255, 255, 255, .02);
 
         }
 
 
-        .accident-detail-photo img {
+        .accident-photo-folder-box p {
 
-            display: block;
+            margin-top: 0;
 
-            width: 100%;
-
-            height: 210px;
-
-            object-fit: cover;
+            margin-bottom: 16px;
 
         }
 
@@ -303,29 +267,6 @@
 
 
         /* =====================================================
-           CARGA
-           ===================================================== */
-
-        .detail-loading {
-
-            padding: 45px 20px;
-
-            text-align: center;
-
-        }
-
-
-        .detail-loading strong {
-
-            display: block;
-
-            margin-bottom: 8px;
-
-        }
-
-
-
-        /* =====================================================
            MODO CLARO
            ===================================================== */
 
@@ -336,7 +277,7 @@
         .accident-coordinate-card,
 
         html[data-theme="light"]
-        .accident-detail-photo {
+        .accident-photo-folder-box {
 
             border-color:
                 #d8dfe2;
@@ -383,10 +324,7 @@
                 grid-template-columns:
                     repeat(
                         2,
-                        minmax(
-                            0,
-                            1fr
-                        )
+                        minmax(0, 1fr)
                     );
 
             }
@@ -423,9 +361,11 @@
 
             .accident-detail-actions .btn {
 
-                width: 100%;
+                width:
+                    100%;
 
-                text-align: center;
+                text-align:
+                    center;
 
             }
 
@@ -527,15 +467,11 @@
             id="accidentDetail"
             aria-live="polite">
 
-            <div class="detail-loading">
+            <div class="empty-state">
 
-                <strong>
+                <p>
                     Cargando daño o accidente...
-                </strong>
-
-                <span>
-                    Espere un momento.
-                </span>
+                </p>
 
             </div>
 
@@ -567,7 +503,7 @@
          APP.JS
          ===================================================== -->
 
-    <script src="js/app.js?v=20260911-23"></script>
+    <script src="js/app.js?v=20260914-01"></script>
 
 
 
@@ -591,7 +527,7 @@
                     );
 
 
-            let activeMap =
+            let detailMap =
                 null;
 
 
@@ -635,10 +571,6 @@
 
 
 
-            /* =================================================
-               MULTILÍNEA
-               ================================================= */
-
             function safeMultiline(
                 value
             ) {
@@ -665,160 +597,6 @@
                     /\r?\n/g,
                     "<br>"
                 );
-
-            }
-
-
-
-            /* =================================================
-               TIMEOUT LOCAL
-               ================================================= */
-
-            function withTimeout(
-                promise,
-                milliseconds
-            ) {
-
-                return Promise.race([
-
-                    promise,
-
-                    new Promise(
-                        (
-                            resolve,
-                            reject
-                        ) => {
-
-                            window.setTimeout(
-                                () => {
-
-                                    reject(
-                                        new Error(
-                                            "La consulta tardó demasiado."
-                                        )
-                                    );
-
-                                },
-                                milliseconds
-                            );
-
-                        }
-                    )
-
-                ]);
-
-            }
-
-
-
-            /* =================================================
-               CACHE
-               ================================================= */
-
-            function cacheKey(
-                id
-            ) {
-
-                return (
-
-                    "asada-accident-detail:" +
-
-                    String(
-                        id ||
-                        ""
-                    )
-                        .trim()
-                        .toUpperCase()
-
-                );
-
-            }
-
-
-            function getCachedAccident(
-                id
-            ) {
-
-                try {
-
-                    const stored =
-                        sessionStorage.getItem(
-                            cacheKey(
-                                id
-                            )
-                        );
-
-
-                    if (
-                        !stored
-                    ) {
-
-                        return null;
-
-                    }
-
-
-                    return JSON.parse(
-                        stored
-                    );
-
-
-                } catch (
-                    error
-                ) {
-
-                    console.warn(
-                        "No se pudo leer el accidente temporal.",
-                        error
-                    );
-
-
-                    return null;
-
-                }
-
-            }
-
-
-            function saveCachedAccident(
-                accident
-            ) {
-
-                if (
-                    !accident ||
-                    !accident.id
-                ) {
-
-                    return;
-
-                }
-
-
-                try {
-
-                    sessionStorage.setItem(
-
-                        cacheKey(
-                            accident.id
-                        ),
-
-                        JSON.stringify(
-                            accident
-                        )
-
-                    );
-
-
-                } catch (
-                    error
-                ) {
-
-                    console.warn(
-                        "No se pudo actualizar el accidente temporal.",
-                        error
-                    );
-
-                }
 
             }
 
@@ -888,180 +666,52 @@
 
 
             /* =================================================
-               FOTOS
+               FOTOGRAFÍAS
+
+               AQUÍ ESTÁ EL CAMBIO QUE PEDISTE.
+
+               No mostramos:
+               - miniaturas
+               - Fotografía 1
+               - enlaces individuales
+
+               Únicamente la carpeta.
                ================================================= */
 
-            function getPhotoSource(
-                photo
-            ) {
-
-                if (
-                    typeof getImageSource ===
-                    "function"
-                ) {
-
-                    const source =
-                        getImageSource(
-                            photo
-                        );
-
-
-                    if (
-                        source
-                    ) {
-
-                        return source;
-
-                    }
-
-                }
-
-
-                if (
-                    typeof photo ===
-                    "string"
-                ) {
-
-                    return photo;
-
-                }
-
-
-                if (
-                    !photo ||
-                    typeof photo !== "object"
-                ) {
-
-                    return "";
-
-                }
-
-
-                return (
-
-                    photo.thumbnailUrl ||
-
-                    photo.url ||
-
-                    photo.data ||
-
-                    ""
-
-                );
-
-            }
-
-
-            function getPhotoLink(
-                photo
-            ) {
-
-                if (
-                    typeof photo ===
-                    "string"
-                ) {
-
-                    return photo;
-
-                }
-
-
-                if (
-                    !photo ||
-                    typeof photo !== "object"
-                ) {
-
-                    return "";
-
-                }
-
-
-                return (
-
-                    photo.url ||
-
-                    photo.thumbnailUrl ||
-
-                    photo.data ||
-
-                    ""
-
-                );
-
-            }
-
-
-            function renderPhotos(
+            function renderAccidentPhotos(
                 accident
             ) {
 
-                const photos =
-                    Array.isArray(
-                        accident.imagenes
-                    )
-
-                        ? accident.imagenes
-
-                        : [];
-
-
-                const usable =
-                    photos.filter(
-                        photo =>
-                            Boolean(
-                                getPhotoSource(
-                                    photo
-                                )
-                            )
-                    );
-
-
                 if (
-                    usable.length === 0
+                    accident.carpetaFotosUrl
                 ) {
 
-                    if (
-                        accident.carpetaFotosUrl
-                    ) {
+                    return `
 
-                        return `
+                        <div class="accident-photo-folder-box">
 
                             <p class="detail-text">
 
-                                Las fotografías están guardadas
-                                en Drive.
+                                Las fotografías de este registro
+                                están almacenadas en su carpeta
+                                correspondiente.
 
                             </p>
 
 
-                            <div class="photo-folder-action">
+                            <a
+                                href="${safeText(
+                                    accident.carpetaFotosUrl
+                                )}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn secondary">
 
-                                <a
-                                    href="${safeText(
-                                        accident.carpetaFotosUrl
-                                    )}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="btn secondary">
+                                Ver carpeta de fotografías
 
-                                    Ver fotografías
+                            </a>
 
-                                </a>
-
-                            </div>
-
-                        `;
-
-                    }
-
-
-                    return `
-
-                        <p class="detail-text">
-
-                            No se registraron fotografías.
-
-                        </p>
+                        </div>
 
                     `;
 
@@ -1070,166 +720,18 @@
 
                 return `
 
-                    <div class="accident-detail-photos">
+                    <div class="accident-photo-folder-box">
 
-                        ${usable.map(
-                            (
-                                photo,
-                                index
-                            ) => {
+                        <p class="detail-text">
 
-                                const source =
-                                    getPhotoSource(
-                                        photo
-                                    );
+                            No se registraron fotografías
+                            para este daño o accidente.
 
-
-                                const link =
-                                    getPhotoLink(
-                                        photo
-                                    ) ||
-                                    source;
-
-
-                                return `
-
-                                    <a
-                                        href="${safeText(
-                                            link
-                                        )}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="accident-detail-photo">
-
-                                        <img
-                                            src="${safeText(
-                                                source
-                                            )}"
-                                            alt="Fotografía ${index + 1}"
-                                            loading="lazy">
-
-                                    </a>
-
-                                `;
-
-                            }
-                        ).join(
-                            ""
-                        )}
+                        </p>
 
                     </div>
 
-
-                    ${
-                        accident.carpetaFotosUrl
-
-                            ? `
-
-                                <div class="photo-folder-action">
-
-                                    <a
-                                        href="${safeText(
-                                            accident.carpetaFotosUrl
-                                        )}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="btn secondary">
-
-                                        Abrir carpeta de fotografías
-
-                                    </a>
-
-                                </div>
-
-                            `
-
-                            : ""
-                    }
-
                 `;
-
-            }
-
-
-
-            /* =================================================
-               MARCADOR
-               ================================================= */
-
-            function createMarkerIcon() {
-
-                if (
-                    !Leaflet ||
-                    typeof Leaflet.icon !== "function"
-                ) {
-
-                    return null;
-
-                }
-
-
-                const svg = `
-
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="44"
-                        height="58"
-                        viewBox="0 0 48 62">
-
-                        <path
-                            d="
-                                M24 2
-                                C12.4 2 3 11.4 3 23
-                                c0 16.5 21 36 21 36
-                                s21-19.5 21-36
-                                C45 11.4 35.6 2 24 2z
-                            "
-                            fill="#20cdb0"
-                            stroke="#ffffff"
-                            stroke-width="3"/>
-
-                        <circle
-                            cx="24"
-                            cy="23"
-                            r="8"
-                            fill="#123d36"
-                            stroke="#ffffff"
-                            stroke-width="2"/>
-
-                    </svg>
-
-                `;
-
-
-                return Leaflet.icon({
-
-                    iconUrl:
-
-                        "data:image/svg+xml;charset=UTF-8," +
-
-                        encodeURIComponent(
-                            svg
-                        ),
-
-                    iconSize:
-                        [
-                            44,
-                            58
-                        ],
-
-                    iconAnchor:
-                        [
-                            22,
-                            55
-                        ],
-
-                    popupAnchor:
-                        [
-                            0,
-                            -50
-                        ]
-
-                });
 
             }
 
@@ -1239,7 +741,7 @@
                MAPA
                ================================================= */
 
-            function renderMap(
+            function renderAccidentDetailMap(
                 latitude,
                 longitude
             ) {
@@ -1285,7 +787,10 @@
                         <div class="empty-state">
 
                             <p>
-                                No existen coordenadas válidas.
+
+                                No existen coordenadas válidas
+                                para mostrar el mapa.
+
                             </p>
 
                         </div>
@@ -1300,7 +805,8 @@
 
                 if (
                     !Leaflet ||
-                    typeof Leaflet.map !== "function"
+                    typeof Leaflet.map !==
+                    "function"
                 ) {
 
                     container.innerHTML = `
@@ -1322,12 +828,12 @@
 
 
                 if (
-                    activeMap
+                    detailMap
                 ) {
 
                     try {
 
-                        activeMap.remove();
+                        detailMap.remove();
 
                     } catch (
                         error
@@ -1339,14 +845,10 @@
 
                     }
 
-
-                    activeMap =
-                        null;
-
                 }
 
 
-                activeMap =
+                detailMap =
                     Leaflet.map(
                         container
                     )
@@ -1374,37 +876,42 @@
                     }
 
                 ).addTo(
-                    activeMap
+                    detailMap
                 );
 
 
-                const options =
-                    {};
+                /*
+                    Punto vectorial.
 
+                    No depende del PNG de Leaflet.
+                */
 
-                const icon =
-                    createMarkerIcon();
-
-
-                if (
-                    icon
-                ) {
-
-                    options.icon =
-                        icon;
-
-                }
-
-
-                Leaflet.marker(
+                Leaflet.circleMarker(
                     [
                         lat,
                         lng
                     ],
-                    options
+                    {
+
+                        radius:
+                            9,
+
+                        weight:
+                            3,
+
+                        color:
+                            "#ffffff",
+
+                        fillColor:
+                            "#20cdb0",
+
+                        fillOpacity:
+                            1
+
+                    }
                 )
                     .addTo(
-                        activeMap
+                        detailMap
                     )
                     .bindPopup(
                         "Ubicación registrada del daño o accidente"
@@ -1415,16 +922,211 @@
                     () => {
 
                         if (
-                            activeMap
+                            detailMap
                         ) {
 
-                            activeMap.invalidateSize();
+                            detailMap.invalidateSize();
 
                         }
 
                     },
                     150
                 );
+
+            }
+
+
+
+            /* =================================================
+               TIMEOUT
+               ================================================= */
+
+            function withTimeout(
+                promise,
+                milliseconds
+            ) {
+
+                return Promise.race([
+
+                    promise,
+
+                    new Promise(
+                        (
+                            resolve,
+                            reject
+                        ) => {
+
+                            window.setTimeout(
+                                () => {
+
+                                    reject(
+                                        new Error(
+                                            "La consulta tardó demasiado."
+                                        )
+                                    );
+
+                                },
+                                milliseconds
+                            );
+
+                        }
+                    )
+
+                ]);
+
+            }
+
+
+
+            /* =================================================
+               CACHE
+               ================================================= */
+
+            function getCachedAccident(
+                id
+            ) {
+
+                try {
+
+                    const text =
+                        sessionStorage.getItem(
+
+                            "asada-accident-detail:" +
+
+                            String(
+                                id
+                            )
+                                .trim()
+                                .toUpperCase()
+
+                        );
+
+
+                    return text
+
+                        ? JSON.parse(
+                            text
+                        )
+
+                        : null;
+
+
+                } catch (
+                    error
+                ) {
+
+                    return null;
+
+                }
+
+            }
+
+
+
+            function saveCachedAccident(
+                accident
+            ) {
+
+                if (
+                    !accident ||
+                    !accident.id
+                ) {
+
+                    return;
+
+                }
+
+
+                try {
+
+                    sessionStorage.setItem(
+
+                        "asada-accident-detail:" +
+
+                        String(
+                            accident.id
+                        )
+                            .trim()
+                            .toUpperCase(),
+
+                        JSON.stringify(
+                            accident
+                        )
+
+                    );
+
+
+                } catch (
+                    error
+                ) {
+
+                    console.warn(
+                        error
+                    );
+
+                }
+
+            }
+
+
+
+            /* =================================================
+               ERROR
+               ================================================= */
+
+            function showError(
+                message
+            ) {
+
+                const root =
+                    $(
+                        "accidentDetail"
+                    );
+
+
+                root.innerHTML = `
+
+                    <div class="empty-state">
+
+                        <h1>
+                            No fue posible cargar el registro
+                        </h1>
+
+                        <p>
+
+                            ${safeText(
+                                message ||
+                                "Se produjo un error."
+                            )}
+
+                        </p>
+
+
+                        <button
+                            type="button"
+                            class="btn primary"
+                            onclick="window.retryAccidentDetail()">
+
+                            Reintentar
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="nav-actions detail-bottom-navigation">
+
+                        <a
+                            href="accidentes.html"
+                            class="btn-back">
+
+                            Volver al listado
+
+                        </a>
+
+                    </div>
+
+                `;
 
             }
 
@@ -1571,6 +1273,10 @@
                     <div class="detail-shell">
 
 
+                        <!-- =====================================
+                             INFORMACIÓN GENERAL
+                             ===================================== -->
+
                         <section class="detail-card">
 
 
@@ -1589,7 +1295,9 @@
                                 <div class="detail-info">
 
                                     <span class="detail-info-label">
+
                                         ID del registro
+
                                     </span>
 
                                     <strong>
@@ -1604,10 +1312,13 @@
                                 </div>
 
 
+
                                 <div class="detail-info">
 
                                     <span class="detail-info-label">
+
                                         Vehículo
+
                                     </span>
 
                                     <strong>
@@ -1622,10 +1333,13 @@
                                 </div>
 
 
+
                                 <div class="detail-info">
 
                                     <span class="detail-info-label">
+
                                         Placa
+
                                     </span>
 
                                     <strong>
@@ -1640,10 +1354,13 @@
                                 </div>
 
 
+
                                 <div class="detail-info">
 
                                     <span class="detail-info-label">
+
                                         Fecha y hora
+
                                     </span>
 
                                     <strong>
@@ -1658,10 +1375,13 @@
                                 </div>
 
 
+
                                 <div class="detail-info">
 
                                     <span class="detail-info-label">
+
                                         Chofer
+
                                     </span>
 
                                     <strong>
@@ -1674,6 +1394,7 @@
                                     </strong>
 
                                 </div>
+
 
 
                                 <div class="detail-info">
@@ -1698,6 +1419,10 @@
 
 
 
+                        <!-- =====================================
+                             DAÑO
+                             ===================================== -->
+
                         <section class="detail-card">
 
 
@@ -1713,8 +1438,11 @@
                             <div class="detail-group">
 
                                 <span class="detail-info-label">
+
                                     Descripción de lo sucedido
+
                                 </span>
+
 
                                 <p class="detail-text">
 
@@ -1727,11 +1455,15 @@
                             </div>
 
 
+
                             <div class="detail-group">
 
                                 <span class="detail-info-label">
+
                                     Ocupantes
+
                                 </span>
+
 
                                 <p class="detail-text">
 
@@ -1750,6 +1482,7 @@
                             </div>
 
 
+
                             <div class="detail-group">
 
                                 <span class="detail-info-label">
@@ -1757,6 +1490,7 @@
                                     Persona a quien se reportó
 
                                 </span>
+
 
                                 <p class="detail-text">
 
@@ -1773,6 +1507,10 @@
                         </section>
 
 
+
+                        <!-- =====================================
+                             UBICACIÓN
+                             ===================================== -->
 
                         <section class="detail-card">
 
@@ -1793,6 +1531,7 @@
                                     Lugar, dirección o referencia
 
                                 </span>
+
 
                                 <p class="detail-text">
 
@@ -1828,6 +1567,7 @@
                                 </div>
 
 
+
                                 <div class="accident-coordinate-card">
 
                                     <span>
@@ -1846,6 +1586,7 @@
                                 </div>
 
 
+
                                 <div class="accident-coordinate-card">
 
                                     <span>
@@ -1862,6 +1603,7 @@
                                     </strong>
 
                                 </div>
+
 
 
                                 <div class="accident-coordinate-card">
@@ -1898,6 +1640,10 @@
 
 
 
+                        <!-- =====================================
+                             FOTOGRAFÍAS
+                             ===================================== -->
+
                         <section class="detail-card">
 
 
@@ -1910,7 +1656,7 @@
                             </div>
 
 
-                            ${renderPhotos(
+                            ${renderAccidentPhotos(
                                 accident
                             )}
 
@@ -1918,6 +1664,10 @@
                         </section>
 
 
+
+                        <!-- =====================================
+                             REPORTE
+                             ===================================== -->
 
                         <section class="detail-card">
 
@@ -2007,7 +1757,7 @@
                 window.setTimeout(
                     () => {
 
-                        renderMap(
+                        renderAccidentDetailMap(
 
                             accident.latitud,
 
@@ -2024,75 +1774,7 @@
 
 
             /* =================================================
-               ERROR
-               ================================================= */
-
-            function showError(
-                message
-            ) {
-
-                const root =
-                    $(
-                        "accidentDetail"
-                    );
-
-
-                if (
-                    !root
-                ) {
-
-                    return;
-
-                }
-
-
-                root.innerHTML = `
-
-                    <div class="empty-state">
-
-                        <h1>
-                            No fue posible cargar el registro
-                        </h1>
-
-                        <p>
-                            ${safeText(
-                                message ||
-                                "Se produjo un error al consultar el registro."
-                            )}
-                        </p>
-
-                        <button
-                            type="button"
-                            class="btn primary"
-                            onclick="window.retryAccidentDetail()">
-
-                            Reintentar
-
-                        </button>
-
-                    </div>
-
-
-                    <div class="nav-actions detail-bottom-navigation">
-
-                        <a
-                            href="accidentes.html"
-                            class="btn-back">
-
-                            Volver al listado
-
-                        </a>
-
-                    </div>
-
-                `;
-
-            }
-
-
-
-            /* =================================================
-               CONSULTA AL SERVIDOR
+               CONSULTAR
                ================================================= */
 
             async function getFreshAccident(
@@ -2126,7 +1808,7 @@
 
 
             /* =================================================
-               INICIAR
+               CARGAR DETALLE
                ================================================= */
 
             async function loadDetail() {
@@ -2168,9 +1850,8 @@
 
 
                 /*
-                    SI VIENE DEL LISTADO:
-
-                    Mostramos inmediatamente.
+                    Si venimos del listado,
+                    mostrar inmediatamente.
                 */
 
                 if (
@@ -2184,10 +1865,7 @@
 
 
                     /*
-                        Luego consultamos Google en segundo plano.
-
-                        Si Google tarda o falla, el usuario ya puede
-                        ver el registro.
+                        Actualización silenciosa.
                     */
 
                     try {
@@ -2220,7 +1898,7 @@
                     ) {
 
                         console.warn(
-                            "El detalle se mostró desde memoria, pero Google no respondió a tiempo.",
+                            "No fue posible actualizar el detalle desde Google.",
                             error
                         );
 
@@ -2233,9 +1911,7 @@
 
 
                 /*
-                    SI ABRIÓ EL LINK DIRECTAMENTE:
-
-                    Consultamos Google.
+                    Link abierto directamente.
                 */
 
                 try {
@@ -2316,15 +1992,11 @@
 
                         root.innerHTML = `
 
-                            <div class="detail-loading">
+                            <div class="empty-state">
 
-                                <strong>
+                                <p>
                                     Consultando registro...
-                                </strong>
-
-                                <span>
-                                    Espere un momento.
-                                </span>
+                                </p>
 
                             </div>
 
