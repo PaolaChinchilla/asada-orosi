@@ -341,6 +341,23 @@
             return;
         }
 
+        /*
+            Reutilizamos el botón y el estado que ya crea
+            factibilidad.js. Así no existen identificadores
+            duplicados ni dos capturas GPS diferentes.
+        */
+
+        let captureButton =
+            root.querySelector("#factGpsButton");
+
+        let captureStatus =
+            root.querySelector("#factGpsStatus");
+
+        const originalActionsRow =
+            captureButton?.closest(".fact-actions-row") ||
+            captureStatus?.closest(".fact-actions-row") ||
+            null;
+
         Object.values(fields).forEach(prepareCoordinateInput);
 
         const wrappers = [
@@ -397,13 +414,6 @@
                         id="factMapSearchButton">
                         Buscar
                     </button>
-
-                    <button
-                        type="button"
-                        class="btn secondary"
-                        id="factGpsButton">
-                        Mi ubicación
-                    </button>
                 </div>
 
                 <div
@@ -411,13 +421,7 @@
                     class="accident-search-results hidden">
                 </div>
 
-                <p
-                    id="factGpsStatus"
-                    class="note gps-status-box"
-                    aria-live="polite">
-                    Puede buscar una referencia, usar Mi ubicación o seleccionar
-                    manualmente un punto en el mapa.
-                </p>
+                <div data-fact-gps-status-slot></div>
 
                 <div class="accident-map-large">
                     <div
@@ -434,6 +438,50 @@
         `;
 
         parent.insertBefore(layout, anchor);
+
+        const searchRow =
+            layout.querySelector(".accident-map-search-row");
+
+        if (!captureButton) {
+            captureButton = document.createElement("button");
+            captureButton.type = "button";
+            captureButton.id = "factGpsButton";
+            captureButton.dataset.factFallbackGps = "true";
+        }
+
+        captureButton.textContent =
+            "Capturar ubicación actual";
+
+        captureButton.classList.remove("fact-secondary-button");
+        captureButton.classList.add("btn", "secondary");
+
+        searchRow.append(captureButton);
+
+        if (!captureStatus) {
+            captureStatus = document.createElement("p");
+            captureStatus.id = "factGpsStatus";
+            captureStatus.setAttribute("aria-live", "polite");
+        }
+
+        captureStatus.classList.remove("fact-inline-status");
+        captureStatus.classList.add("note", "gps-status-box");
+
+        if (!captureStatus.textContent.trim()) {
+            captureStatus.textContent =
+                "Puede buscar una referencia, capturar su ubicación actual " +
+                "o seleccionar manualmente un punto en el mapa.";
+        }
+
+        layout
+            .querySelector("[data-fact-gps-status-slot]")
+            .replaceWith(captureStatus);
+
+        if (
+            originalActionsRow &&
+            originalActionsRow.children.length === 0
+        ) {
+            originalActionsRow.remove();
+        }
 
         const coordinateColumn =
             layout.querySelector("[data-fact-coordinate-column]");
@@ -1215,13 +1263,18 @@
 
     function installMapEvents() {
 
+        const captureButton =
+            document.getElementById("factGpsButton");
+
         document
             .getElementById("factMapSearchButton")
             ?.addEventListener("click", searchLocation);
 
-        document
-            .getElementById("factGpsButton")
-            ?.addEventListener("click", getMyLocation);
+        if (
+            captureButton?.dataset.factFallbackGps === "true"
+        ) {
+            captureButton.addEventListener("click", getMyLocation);
+        }
 
         document
             .getElementById("factMapSearch")
@@ -1231,6 +1284,58 @@
                     searchLocation();
                 }
             });
+    }
+
+
+    function showCapturedLocationOnMap(event) {
+
+        const detail =
+            event.detail || {};
+
+        const latitude =
+            Number(detail.latitude);
+
+        const longitude =
+            Number(detail.longitude);
+
+        const accuracy =
+            Number(detail.accuracy);
+
+        if (
+            !Number.isFinite(latitude) ||
+            !Number.isFinite(longitude)
+        ) {
+            return;
+        }
+
+        setMapPoint(latitude, longitude, {
+            altitude:
+                detail.altitude || "No disponible",
+            accuracy:
+                Number.isFinite(accuracy)
+                    ? accuracy.toFixed(2)
+                    : "No disponible",
+            centerMap: true,
+            zoom:
+                Number.isFinite(accuracy) && accuracy <= 25
+                    ? 18
+                    : Number.isFinite(accuracy) && accuracy <= 75
+                        ? 17
+                        : 16,
+            reverse: true
+        });
+
+        if (Number.isFinite(accuracy)) {
+            drawAccuracyCircle(latitude, longitude, accuracy);
+        }
+
+        setGpsStatus(
+            Number.isFinite(accuracy)
+                ? "Ubicación aceptada correctamente. Precisión aproximada: " +
+                    Math.round(accuracy) + " m."
+                : "Ubicación capturada correctamente.",
+            "gps-ok"
+        );
     }
 
 
@@ -1303,6 +1408,11 @@
             subtree: true
         });
 
+        document.addEventListener(
+            "factibilidad:gps-captured",
+            showCapturedLocationOnMap
+        );
+
         window.addEventListener(
             "beforeunload",
             stopGpsWatch,
@@ -1320,5 +1430,513 @@
     } else {
         startAdjustments();
     }
+
+})();
+
+/* =========================================================
+   ASADA OROSI
+   CORRECCIÓN DE BOTÓN GPS DE FACTIBILIDAD
+
+   OBJETIVO:
+
+   - Dejar UN SOLO botón de ubicación.
+   - Conservar el botón original factGpsButton.
+   - Moverlo al lado de Buscar.
+   - Cambiar el texto a:
+     "Capturar ubicación actual".
+   - Eliminar botones duplicados como:
+     "Mi ubicación".
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+
+    /* =====================================================
+       NORMALIZAR TEXTO
+       ===================================================== */
+
+    function normalizarTextoBoton(
+        value
+    ) {
+
+        return String(
+            value || ""
+        )
+            .normalize(
+                "NFD"
+            )
+            .replace(
+                /[\u0300-\u036f]/g,
+                ""
+            )
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim()
+            .toLowerCase();
+
+    }
+
+
+
+    /* =====================================================
+       SABER SI ES UN BOTÓN DE UBICACIÓN
+       ===================================================== */
+
+    function esBotonUbicacion(
+        button
+    ) {
+
+        if (
+            !button
+        ) {
+
+            return false;
+
+        }
+
+
+        const text =
+            normalizarTextoBoton(
+                button.textContent
+            );
+
+
+        const id =
+            String(
+                button.id ||
+                ""
+            )
+                .trim()
+                .toLowerCase();
+
+
+        /*
+            IDs conocidos.
+        */
+
+        if (
+            id === "factgpsbutton" ||
+            id === "factmapgpsbutton" ||
+            id === "factlocationbutton" ||
+            id === "factcurrentlocationbutton"
+        ) {
+
+            return true;
+
+        }
+
+
+        /*
+            Textos conocidos.
+        */
+
+        return (
+
+            text ===
+            "mi ubicacion" ||
+
+            text ===
+            "capturar ubicacion actual" ||
+
+            text ===
+            "obtener ubicacion actual" ||
+
+            text ===
+            "actualizar ubicacion"
+
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CORREGIR BOTONES
+       ===================================================== */
+
+    function corregirBotonUbicacion() {
+
+        const root =
+            document.getElementById(
+                "factibilidadApp"
+            );
+
+
+        if (
+            !root
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+            Buscamos la fila que contiene:
+
+            campo de búsqueda
+            Buscar
+            botón GPS
+        */
+
+        const searchRow =
+            root.querySelector(
+                ".accident-map-search-row"
+            );
+
+
+        if (
+            !searchRow
+        ) {
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           BOTÓN ORIGINAL
+           ================================================= */
+
+        let mainButton =
+            root.querySelector(
+                "#factGpsButton"
+            );
+
+
+        /*
+            Si por alguna versión anterior no encontramos
+            el ID, buscamos el botón por su texto.
+        */
+
+        if (
+            !mainButton
+        ) {
+
+            const buttons =
+                Array.from(
+                    root.querySelectorAll(
+                        "button"
+                    )
+                );
+
+
+            mainButton =
+                buttons.find(
+                    esBotonUbicacion
+                ) ||
+                null;
+
+        }
+
+
+        if (
+            !mainButton
+        ) {
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           TEXTO CORRECTO
+           ================================================= */
+
+        mainButton.id =
+            "factGpsButton";
+
+
+        mainButton.type =
+            "button";
+
+
+        mainButton.textContent =
+            "Capturar ubicación actual";
+
+
+        /*
+            Usamos las mismas clases de los botones
+            que están al lado del buscador.
+        */
+
+        mainButton.classList.remove(
+            "fact-secondary-button"
+        );
+
+
+        mainButton.classList.add(
+            "btn",
+            "secondary"
+        );
+
+
+
+        /* =================================================
+           MOVER AL LADO DE BUSCAR
+           ================================================= */
+
+        /*
+            Solo lo movemos si todavía no está
+            en la posición correcta.
+
+            Así evitamos un ciclo infinito con
+            MutationObserver.
+        */
+
+        if (
+            mainButton.parentElement !==
+            searchRow ||
+
+            mainButton !==
+            searchRow.lastElementChild
+        ) {
+
+            searchRow.appendChild(
+                mainButton
+            );
+
+        }
+
+
+
+        /* =================================================
+           ELIMINAR DUPLICADOS
+           ================================================= */
+
+        const allButtons =
+            Array.from(
+                root.querySelectorAll(
+                    "button"
+                )
+            );
+
+
+        allButtons.forEach(
+            function (
+                button
+            ) {
+
+                if (
+                    button ===
+                    mainButton
+                ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    esBotonUbicacion(
+                        button
+                    )
+                ) {
+
+                    button.remove();
+
+                }
+
+            }
+        );
+
+
+
+        /* =================================================
+           QUITAR FILA VIEJA VACÍA
+           ================================================= */
+
+        const oldActionRows =
+            root.querySelectorAll(
+                ".fact-actions-row"
+            );
+
+
+        oldActionRows.forEach(
+            function (
+                row
+            ) {
+
+                /*
+                    NO eliminamos las filas que contienen
+                    botones normales del formulario,
+                    como Guardar o Cancelar.
+                */
+
+                if (
+                    row.contains(
+                        mainButton
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                const hasButton =
+                    row.querySelector(
+                        "button, a"
+                    );
+
+
+                const visibleText =
+                    String(
+                        row.textContent ||
+                        ""
+                    ).trim();
+
+
+                /*
+                    Si quedó la antigua fila del GPS
+                    totalmente vacía, desaparece.
+                */
+
+                if (
+                    !hasButton &&
+                    !visibleText
+                ) {
+
+                    row.remove();
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       EJECUTAR CUANDO CAMBIA LA PÁGINA
+       ===================================================== */
+
+    let correctionTimer =
+        null;
+
+
+    function programarCorreccion() {
+
+        if (
+            correctionTimer
+        ) {
+
+            window.clearTimeout(
+                correctionTimer
+            );
+
+        }
+
+
+        correctionTimer =
+            window.setTimeout(
+                function () {
+
+                    correctionTimer =
+                        null;
+
+
+                    corregirBotonUbicacion();
+
+                },
+                20
+            );
+
+    }
+
+
+
+    /* =====================================================
+       INICIAR
+       ===================================================== */
+
+    function iniciarCorreccionUbicacion() {
+
+        const root =
+            document.getElementById(
+                "factibilidadApp"
+            );
+
+
+        if (
+            !root
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+            Primera corrección.
+        */
+
+        programarCorreccion();
+
+
+
+        /*
+            Factibilidad se dibuja dinámicamente.
+
+            Por eso observamos cambios para aplicar
+            nuevamente la corrección cuando el formulario
+            termine de construirse.
+        */
+
+        const observer =
+            new MutationObserver(
+                programarCorreccion
+            );
+
+
+        observer.observe(
+            root,
+            {
+
+                childList:
+                    true,
+
+                subtree:
+                    true
+
+            }
+        );
+
+    }
+
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+
+            "DOMContentLoaded",
+
+            iniciarCorreccionUbicacion,
+
+            {
+                once:
+                    true
+            }
+
+        );
+
+
+    } else {
+
+        iniciarCorreccionUbicacion();
+
+    }
+
 
 })();

@@ -901,7 +901,7 @@ function factibilidadFormTemplate() {
 
                     <div>
                         <h2>Ubicación geográfica</h2>
-                        <p>Puede capturar el GPS o escribir las coordenadas.</p>
+                        <p>Puede capturar el GPS, buscar una dirección o seleccionar el punto en el mapa.</p>
                     </div>
 
                 </div>
@@ -2085,8 +2085,52 @@ function factibilidadCaptureGps(
                     )
                     : "";
 
+            const capturedAccuracy =
+                Number(
+                    position.coords.accuracy
+                );
+
+
             status.textContent =
-                "Ubicación capturada.";
+
+                Number.isFinite(
+                    capturedAccuracy
+                )
+
+                    ? "Ubicación aceptada correctamente. Precisión aproximada: " +
+                        Math.round(
+                            capturedAccuracy
+                        ) +
+                        " m."
+
+                    : "Ubicación capturada correctamente.";
+
+
+            /*
+                El mapa escucha este evento para colocar el
+                marcador en la ubicación recién capturada.
+            */
+
+            document.dispatchEvent(
+                new CustomEvent(
+                    "factibilidad:gps-captured",
+                    {
+                        detail: {
+                            longitude:
+                                form.elements.longitudX.value,
+
+                            latitude:
+                                form.elements.latitudY.value,
+
+                            altitude:
+                                form.elements.altitud.value,
+
+                            accuracy:
+                                form.elements.precisionGPS.value
+                        }
+                    }
+                )
+            );
 
         },
 
