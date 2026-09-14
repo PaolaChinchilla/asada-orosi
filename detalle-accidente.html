@@ -5,29 +5,17 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="theme-color"
-        content="#16181c">
+    <meta name="theme-color" content="#16181c">
 
-    <meta
-        name="description"
-        content="Detalle del registro de daño o accidente de vehículos de ASADA Orosi.">
+    <meta name="description" content="Detalle del registro de daño o accidente de vehículos de ASADA Orosi.">
 
-    <link
-        rel="manifest"
-        href="manifest.json">
+    <link rel="manifest" href="manifest.json">
 
-    <link
-        rel="stylesheet"
-        href="css/style.css?v=20260914-01">
+    <link rel="stylesheet" href="css/style.css?v=20260914-01">
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <title>
         Detalle de daño o accidente | ASADA Orosi
@@ -35,7 +23,6 @@
 
 
     <style>
-
         /* =====================================================
            ESTADO
            ===================================================== */
@@ -146,10 +133,8 @@
             display: grid;
 
             grid-template-columns:
-                repeat(
-                    4,
-                    minmax(0, 1fr)
-                );
+                repeat(4,
+                    minmax(0, 1fr));
 
             gap: 14px;
 
@@ -270,14 +255,11 @@
            MODO CLARO
            ===================================================== */
 
-        html[data-theme="light"]
-        .accident-detail-map-shell,
+        html[data-theme="light"] .accident-detail-map-shell,
 
-        html[data-theme="light"]
-        .accident-coordinate-card,
+        html[data-theme="light"] .accident-coordinate-card,
 
-        html[data-theme="light"]
-        .accident-photo-folder-box {
+        html[data-theme="light"] .accident-photo-folder-box {
 
             border-color:
                 #d8dfe2;
@@ -288,8 +270,7 @@
         }
 
 
-        html[data-theme="light"]
-        .accident-coordinate-card strong {
+        html[data-theme="light"] .accident-coordinate-card strong {
 
             color:
                 #172027;
@@ -297,8 +278,7 @@
         }
 
 
-        html[data-theme="light"]
-        .accident-status-badge.unknown {
+        html[data-theme="light"] .accident-status-badge.unknown {
 
             border-color:
                 #ccd4d8;
@@ -322,10 +302,8 @@
             .accident-coordinate-grid {
 
                 grid-template-columns:
-                    repeat(
-                        2,
-                        minmax(0, 1fr)
-                    );
+                    repeat(2,
+                        minmax(0, 1fr));
 
             }
 
@@ -370,7 +348,6 @@
             }
 
         }
-
     </style>
 
 </head>
@@ -385,11 +362,7 @@
 
     <header class="topbar">
 
-        <button
-            type="button"
-            class="menu-btn"
-            onclick="toggleMenu()"
-            aria-label="Abrir menú de navegación">
+        <button type="button" class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
 
             ☰
 
@@ -398,10 +371,7 @@
 
         <div class="brand">
 
-            <img
-                src="img/asadalogo.png"
-                alt="Logo ASADA Orosi"
-                class="brand-logo">
+            <img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo">
 
             <span>
                 ASADA OROSI
@@ -417,13 +387,11 @@
          MENÚ
          ===================================================== -->
 
-    <aside
+     <aside
         id="sideMenu"
         class="side-menu">
 
-        <a href="index.html">
-            Inicio
-        </a>
+        <a href="index.html">Inicio</a>
 
         <a href="registros.html">
             Listado de revisiones
@@ -433,20 +401,20 @@
             Crear nueva revisión
         </a>
 
-        <a
-            id="menuCreateAccident"
-            href="crear-accidente.html">
-
-            Crear registro de daño y accidente
-
+        <a href="crear-accidente.html">
+            Crear daño y accidente
         </a>
 
-        <a
-            id="menuAccidentList"
-            href="accidentes.html">
-
+        <a href="accidentes.html">
             Listado de daños y accidentes
+        </a>
 
+        <a href="crear-factibilidad.html">
+            Crear inspección de factibilidad
+        </a>
+
+        <a href="factibilidades.html">
+            Listado de factibilidades
         </a>
 
         <a href="excel.html">
@@ -463,9 +431,7 @@
 
     <main class="page detail-page">
 
-        <div
-            id="accidentDetail"
-            aria-live="polite">
+        <div id="accidentDetail" aria-live="polite">
 
             <div class="empty-state">
 
@@ -485,8 +451,7 @@
          LEAFLET
          ===================================================== -->
 
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
 
 
@@ -701,8 +666,8 @@
 
                             <a
                                 href="${safeText(
-                                    accident.carpetaFotosUrl
-                                )}"
+                        accident.carpetaFotosUrl
+                    )}"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="btn secondary">
@@ -836,7 +801,7 @@
                         detailMap.remove();
 
                     } catch (
-                        error
+                    error
                     ) {
 
                         console.warn(
@@ -1012,7 +977,7 @@
 
 
                 } catch (
-                    error
+                error
                 ) {
 
                     return null;
@@ -1057,7 +1022,7 @@
 
 
                 } catch (
-                    error
+                error
                 ) {
 
                     console.warn(
@@ -1095,9 +1060,9 @@
                         <p>
 
                             ${safeText(
-                                message ||
-                                "Se produjo un error."
-                            )}
+                    message ||
+                    "Se produjo un error."
+                )}
 
                         </p>
 
@@ -1191,8 +1156,8 @@
 
                             <a
                                 href="${safeText(
-                                    accident.reportePdfUrl
-                                )}"
+                            accident.reportePdfUrl
+                        )}"
                                 class="btn primary">
 
                                 Descargar reporte
@@ -1243,9 +1208,9 @@
                             <h1>
 
                                 ${safeText(
-                                    accident.vehiculo ||
-                                    "Vehículo"
-                                )}
+                    accident.vehiculo ||
+                    "Vehículo"
+                )}
 
                             </h1>
 
@@ -1253,14 +1218,14 @@
                             <p>
 
                                 Registro ${safeText(
-                                    accident.id ||
-                                    ""
-                                )}
+                    accident.id ||
+                    ""
+                )}
 
                                 · Placa ${safeText(
-                                    accident.placa ||
-                                    ""
-                                )}
+                    accident.placa ||
+                    ""
+                )}
 
                             </p>
 
@@ -1303,9 +1268,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.id ||
-                                            "Sin información"
-                                        )}
+                    accident.id ||
+                    "Sin información"
+                )}
 
                                     </strong>
 
@@ -1324,9 +1289,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.vehiculo ||
-                                            "Sin información"
-                                        )}
+                    accident.vehiculo ||
+                    "Sin información"
+                )}
 
                                     </strong>
 
@@ -1345,9 +1310,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.placa ||
-                                            "Sin información"
-                                        )}
+                    accident.placa ||
+                    "Sin información"
+                )}
 
                                     </strong>
 
@@ -1366,9 +1331,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.fechaHora ||
-                                            "Sin información"
-                                        )}
+                    accident.fechaHora ||
+                    "Sin información"
+                )}
 
                                     </strong>
 
@@ -1387,9 +1352,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.chofer ||
-                                            "Sin información"
-                                        )}
+                    accident.chofer ||
+                    "Sin información"
+                )}
 
                                     </strong>
 
@@ -1406,8 +1371,8 @@
                                     </span>
 
                                     ${getStatusBadge(
-                                        accident.puedeContinuarUso
-                                    )}
+                    accident.puedeContinuarUso
+                )}
 
                                 </div>
 
@@ -1447,8 +1412,8 @@
                                 <p class="detail-text">
 
                                     ${safeMultiline(
-                                        accident.descripcion
-                                    )}
+                    accident.descripcion
+                )}
 
                                 </p>
 
@@ -1467,15 +1432,14 @@
 
                                 <p class="detail-text">
 
-                                    ${
-                                        accident.ocupantes
+                                    ${accident.ocupantes
 
-                                            ? safeMultiline(
-                                                accident.ocupantes
-                                            )
+                        ? safeMultiline(
+                            accident.ocupantes
+                        )
 
-                                            : "No se registraron acompañantes."
-                                    }
+                        : "No se registraron acompañantes."
+                    }
 
                                 </p>
 
@@ -1495,9 +1459,9 @@
                                 <p class="detail-text">
 
                                     ${safeText(
-                                        accident.personaReportada ||
-                                        "Sin información"
-                                    )}
+                        accident.personaReportada ||
+                        "Sin información"
+                    )}
 
                                 </p>
 
@@ -1536,9 +1500,9 @@
                                 <p class="detail-text">
 
                                     ${safeText(
-                                        accident.ubicacion ||
-                                        "Sin información"
-                                    )}
+                        accident.ubicacion ||
+                        "Sin información"
+                    )}
 
                                 </p>
 
@@ -1558,9 +1522,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.latitud ||
-                                            "Sin información"
-                                        )}
+                        accident.latitud ||
+                        "Sin información"
+                    )}
 
                                     </strong>
 
@@ -1577,9 +1541,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.longitud ||
-                                            "Sin información"
-                                        )}
+                        accident.longitud ||
+                        "Sin información"
+                    )}
 
                                     </strong>
 
@@ -1596,9 +1560,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.altitud ||
-                                            "No disponible"
-                                        )}
+                        accident.altitud ||
+                        "No disponible"
+                    )}
 
                                     </strong>
 
@@ -1615,9 +1579,9 @@
                                     <strong>
 
                                         ${safeText(
-                                            accident.precision ||
-                                            "No disponible"
-                                        )}
+                        accident.precision ||
+                        "No disponible"
+                    )}
 
                                     </strong>
 
@@ -1657,8 +1621,8 @@
 
 
                             ${renderAccidentPhotos(
-                                accident
-                            )}
+                        accident
+                    )}
 
 
                         </section>
@@ -1683,13 +1647,12 @@
 
                             <p class="detail-text">
 
-                                ${
-                                    accident.reportePdfUrl
+                                ${accident.reportePdfUrl
 
-                                        ? "El reporte oficial PDF está disponible para descargar."
+                        ? "El reporte oficial PDF está disponible para descargar."
 
-                                        : "El reporte PDF todavía no está disponible."
-                                }
+                        : "El reporte PDF todavía no está disponible."
+                    }
 
                             </p>
 
@@ -1894,7 +1857,7 @@
 
 
                     } catch (
-                        error
+                    error
                     ) {
 
                         console.warn(
@@ -1947,7 +1910,7 @@
 
 
                 } catch (
-                    error
+                error
                 ) {
 
                     console.error(
@@ -1959,7 +1922,7 @@
                     showError(
 
                         error &&
-                        error.message
+                            error.message
 
                             ? error.message
 
