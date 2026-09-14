@@ -3,7 +3,7 @@
    ========================================================= */
 
 const CACHE_NAME =
-    "asada-static-v37";
+    "asada-static-v38";
 
 const STATIC_FILES = [
 
@@ -23,6 +23,16 @@ const STATIC_FILES = [
 
     "./detalle.html",
 
+    "./crear-factibilidad.html",
+
+    "./factibilidades.html",
+
+    "./detalle-factibilidad.html",
+
+    "./css/factibilidad.css",
+
+    "./js/factibilidad.js",
+    
     "./excel.html",
 
     "./css/style.css",
@@ -34,7 +44,6 @@ const STATIC_FILES = [
     "./img/asadalogo.png"
 
 ];
-
 
 /* =========================================================
    INSTALACIÓN
