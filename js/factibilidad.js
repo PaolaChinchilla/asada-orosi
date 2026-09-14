@@ -501,8 +501,6 @@ function factibilidadFormTemplate() {
 
                 <div class="fact-section-heading">
 
-                    <span>1</span>
-
                     <div>
                         <h2>Información del solicitante</h2>
                         <p>Identificación y ubicación de la propiedad.</p>
@@ -565,8 +563,6 @@ function factibilidadFormTemplate() {
             <section class="fact-panel">
 
                 <div class="fact-section-heading">
-
-                    <span>2</span>
 
                     <div>
                         <h2>Información de la propiedad</h2>
@@ -669,8 +665,6 @@ function factibilidadFormTemplate() {
             <section class="fact-panel">
 
                 <div class="fact-section-heading">
-
-                    <span>3</span>
 
                     <div>
                         <h2>Condiciones hidráulicas</h2>
@@ -873,8 +867,6 @@ function factibilidadFormTemplate() {
 
                 <div class="fact-section-heading">
 
-                    <span>4</span>
-
                     <div>
                         <h2>Ubicación geográfica</h2>
                         <p>Puede capturar el GPS, buscar una dirección o seleccionar el punto en el mapa.</p>
@@ -967,8 +959,6 @@ function factibilidadFormTemplate() {
             <section class="fact-panel">
 
                 <div class="fact-section-heading">
-
-                    <span>5</span>
 
                     <div>
                         <h2>Red y dispositivo de medición</h2>
@@ -1118,8 +1108,6 @@ function factibilidadFormTemplate() {
             <section class="fact-panel">
 
                 <div class="fact-section-heading">
-
-                    <span>6</span>
 
                     <div>
                         <h2>Fotografía y cierre</h2>
