@@ -1236,6 +1236,7 @@ function factibilidadFormTemplate() {
 
         </form>
     `;
+
 }
 
 
@@ -2943,34 +2944,49 @@ function factibilidadRenderDetail(
                 ]
             )}
 
+        <section class="fact-panel fact-location-panel">
+            <div class="fact-section-heading">
+                <span>4</span>
+                <div>
+                    <h2>Ubicación geográfica</h2>
+                    <p>Lugar, dirección o referencia y punto registrado.</p>
+                </div>
+            </div>
 
-        ${factibilidadDetailSection(
-                "Ubicación geográfica",
-                [
-                    [
-                        "Longitud X",
-                        record.longitudX
-                    ],
-                    [
-                        "Latitud Y",
-                        record.latitudY
-                    ],
-                    [
-                        "Altitud",
-                        record.altitud !== ""
-                            ? record.altitud +
-                            " m"
-                            : ""
-                    ],
-                    [
-                        "Precisión GPS",
-                        record.precisionGPS !== ""
-                            ? record.precisionGPS +
-                            " m"
-                            : ""
-                    ],
-                ]
-            )}
+            <div class="fact-location-reference">
+                <span>LUGAR, DIRECCIÓN O REFERENCIA</span>
+                <strong>${factibilidadEscape(record.direccion || "No indicada")}</strong>
+            </div>
+
+            <div class="fact-location-coordinates">
+                <div>
+                    <span>COORDENADA Y - LATITUD</span>
+                    <strong>${factibilidadEscape(record.latitudY)}</strong>
+                </div>
+                <div>
+                    <span>COORDENADA X - LONGITUD</span>
+                    <strong>${factibilidadEscape(record.longitudX)}</strong>
+                </div>
+                <div>
+                    <span>ALTITUD (M)</span>
+                    <strong>${factibilidadEscape(record.altitud !== "" ? record.altitud : "No disponible")}</strong>
+                </div>
+                <div>
+                    <span>PRECISIÓN (M)</span>
+                    <strong>${factibilidadEscape(record.precisionGPS !== "" ? record.precisionGPS : "No disponible")}</strong>
+                </div>
+            </div>
+
+            <div class="fact-detail-map-wrapper">
+                <h3>Mapa de la ubicación registrada</h3>
+                <div
+                    id="factDetailMap"
+                    class="fact-detail-map"
+                    data-latitude="${factibilidadEscape(record.latitudY)}"
+                    data-longitude="${factibilidadEscape(record.longitudX)}">
+                </div>
+            </div>
+        </section>
 
 
         ${factibilidadDetailSection(
@@ -3081,6 +3097,11 @@ function factibilidadRenderDetail(
     `;
 
 
+    window.setTimeout(
+        initializeFactibilidadDetailMap,
+        0
+    );
+
     document
         .getElementById(
             "factPdfButton"
@@ -3159,6 +3180,69 @@ function factibilidadRenderDetail(
                 }
             }
         );
+}
+
+function initializeFactibilidadDetailMap() {
+    const container =
+        document.getElementById("factDetailMap");
+
+    const Leaflet =
+        window.ASADA_LEAFLET || window.L;
+
+    if (!container || !Leaflet) {
+        if (container) {
+            container.innerHTML =
+                "<p class=\"fact-map-unavailable\">No fue posible cargar el mapa.</p>";
+        }
+        return;
+    }
+
+    const latitude =
+        Number(container.dataset.latitude);
+
+    const longitude =
+        Number(container.dataset.longitude);
+
+    if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
+    ) {
+        container.innerHTML =
+            "<p class=\"fact-map-unavailable\">No hay coordenadas disponibles.</p>";
+        return;
+    }
+
+    const map =
+        Leaflet.map(container, {
+            zoomControl: true,
+            attributionControl: true
+        }).setView(
+            [latitude, longitude],
+            17
+        );
+
+    Leaflet.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap"
+        }
+    ).addTo(map);
+
+    Leaflet.marker([
+        latitude,
+        longitude
+    ])
+        .addTo(map)
+        .bindPopup("Ubicación de la inspección")
+        .openPopup();
+
+    window.setTimeout(
+        function () {
+            map.invalidateSize();
+        },
+        200
+    );
 }
 
 
@@ -3244,7 +3328,7 @@ async function factibilidadGeneratePdf(
                 "mm",
 
             format:
-                "a4"
+                "letter"
 
         });
 
@@ -3262,7 +3346,7 @@ async function factibilidadGeneratePdf(
 
     const logo =
         await factibilidadUrlToData(
-            "img/asada.png"
+            "img/asadalogo.png"
         )
             .catch(
                 function () {
@@ -3309,14 +3393,20 @@ async function factibilidadGeneratePdf(
     const addSection =
         function (
             title,
-            rows
+            rows,
+            forceNewPage
         ) {
 
-            let y =
-                doc.lastAutoTable
-                    ? doc.lastAutoTable.finalY +
-                    8
+            let y;
+
+            if (forceNewPage) {
+                doc.addPage();
+                y = 39;
+            } else {
+                y = doc.lastAutoTable
+                    ? doc.lastAutoTable.finalY + 8
                     : 39;
+            }
 
 
             if (
@@ -3583,6 +3673,10 @@ async function factibilidadGeneratePdf(
         "Ubicación geográfica",
         [
             [
+                "Lugar, dirección o referencia",
+                record.direccion || "No indicada"
+            ],
+            [
                 "Longitud X",
                 record.longitudX
             ],
@@ -3608,20 +3702,15 @@ async function factibilidadGeneratePdf(
     );
 
     if (reportMapImage) {
-        let mapY = doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : 40;
+        doc.addPage();
 
-        if (mapY + 78 > 278) {
-            doc.addPage();
-            mapY = 40;
-        }
+        const mapY = 42;
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(24, 89, 79);
         doc.text("Mapa de la ubicación registrada", 16, mapY);
-        doc.addImage(reportMapImage, "PNG", 16, mapY + 4, 178, 70);
+        doc.addImage(reportMapImage, "PNG", 16, mapY + 5, 178, 100);
     }
 
 
@@ -3646,7 +3735,8 @@ async function factibilidadGeneratePdf(
                 "Diámetro del dispositivo",
                 record.diametroDispositivo
             ]
-        ]
+        ],
+        Boolean(reportMapImage)
     );
 
 
@@ -3793,10 +3883,10 @@ async function factibilidadGeneratePdf(
             doc.addImage(
                 logo,
                 logoFormat,
-                174,
+                18,
                 8,
-                20,
-                20
+                25,
+                25
             );
         }
 
@@ -3818,8 +3908,12 @@ async function factibilidadGeneratePdf(
 
         doc.text(
             "ASADA OROSI",
-            16,
-            14
+            105,
+            14,
+            {
+                align:
+                    "center"
+            }
         );
 
 
@@ -3828,9 +3922,13 @@ async function factibilidadGeneratePdf(
         );
 
         doc.text(
-            "Inspección de Factibilidad de Agua Potable",
-            16,
-            21
+            "REPORTE DE INSPECCIÓN DE FACTIBILIDAD DE AGUA POTABLE",
+            105,
+            21,
+            {
+                align:
+                    "center"
+            }
         );
 
 
@@ -3846,9 +3944,9 @@ async function factibilidadGeneratePdf(
 
         doc.line(
             16,
-            28,
+            32,
             194,
-            28
+            32
         );
 
 
@@ -3871,7 +3969,7 @@ async function factibilidadGeneratePdf(
             "Registro " +
             record.id,
             16,
-            289
+            doc.internal.pageSize.getHeight() - 10
         );
 
         doc.text(
@@ -3880,7 +3978,7 @@ async function factibilidadGeneratePdf(
             " de " +
             pageCount,
             194,
-            289,
+            doc.internal.pageSize.getHeight() - 10,
             {
                 align:
                     "right"
