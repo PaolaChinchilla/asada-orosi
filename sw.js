@@ -3,7 +3,7 @@
    ========================================================= */
 
 const CACHE_NAME =
-    "asada-static-v38";
+    "asada-static-v39";
 
 const STATIC_FILES = [
 
@@ -32,7 +32,7 @@ const STATIC_FILES = [
     "./css/factibilidad.css",
 
     "./js/factibilidad.js",
-    
+
     "./excel.html",
 
     "./css/style.css",
