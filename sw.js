@@ -31,7 +31,11 @@ const STATIC_FILES = [
 
     "./css/factibilidad.css",
 
+    "./css/factibilidad-ajustes.css",
+
     "./js/factibilidad.js",
+
+    "./js/factibilidad-ajustes.js",
 
     "./excel.html",
 
@@ -127,10 +131,6 @@ self.addEventListener(
     "fetch",
     event => {
 
-        /*
-            Solamente manejamos solicitudes GET.
-        */
-
         if (
             event.request.method !==
             "GET"
@@ -146,10 +146,6 @@ self.addEventListener(
             );
 
 
-        /*
-            No almacenamos recursos externos.
-        */
-
         if (
             url.origin !==
             self.location.origin
@@ -164,12 +160,6 @@ self.addEventListener(
             fetch(
                 event.request,
                 {
-                    /*
-                        Evita que el navegador entregue
-                        una versión antigua desde su
-                        propia caché HTTP.
-                    */
-
                     cache:
                         "no-store"
                 }
@@ -177,11 +167,6 @@ self.addEventListener(
 
                 .then(
                     response => {
-
-                        /*
-                            Solo almacenamos respuestas
-                            correctas.
-                        */
 
                         if (
                             response &&
@@ -215,16 +200,6 @@ self.addEventListener(
                 .catch(
                     async () => {
 
-                        /*
-                            Intentamos encontrar el recurso
-                            almacenado.
-
-                            ignoreSearch también permite
-                            recuperar archivos aunque en
-                            algún momento utilicemos
-                            parámetros de versión.
-                        */
-
                         const cached =
                             await caches.match(
                                 event.request,
@@ -235,19 +210,10 @@ self.addEventListener(
                             );
 
 
-                        if (
-                            cached
-                        ) {
-
+                        if (cached) {
                             return cached;
                         }
 
-
-                        /*
-                            Si no hay Internet y se intentó
-                            abrir una página, mostramos
-                            el inicio almacenado.
-                        */
 
                         if (
                             event.request.mode ===

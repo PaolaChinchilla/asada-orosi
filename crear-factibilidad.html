@@ -27,7 +27,15 @@
 
     <link
         rel="stylesheet"
-        href="css/factibilidad.css?v=20260914-2">
+        href="css/factibilidad.css?v=20260914-1">
+
+    <link
+        rel="stylesheet"
+        href="css/factibilidad-ajustes.css?v=20260914-2">
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <title>
         Inspección de factibilidad | ASADA Orosi
@@ -89,6 +97,10 @@
             Listado de daños y accidentes
         </a>
 
+        <a href="crear-factibilidad.html">
+            Crear inspección de factibilidad
+        </a>
+
         <a href="factibilidades.html">
             Listado de factibilidades
         </a>
@@ -112,9 +124,17 @@
     </main>
 
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        window.ASADA_LEAFLET = window.L;
+    </script>
+
     <script src="js/app.js?v=20260914-6"></script>
 
     <script src="js/factibilidad.js?v=20260914-1"></script>
+
+    <script src="js/factibilidad-ajustes.js?v=20260914-2"></script>
 
 </body>
 
