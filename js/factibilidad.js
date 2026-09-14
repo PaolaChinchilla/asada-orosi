@@ -672,21 +672,6 @@ function factibilidadFormTemplate() {
 
                 </div>
 
-
-                <label class="fact-field">
-
-                    <span>
-                        Condiciones de la propiedad donde se inspecciona *
-                    </span>
-
-                    <textarea
-                        name="condicionesPropiedad"
-                        rows="4"
-                        maxlength="1500"
-                        required></textarea>
-
-                </label>
-
             </section>
 
 
@@ -1559,7 +1544,6 @@ function factibilidadFillForm(
         "ruta",
         "numeroPaja",
         "tipoOtroDescripcion",
-        "condicionesPropiedad",
         "presionMinimaPSI",
         "presionMaximaPSI",
         "caudalReservado",
@@ -1912,11 +1896,6 @@ function factibilidadCollectForm(
         tipoOtroDescripcion:
             value(
                 "tipoOtroDescripcion"
-            ),
-
-        condicionesPropiedad:
-            value(
-                "condicionesPropiedad"
             ),
 
         presionMinimaPSI:
@@ -2937,10 +2916,6 @@ function factibilidadRenderDetail(
                 [
                     "Tipo de propiedad",
                     types
-                ],
-                [
-                    "Condiciones de la propiedad",
-                    record.condicionesPropiedad
                 ]
             ]
         )}
@@ -3575,10 +3550,6 @@ async function factibilidadGeneratePdf(
             [
                 "Tipo de propiedad",
                 propertyTypes
-            ],
-            [
-                "Condiciones de la propiedad",
-                record.condicionesPropiedad
             ]
         ]
     );
