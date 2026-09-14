@@ -3282,7 +3282,7 @@ async function factibilidadGeneratePdf(
 
     const logo =
         await factibilidadUrlToData(
-            "img/asadalogo.png"
+            "img/asada.png"
         )
             .catch(
                 function () {
