@@ -2759,17 +2759,6 @@ function factibilidadRenderDetail(
             record
         );
 
-    const mapUrl =
-        record.latitudY !== "" &&
-            record.longitudX !== ""
-            ? "https://www.google.com/maps?q=" +
-            encodeURIComponent(
-                record.latitudY +
-                "," +
-                record.longitudX
-            )
-            : "";
-
     const imageUrl =
         factibilidadSafeUrl(
             record.imagenFrenteURL
@@ -2977,18 +2966,6 @@ function factibilidadRenderDetail(
                             " m"
                             : ""
                     ],
-                    [
-                        "Mapa",
-                        mapUrl
-                            ? {
-                                text:
-                                    "Abrir ubicación en Google Maps",
-
-                                url:
-                                    mapUrl
-                            }
-                            : ""
-                    ]
                 ]
             )}
 
@@ -3312,6 +3289,19 @@ async function factibilidadGeneratePdf(
             ? imageResponse.data
             : "";
 
+    const mapResponse =
+        await factibilidadCall(
+            "getFactibilidadMapData",
+            { id: record.id }
+        ).catch(function () {
+            return null;
+        });
+
+    const reportMapImage =
+        mapResponse && mapResponse.data
+            ? mapResponse.data
+            : "";
+
 
     const addSection =
         function (
@@ -3613,6 +3603,23 @@ async function factibilidadGeneratePdf(
             ]
         ]
     );
+
+    if (reportMapImage) {
+        let mapY = doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : 40;
+
+        if (mapY + 78 > 278) {
+            doc.addPage();
+            mapY = 40;
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(24, 89, 79);
+        doc.text("Mapa de la ubicación registrada", 16, mapY);
+        doc.addImage(reportMapImage, "PNG", 16, mapY + 4, 178, 70);
+    }
 
 
     addSection(
