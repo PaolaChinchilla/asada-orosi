@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -14,7 +15,7 @@
 
     <meta
         name="description"
-        content="Descarga de registros de revisiones de vehículos de ASADA Orosi.">
+        content="Descarga de registros de vehículos de ASADA Orosi.">
 
     <link
         rel="manifest"
@@ -22,23 +23,30 @@
 
     <link
         rel="stylesheet"
-        href="css/style.css">
+        href="css/style.css?v=20260914-04">
 
     <title>
         Descargar Excel | ASADA Orosi
     </title>
 
 
-    <!--
-        Librería para crear archivos Excel
-    -->
+    <!-- =====================================================
+         EXCELJS
+         ===================================================== -->
+
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js">
     </script>
 
 </head>
 
+
 <body>
+
+
+    <!-- =====================================================
+         BARRA SUPERIOR
+         ===================================================== -->
 
     <header class="topbar">
 
@@ -47,7 +55,9 @@
             class="menu-btn"
             onclick="toggleMenu()"
             aria-label="Abrir menú de navegación">
+
             ☰
+
         </button>
 
 
@@ -67,6 +77,11 @@
     </header>
 
 
+
+    <!-- =====================================================
+         MENÚ
+         ===================================================== -->
+
     <aside
         id="sideMenu"
         class="side-menu">
@@ -83,6 +98,22 @@
             Crear registro de revisión
         </a>
 
+        <a
+            id="menuCreateAccident"
+            href="crear-accidente.html">
+
+            Crear registro de daño y accidente
+
+        </a>
+
+        <a
+            id="menuAccidentList"
+            href="accidentes.html">
+
+            Listado de daños y accidentes
+
+        </a>
+
         <a href="excel.html">
             Descargar Excel
         </a>
@@ -90,17 +121,26 @@
     </aside>
 
 
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
     <main class="page">
+
 
         <div class="nav-actions">
 
             <a
                 href="index.html"
                 class="btn-back">
+
                 Volver al inicio
+
             </a>
 
         </div>
+
 
 
         <div class="page-head">
@@ -116,7 +156,10 @@
                 </h1>
 
                 <p>
-                    Seleccione los registros que desea incluir en el archivo.
+
+                    Seleccione los registros que desea incluir
+                    en el archivo.
+
                 </p>
 
             </div>
@@ -124,7 +167,13 @@
         </div>
 
 
+
+        <!-- =================================================
+             TARJETA DE EXPORTACIÓN
+             ================================================= -->
+
         <section class="export-card">
+
 
             <label for="exportScope">
 
@@ -135,17 +184,26 @@
                     onchange="toggleVehicleExport()">
 
                     <option value="all">
+
                         Todos los registros
+
                     </option>
 
                     <option value="vehicle">
+
                         Registros de un vehículo específico
+
                     </option>
 
                 </select>
 
             </label>
 
+
+
+            <!-- =================================================
+                 VEHÍCULO
+                 ================================================= -->
 
             <div
                 id="exportVehicleWrap"
@@ -158,19 +216,27 @@
                     <select id="exportVehicle">
 
                         <option value="">
+
                             Seleccione un vehículo
+
                         </option>
 
                         <option value="Toyota Rush">
+
                             Toyota Rush - BPW199
+
                         </option>
 
                         <option value="Isuzu D-Max Gris">
+
                             Isuzu D-Max Gris - CL376760
+
                         </option>
 
                         <option value="Isuzu D-Max Blanco">
+
                             Isuzu D-Max Blanco - AGV
+
                         </option>
 
                     </select>
@@ -180,14 +246,27 @@
             </div>
 
 
+
+            <!-- =================================================
+                 DESCRIPCIÓN
+                 ================================================= -->
+
             <div class="export-description">
 
                 <p id="exportDescription">
-                    El archivo incluirá todos los registros de revisión existentes.
+
+                    El archivo incluirá las revisiones
+                    y los daños o accidentes registrados.
+
                 </p>
 
             </div>
 
+
+
+            <!-- =================================================
+                 BOTÓN
+                 ================================================= -->
 
             <button
                 id="downloadExcelButton"
@@ -200,17 +279,1783 @@
             </button>
 
 
+
             <p
                 id="excelStatus"
+                class="note"
                 aria-live="polite">
             </p>
 
+
         </section>
+
 
     </main>
 
 
-    <script src="js/app.js"></script>
+
+    <!-- =====================================================
+         APP.JS
+         ===================================================== -->
+
+    <script src="js/app.js?v=20260914-04"></script>
+
+
+
+    <!-- =====================================================
+         EXCEL
+         ===================================================== -->
+
+    <script>
+
+        (() => {
+
+
+            /* =================================================
+               MOSTRAR / OCULTAR VEHÍCULO
+               ================================================= */
+
+            window.toggleVehicleExport =
+                function () {
+
+                    const scope =
+                        document.getElementById(
+                            "exportScope"
+                        );
+
+
+                    const wrap =
+                        document.getElementById(
+                            "exportVehicleWrap"
+                        );
+
+
+                    const vehicle =
+                        document.getElementById(
+                            "exportVehicle"
+                        );
+
+
+                    const description =
+                        document.getElementById(
+                            "exportDescription"
+                        );
+
+
+                    if (
+                        !scope ||
+                        !wrap
+                    ) {
+
+                        return;
+
+                    }
+
+
+
+                    if (
+                        scope.value ===
+                        "vehicle"
+                    ) {
+
+                        wrap.classList.remove(
+                            "hidden"
+                        );
+
+
+                        if (
+                            description
+                        ) {
+
+                            description.textContent =
+
+                                "El archivo incluirá únicamente las revisiones y los daños o accidentes del vehículo seleccionado.";
+
+                        }
+
+
+                        return;
+
+                    }
+
+
+
+                    wrap.classList.add(
+                        "hidden"
+                    );
+
+
+                    if (
+                        vehicle
+                    ) {
+
+                        vehicle.value =
+                            "";
+
+                    }
+
+
+                    if (
+                        description
+                    ) {
+
+                        description.textContent =
+
+                            "El archivo incluirá todas las revisiones y todos los daños o accidentes registrados.";
+
+                    }
+
+                };
+
+
+
+            /* =================================================
+               PUNTOS DE REVISIÓN
+               ================================================= */
+
+            function getReviewPoints(
+                points
+            ) {
+
+                if (
+                    Array.isArray(
+                        points
+                    )
+                ) {
+
+                    return points
+                        .map(
+                            item =>
+                                String(
+                                    item ||
+                                    ""
+                                ).trim()
+                        )
+                        .filter(
+                            Boolean
+                        );
+
+                }
+
+
+                if (
+                    typeof points ===
+                    "string"
+                ) {
+
+                    return points
+                        .split(
+                            "|"
+                        )
+                        .map(
+                            item =>
+                                item.trim()
+                        )
+                        .filter(
+                            Boolean
+                        );
+
+                }
+
+
+                return [];
+
+            }
+
+
+
+            /* =================================================
+               ¿TIENE FOTOGRAFÍAS?
+               ================================================= */
+
+            function recordHasPhotos(
+                record
+            ) {
+
+                if (
+                    !record
+                ) {
+
+                    return false;
+
+                }
+
+
+                const images =
+                    Array.isArray(
+                        record.imagenes
+                    )
+
+                        ? record.imagenes
+
+                        : [];
+
+
+                const folderUrl =
+                    String(
+                        record.carpetaFotosUrl ||
+                        ""
+                    ).trim();
+
+
+                return (
+
+                    images.length > 0 &&
+                    folderUrl !== ""
+
+                );
+
+            }
+
+
+
+            /* =================================================
+               FECHA PARA NOMBRE DEL ARCHIVO
+               ================================================= */
+
+            function getExcelDate() {
+
+                const now =
+                    new Date();
+
+
+                const pad =
+                    value =>
+                        String(
+                            value
+                        ).padStart(
+                            2,
+                            "0"
+                        );
+
+
+                return (
+
+                    now.getFullYear() +
+
+                    "-" +
+
+                    pad(
+                        now.getMonth() +
+                        1
+                    ) +
+
+                    "-" +
+
+                    pad(
+                        now.getDate()
+                    )
+
+                );
+
+            }
+
+
+
+            /* =================================================
+               NOMBRE SEGURO
+               ================================================= */
+
+            function safeFileName(
+                value
+            ) {
+
+                return String(
+                    value ||
+                    "Vehiculo"
+                )
+                    .normalize(
+                        "NFD"
+                    )
+                    .replace(
+                        /[\u0300-\u036f]/g,
+                        ""
+                    )
+                    .replace(
+                        /[^a-zA-Z0-9_-]+/g,
+                        "_"
+                    );
+
+            }
+
+
+
+            /* =================================================
+               ESTILO GENERAL DE UNA HOJA
+               ================================================= */
+
+            function styleWorksheet(
+                sheet,
+                lastColumn
+            ) {
+
+                /* =============================================
+                   ENCABEZADO
+                   ============================================= */
+
+                const header =
+                    sheet.getRow(
+                        1
+                    );
+
+
+                header.height =
+                    30;
+
+
+                header.eachCell(
+                    cell => {
+
+                        cell.fill = {
+
+                            type:
+                                "pattern",
+
+                            pattern:
+                                "solid",
+
+                            fgColor: {
+
+                                argb:
+                                    "FF20CDB0"
+
+                            }
+
+                        };
+
+
+                        cell.font = {
+
+                            bold:
+                                true,
+
+                            color: {
+
+                                argb:
+                                    "FF071512"
+
+                            }
+
+                        };
+
+
+                        cell.alignment = {
+
+                            vertical:
+                                "middle",
+
+                            horizontal:
+                                "center",
+
+                            wrapText:
+                                true
+
+                        };
+
+
+                        cell.border = {
+
+                            top: {
+
+                                style:
+                                    "thin"
+
+                            },
+
+                            left: {
+
+                                style:
+                                    "thin"
+
+                            },
+
+                            bottom: {
+
+                                style:
+                                    "thin"
+
+                            },
+
+                            right: {
+
+                                style:
+                                    "thin"
+
+                            }
+
+                        };
+
+                    }
+                );
+
+
+
+                /* =============================================
+                   FILAS
+                   ============================================= */
+
+                sheet.eachRow(
+                    (
+                        row,
+                        rowNumber
+                    ) => {
+
+                        if (
+                            rowNumber ===
+                            1
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        row.eachCell(
+                            {
+                                includeEmpty:
+                                    true
+                            },
+                            cell => {
+
+                                cell.alignment = {
+
+                                    vertical:
+                                        "top",
+
+                                    wrapText:
+                                        true
+
+                                };
+
+
+                                cell.border = {
+
+                                    top: {
+
+                                        style:
+                                            "thin"
+
+                                    },
+
+                                    left: {
+
+                                        style:
+                                            "thin"
+
+                                    },
+
+                                    bottom: {
+
+                                        style:
+                                            "thin"
+
+                                    },
+
+                                    right: {
+
+                                        style:
+                                            "thin"
+
+                                    }
+
+                                };
+
+                            }
+                        );
+
+                    }
+                );
+
+
+
+                /* =============================================
+                   CONGELAR ENCABEZADO
+                   ============================================= */
+
+                sheet.views = [
+
+                    {
+
+                        state:
+                            "frozen",
+
+                        ySplit:
+                            1
+
+                    }
+
+                ];
+
+
+
+                /* =============================================
+                   FILTROS
+                   ============================================= */
+
+                sheet.autoFilter = {
+
+                    from:
+                        "A1",
+
+                    to:
+
+                        String.fromCharCode(
+                            64 +
+                            lastColumn
+                        ) +
+
+                        "1"
+
+                };
+
+            }
+
+
+
+            /* =================================================
+               CREAR HOJA DE REVISIONES
+               ================================================= */
+
+            function createReviewsSheet(
+                workbook,
+                records
+            ) {
+
+                const sheet =
+                    workbook.addWorksheet(
+                        "Registro de revisiones"
+                    );
+
+
+                /*
+                    Dejamos la hoja que ya tenías
+                    con la misma información.
+                */
+
+                sheet.columns = [
+
+                    {
+                        header:
+                            "ID",
+
+                        key:
+                            "id",
+
+                        width:
+                            12
+                    },
+
+
+                    {
+                        header:
+                            "Vehículo",
+
+                        key:
+                            "vehiculo",
+
+                        width:
+                            27
+                    },
+
+
+                    {
+                        header:
+                            "Placa",
+
+                        key:
+                            "placa",
+
+                        width:
+                            17
+                    },
+
+
+                    {
+                        header:
+                            "Fecha y hora",
+
+                        key:
+                            "fecha",
+
+                        width:
+                            22
+                    },
+
+
+                    {
+                        header:
+                            "El carro lo utilizó",
+
+                        key:
+                            "usuario",
+
+                        width:
+                            30
+                    },
+
+
+                    {
+                        header:
+                            "Responsable de la Inspección",
+
+                        key:
+                            "responsable",
+
+                        width:
+                            35
+                    },
+
+
+                    {
+                        header:
+                            "Kilometraje",
+
+                        key:
+                            "kilometraje",
+
+                        width:
+                            18
+                    },
+
+
+                    {
+                        header:
+                            "Puntos revisados",
+
+                        key:
+                            "puntos",
+
+                        width:
+                            55
+                    },
+
+
+                    {
+                        header:
+                            "Condición",
+
+                        key:
+                            "condicion",
+
+                        width:
+                            18
+                    },
+
+
+                    {
+                        header:
+                            "Comentario de condición",
+
+                        key:
+                            "comentarioCondicion",
+
+                        width:
+                            40
+                    },
+
+
+                    {
+                        header:
+                            "Motivo de uso",
+
+                        key:
+                            "motivo",
+
+                        width:
+                            40
+                    },
+
+
+                    {
+                        header:
+                            "Comentario General",
+
+                        key:
+                            "comentario",
+
+                        width:
+                            45
+                    },
+
+
+                    {
+                        header:
+                            "Fotografías",
+
+                        key:
+                            "fotografias",
+
+                        width:
+                            24
+                    }
+
+                ];
+
+
+
+                records.forEach(
+                    record => {
+
+                        const points =
+                            getReviewPoints(
+                                record.puntos
+                            );
+
+
+                        const hasPhotos =
+                            recordHasPhotos(
+                                record
+                            );
+
+
+                        const row =
+                            sheet.addRow({
+
+                                id:
+                                    record.id ||
+                                    "",
+
+
+                                vehiculo:
+                                    record.vehiculo ||
+                                    "",
+
+
+                                placa:
+                                    record.placa ||
+                                    "",
+
+
+                                fecha:
+                                    record.fechaHora ||
+                                    "",
+
+
+                                usuario:
+                                    record.usuario ||
+                                    "",
+
+
+                                responsable:
+                                    record.responsable ||
+                                    "",
+
+
+                                kilometraje:
+                                    record.kilometraje ||
+                                    "",
+
+
+                                puntos:
+
+                                    points.length > 0
+
+                                        ? points.join(
+                                            ", "
+                                        )
+
+                                        : "No se revisó ningún punto",
+
+
+                                condicion:
+                                    record.condicion ||
+                                    "",
+
+
+                                comentarioCondicion:
+                                    record.comentarioCondicion ||
+                                    "",
+
+
+                                motivo:
+                                    record.motivo ||
+                                    "",
+
+
+                                comentario:
+                                    record.comentario ||
+                                    "",
+
+
+                                fotografias:
+
+                                    hasPhotos
+
+                                        ? "Ver fotografías"
+
+                                        : ""
+
+                            });
+
+
+
+                        /*
+                            Hipervínculo hacia la carpeta
+                            de fotografías.
+                        */
+
+                        if (
+                            hasPhotos &&
+                            record.carpetaFotosUrl
+                        ) {
+
+                            const cell =
+                                row.getCell(
+                                    13
+                                );
+
+
+                            cell.value = {
+
+                                text:
+                                    "Ver fotografías",
+
+                                hyperlink:
+                                    record.carpetaFotosUrl
+
+                            };
+
+
+                            cell.font = {
+
+                                underline:
+                                    true,
+
+                                color: {
+
+                                    argb:
+                                        "FF0563C1"
+
+                                }
+
+                            };
+
+                        }
+
+                    }
+                );
+
+
+                styleWorksheet(
+                    sheet,
+                    13
+                );
+
+
+                return sheet;
+
+            }
+
+
+
+            /* =================================================
+               CREAR HOJA DE DAÑOS Y ACCIDENTES
+               ================================================= */
+
+            function createAccidentsSheet(
+                workbook,
+                accidents
+            ) {
+
+                const sheet =
+                    workbook.addWorksheet(
+                        "Daños y accidentes"
+                    );
+
+
+                /*
+                    AQUÍ VAN SOLAMENTE LOS CAMPOS
+                    QUE PEDISTE.
+
+                    No incluimos:
+                    - ubicación
+                    - latitud
+                    - longitud
+                    - altitud
+                    - precisión
+                    - mapa
+                    - fotos
+                */
+
+                sheet.columns = [
+
+                    {
+                        header:
+                            "ID",
+
+                        key:
+                            "id",
+
+                        width:
+                            14
+                    },
+
+
+                    {
+                        header:
+                            "Chofer",
+
+                        key:
+                            "chofer",
+
+                        width:
+                            30
+                    },
+
+
+                    {
+                        header:
+                            "Fecha y hora",
+
+                        key:
+                            "fecha",
+
+                        width:
+                            22
+                    },
+
+
+                    {
+                        header:
+                            "Vehículo",
+
+                        key:
+                            "vehiculo",
+
+                        width:
+                            27
+                    },
+
+
+                    {
+                        header:
+                            "Placa",
+
+                        key:
+                            "placa",
+
+                        width:
+                            17
+                    },
+
+
+                    {
+                        header:
+                            "Descripción",
+
+                        key:
+                            "descripcion",
+
+                        width:
+                            55
+                    },
+
+
+                    {
+                        header:
+                            "Ocupantes",
+
+                        key:
+                            "ocupantes",
+
+                        width:
+                            38
+                    },
+
+
+                    {
+                        header:
+                            "Persona a quien se reportó",
+
+                        key:
+                            "personaReportada",
+
+                        width:
+                            34
+                    },
+
+
+                    {
+                        header:
+                            "¿Puede continuar en uso?",
+
+                        key:
+                            "puedeContinuar",
+
+                        width:
+                            25
+                    },
+
+
+                    {
+                        header:
+                            "Descargar PDF",
+
+                        key:
+                            "pdf",
+
+                        width:
+                            22
+                    }
+
+                ];
+
+
+
+                accidents.forEach(
+                    accident => {
+
+                        const pdfUrl =
+                            String(
+                                accident.reportePdfUrl ||
+                                ""
+                            ).trim();
+
+
+                        const row =
+                            sheet.addRow({
+
+                                id:
+                                    accident.id ||
+                                    "",
+
+
+                                chofer:
+                                    accident.chofer ||
+                                    "",
+
+
+                                fecha:
+                                    accident.fechaHora ||
+                                    "",
+
+
+                                vehiculo:
+                                    accident.vehiculo ||
+                                    "",
+
+
+                                placa:
+                                    accident.placa ||
+                                    "",
+
+
+                                descripcion:
+                                    accident.descripcion ||
+                                    "",
+
+
+                                ocupantes:
+
+                                    accident.ocupantes
+
+                                        ? accident.ocupantes
+
+                                        : "Sin acompañantes",
+
+
+                                personaReportada:
+                                    accident.personaReportada ||
+                                    "",
+
+
+                                puedeContinuar:
+                                    accident.puedeContinuarUso ||
+                                    "Sin información",
+
+
+                                pdf:
+
+                                    pdfUrl
+
+                                        ? "Descargar PDF"
+
+                                        : "Sin reporte"
+
+                            });
+
+
+
+                        /* =====================================
+                           HIPERVÍNCULO DEL PDF
+                           ===================================== */
+
+                        if (
+                            pdfUrl
+                        ) {
+
+                            const pdfCell =
+                                row.getCell(
+                                    10
+                                );
+
+
+                            pdfCell.value = {
+
+                                text:
+                                    "Descargar PDF",
+
+                                hyperlink:
+                                    pdfUrl,
+
+                                tooltip:
+                                    "Descargar reporte oficial en PDF"
+
+                            };
+
+
+                            pdfCell.font = {
+
+                                underline:
+                                    true,
+
+                                color: {
+
+                                    argb:
+                                        "FF0563C1"
+
+                                },
+
+                                bold:
+                                    true
+
+                            };
+
+
+                            pdfCell.alignment = {
+
+                                vertical:
+                                    "middle",
+
+                                horizontal:
+                                    "center"
+
+                            };
+
+                        }
+
+                    }
+                );
+
+
+
+                styleWorksheet(
+                    sheet,
+                    10
+                );
+
+
+
+                /* =============================================
+                   CENTRAR ALGUNAS COLUMNAS
+                   ============================================= */
+
+                sheet
+                    .getColumn(
+                        1
+                    )
+                    .alignment = {
+
+                        vertical:
+                            "top",
+
+                        horizontal:
+                            "center"
+
+                    };
+
+
+                sheet
+                    .getColumn(
+                        5
+                    )
+                    .alignment = {
+
+                        vertical:
+                            "top",
+
+                        horizontal:
+                            "center"
+
+                    };
+
+
+                sheet
+                    .getColumn(
+                        9
+                    )
+                    .alignment = {
+
+                        vertical:
+                            "top",
+
+                        horizontal:
+                            "center",
+
+                        wrapText:
+                            true
+
+                    };
+
+
+                sheet
+                    .getColumn(
+                        10
+                    )
+                    .alignment = {
+
+                        vertical:
+                            "middle",
+
+                        horizontal:
+                            "center"
+
+                    };
+
+
+                return sheet;
+
+            }
+
+
+
+            /* =================================================
+               EXPORTAR EXCEL
+               ================================================= */
+
+            window.exportExcel =
+                async function () {
+
+
+                    const button =
+                        document.getElementById(
+                            "downloadExcelButton"
+                        );
+
+
+                    const status =
+                        document.getElementById(
+                            "excelStatus"
+                        );
+
+
+                    const scopeElement =
+                        document.getElementById(
+                            "exportScope"
+                        );
+
+
+                    const originalButtonText =
+                        button
+
+                            ? button.textContent
+
+                            : "Descargar archivo";
+
+
+
+                    /* =========================================
+                       VALIDAR EXCELJS
+                       ========================================= */
+
+                    if (
+                        typeof ExcelJS ===
+                        "undefined"
+                    ) {
+
+                        alert(
+
+                            "No fue posible cargar la herramienta de Excel. " +
+
+                            "Revise su conexión a Internet y vuelva a cargar la página."
+
+                        );
+
+
+                        return;
+
+                    }
+
+
+
+                    /* =========================================
+                       VALIDAR API
+                       ========================================= */
+
+                    if (
+                        typeof getAllRecordsFromServer !==
+                        "function" ||
+                        typeof getAllAccidentsFromServer !==
+                        "function"
+                    ) {
+
+                        alert(
+
+                            "No fue posible encontrar las funciones necesarias para consultar los registros."
+
+                        );
+
+
+                        return;
+
+                    }
+
+
+
+                    if (
+                        !scopeElement
+                    ) {
+
+                        alert(
+                            "No fue posible determinar los registros que desea descargar."
+                        );
+
+
+                        return;
+
+                    }
+
+
+
+                    try {
+
+
+                        /* =====================================
+                           BOTÓN
+                           ===================================== */
+
+                        if (
+                            button
+                        ) {
+
+                            button.disabled =
+                                true;
+
+
+                            button.textContent =
+                                "Preparando archivo...";
+
+                        }
+
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+                                "Consultando revisiones y daños o accidentes...";
+
+                        }
+
+
+
+                        /* =====================================
+                           CONSULTAR AMBOS MÓDULOS
+                           ===================================== */
+
+                        const results =
+                            await Promise.all([
+
+                                getAllRecordsFromServer(),
+
+                                getAllAccidentsFromServer()
+
+                            ]);
+
+
+                        const allRecords =
+                            Array.isArray(
+                                results[0]
+                            )
+
+                                ? results[0]
+
+                                : [];
+
+
+                        const allAccidents =
+                            Array.isArray(
+                                results[1]
+                            )
+
+                                ? results[1]
+
+                                : [];
+
+
+
+                        /* =====================================
+                           ALCANCE
+                           ===================================== */
+
+                        const scope =
+                            scopeElement.value;
+
+
+                        let selectedVehicle =
+                            "";
+
+
+                        let records =
+                            allRecords;
+
+
+                        let accidents =
+                            allAccidents;
+
+
+
+                        /* =====================================
+                           FILTRAR POR VEHÍCULO
+                           ===================================== */
+
+                        if (
+                            scope ===
+                            "vehicle"
+                        ) {
+
+                            const vehicleElement =
+                                document.getElementById(
+                                    "exportVehicle"
+                                );
+
+
+                            selectedVehicle =
+                                vehicleElement
+
+                                    ? vehicleElement.value
+
+                                    : "";
+
+
+                            if (
+                                !selectedVehicle
+                            ) {
+
+                                alert(
+                                    "Seleccione el vehículo cuyos registros desea descargar."
+                                );
+
+
+                                return;
+
+                            }
+
+
+                            records =
+                                allRecords.filter(
+                                    record =>
+                                        record.vehiculo ===
+                                        selectedVehicle
+                                );
+
+
+                            accidents =
+                                allAccidents.filter(
+                                    accident =>
+                                        accident.vehiculo ===
+                                        selectedVehicle
+                                );
+
+                        }
+
+
+
+                        /* =====================================
+                           SIN REGISTROS
+                           ===================================== */
+
+                        if (
+                            records.length === 0 &&
+                            accidents.length === 0
+                        ) {
+
+                            alert(
+
+                                scope === "vehicle"
+
+                                    ? "El vehículo seleccionado todavía no tiene registros para descargar."
+
+                                    : "No existen registros para descargar."
+
+                            );
+
+
+                            return;
+
+                        }
+
+
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+                                "Creando las hojas del archivo Excel...";
+
+                        }
+
+
+
+                        /* =====================================
+                           CREAR LIBRO
+                           ===================================== */
+
+                        const workbook =
+                            new ExcelJS.Workbook();
+
+
+                        workbook.creator =
+                            "ASADA Orosi";
+
+
+                        workbook.company =
+                            "ASADA Orosi";
+
+
+                        workbook.subject =
+                            "Registro de revisiones, daños y accidentes vehiculares";
+
+
+                        workbook.title =
+                            "Registros de vehículos ASADA Orosi";
+
+
+                        workbook.created =
+                            new Date();
+
+
+
+                        /* =====================================
+                           HOJA 1
+                           REVISIONES
+                           ===================================== */
+
+                        createReviewsSheet(
+
+                            workbook,
+
+                            records
+
+                        );
+
+
+
+                        /* =====================================
+                           HOJA 2
+                           DAÑOS Y ACCIDENTES
+                           ===================================== */
+
+                        createAccidentsSheet(
+
+                            workbook,
+
+                            accidents
+
+                        );
+
+
+
+                        /* =====================================
+                           GENERAR ARCHIVO
+                           ===================================== */
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+                                "Generando archivo Excel...";
+
+                        }
+
+
+                        const buffer =
+                            await workbook.xlsx.writeBuffer();
+
+
+
+                        /* =====================================
+                           DESCARGA
+                           ===================================== */
+
+                        const blob =
+                            new Blob(
+                                [
+                                    buffer
+                                ],
+                                {
+
+                                    type:
+                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+                                }
+                            );
+
+
+                        const fileName =
+
+                            scope ===
+                            "vehicle"
+
+                                ? (
+
+                                    "ASADA_" +
+
+                                    safeFileName(
+                                        selectedVehicle
+                                    ) +
+
+                                    "_" +
+
+                                    getExcelDate() +
+
+                                    ".xlsx"
+
+                                )
+
+                                : (
+
+                                    "ASADA_Todos_los_Registros_" +
+
+                                    getExcelDate() +
+
+                                    ".xlsx"
+
+                                );
+
+
+                        const downloadUrl =
+                            URL.createObjectURL(
+                                blob
+                            );
+
+
+                        const link =
+                            document.createElement(
+                                "a"
+                            );
+
+
+                        link.href =
+                            downloadUrl;
+
+
+                        link.download =
+                            fileName;
+
+
+                        document.body.appendChild(
+                            link
+                        );
+
+
+                        link.click();
+
+
+                        link.remove();
+
+
+
+                        window.setTimeout(
+                            () => {
+
+                                URL.revokeObjectURL(
+                                    downloadUrl
+                                );
+
+                            },
+                            2000
+                        );
+
+
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+
+                                "Archivo generado correctamente. " +
+
+                                "Incluye una hoja de revisiones y otra de daños y accidentes.";
+
+                        }
+
+
+                    } catch (
+                        error
+                    ) {
+
+                        console.error(
+                            "Error generando Excel.",
+                            error
+                        );
+
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+                                "";
+
+                        }
+
+
+                        alert(
+
+                            error &&
+                            error.message
+
+                                ? error.message
+
+                                : "No fue posible generar el archivo Excel."
+
+                        );
+
+
+                    } finally {
+
+
+                        if (
+                            button
+                        ) {
+
+                            button.disabled =
+                                false;
+
+
+                            button.textContent =
+                                originalButtonText;
+
+                        }
+
+                    }
+
+                };
+
+
+
+            /* =================================================
+               INICIAR
+               ================================================= */
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                function () {
+
+                    toggleVehicleExport();
+
+                }
+            );
+
+
+        })();
+
+    </script>
+
 
 </body>
 
