@@ -23,7 +23,7 @@
 
     <link
         rel="stylesheet"
-        href="css/style.css?v=20260914-05">
+        href="css/style.css?v=20260914-06">
 
     <title>
         Descargar Excel | ASADA Orosi
@@ -114,7 +114,7 @@
 
         </a>
 
-        <a href="excel.html?v=20260914-05">
+        <a href="excel.html?v=20260914-06">
             Descargar Excel
         </a>
 
@@ -274,9 +274,6 @@
 
             <!-- =================================================
                  BOTÓN
-
-                 IMPORTANTE:
-                 YA NO LLAMA exportExcel()
                  ================================================= -->
 
             <button
@@ -307,19 +304,14 @@
 
     <!-- =====================================================
          APP.JS
-
-         Lo necesitamos para las llamadas al servidor,
-         menú, tema, accesibilidad, etc.
-
-         Pero NO utilizamos su exportExcel() viejo.
          ===================================================== -->
 
-    <script src="js/app.js?v=20260914-05"></script>
+    <script src="js/app.js?v=20260914-06"></script>
 
 
 
     <!-- =====================================================
-         EXCEL NUEVO
+         EXCEL
          ===================================================== -->
 
     <script>
@@ -328,7 +320,7 @@
 
 
             /* =================================================
-               MOSTRAR VEHÍCULO
+               MOSTRAR / OCULTAR VEHÍCULO
                ================================================= */
 
             window.toggleVehicleExportASADA =
@@ -427,7 +419,7 @@
 
 
             /* =================================================
-               NORMALIZAR PUNTOS DE REVISIÓN
+               NORMALIZAR PUNTOS
                ================================================= */
 
             function normalizeExcelReviewPoints(
@@ -441,6 +433,7 @@
                 ) {
 
                     return points
+
                         .map(
                             point =>
                                 String(
@@ -448,6 +441,7 @@
                                     ""
                                 ).trim()
                         )
+
                         .filter(
                             Boolean
                         );
@@ -461,13 +455,16 @@
                 ) {
 
                     return points
+
                         .split(
                             "|"
                         )
+
                         .map(
                             point =>
                                 point.trim()
                         )
+
                         .filter(
                             Boolean
                         );
@@ -482,7 +479,7 @@
 
 
             /* =================================================
-               REVISIÓN CON FOTOS
+               REVISIÓN CON FOTOGRAFÍAS
                ================================================= */
 
             function excelReviewHasPhotos(
@@ -517,7 +514,9 @@
 
                 return (
 
-                    photos.length > 0 &&
+                    photos.length >
+                    0 &&
+
                     folder !== ""
 
                 );
@@ -570,7 +569,7 @@
 
 
             /* =================================================
-               NOMBRE DE ARCHIVO
+               NOMBRE SEGURO
                ================================================= */
 
             function excelSafeName(
@@ -642,7 +641,7 @@
 
 
                 /* =============================================
-                   CABECERA
+                   ENCABEZADO
                    ============================================= */
 
                 const header =
@@ -715,7 +714,7 @@
 
 
                 /* =============================================
-                   DATOS
+                   FILAS DE DATOS
                    ============================================= */
 
                 sheet.eachRow(
@@ -805,7 +804,8 @@
 
 
             /* =================================================
-               HOJA 1 - REVISIONES
+               HOJA 1
+               REGISTRO DE REVISIONES
                ================================================= */
 
             function addReviewsSheetASADA(
@@ -819,6 +819,11 @@
                         "Registro de revisiones"
                     );
 
+
+
+                /* =============================================
+                   COLUMNAS
+                   ============================================= */
 
                 sheet.columns = [
 
@@ -907,6 +912,22 @@
                     },
 
 
+                    /* =========================================
+                       NUEVA COLUMNA
+                       ========================================= */
+
+                    {
+                        header:
+                            "Nivel de combustible",
+
+                        key:
+                            "nivelCombustible",
+
+                        width:
+                            23
+                    },
+
+
                     {
                         header:
                             "Puntos revisados",
@@ -983,6 +1004,10 @@
 
 
 
+                /* =============================================
+                   REGISTROS
+                   ============================================= */
+
                 records.forEach(
                     record => {
 
@@ -1038,6 +1063,17 @@
                                     "",
 
 
+
+                                /* =================================
+                                   NIVEL DE COMBUSTIBLE
+                                   ================================= */
+
+                                nivelCombustible:
+                                    record.nivelCombustible ||
+                                    "Sin información",
+
+
+
                                 puntos:
 
                                     points.length
@@ -1083,7 +1119,9 @@
 
 
                         /* =====================================
-                           LINK FOTOS
+                           LINK FOTOGRAFÍAS
+
+                           Ahora Fotografías es columna 14.
                            ===================================== */
 
                         if (
@@ -1094,7 +1132,7 @@
 
                             const photoCell =
                                 row.getCell(
-                                    13
+                                    14
                                 );
 
 
@@ -1129,10 +1167,40 @@
                 );
 
 
+
+                /* =============================================
+                   ESTILO
+
+                   Ahora termina en columna N.
+                   ============================================= */
+
                 styleExcelSheet(
                     sheet,
-                    "M"
+                    "N"
                 );
+
+
+
+                /* =============================================
+                   CENTRAR COMBUSTIBLE
+                   ============================================= */
+
+                sheet
+                    .getColumn(
+                        8
+                    )
+                    .alignment = {
+
+                        horizontal:
+                            "center",
+
+                        vertical:
+                            "top",
+
+                        wrapText:
+                            true
+
+                    };
 
 
                 return sheet;
@@ -1142,7 +1210,8 @@
 
 
             /* =================================================
-               HOJA 2 - DAÑOS Y ACCIDENTES
+               HOJA 2
+               DAÑOS Y ACCIDENTES
                ================================================= */
 
             function addAccidentsSheetASADA(
@@ -1150,15 +1219,6 @@
                 accidents
             ) {
 
-
-                /*
-                    IMPORTANTE:
-
-                    Esta hoja se crea SIEMPRE.
-
-                    Aunque no existan accidentes,
-                    la pestaña aparecerá.
-                */
 
                 const sheet =
                     workbook.addWorksheet(
@@ -1295,9 +1355,7 @@
 
 
                 /* =============================================
-                   SIN ACCIDENTES
-
-                   Dejamos la hoja creada.
+                   SI NO HAY ACCIDENTES
                    ============================================= */
 
                 if (
@@ -1364,7 +1422,7 @@
 
 
                 /* =============================================
-                   REGISTROS
+                   REGISTROS DE ACCIDENTES
                    ============================================= */
 
                 if (
@@ -1603,9 +1661,7 @@
 
 
             /* =================================================
-               DESCARGAR EXCEL NUEVO
-
-               NO SE LLAMA exportExcel()
+               EXPORTAR EXCEL
                ================================================= */
 
             window.exportExcelASADA =
@@ -1665,7 +1721,7 @@
 
 
                     /* =========================================
-                       FUNCIONES API
+                       VALIDAR API
                        ========================================= */
 
                     if (
@@ -1675,7 +1731,9 @@
 
 
                         alert(
+
                             "No se encontró la función para consultar las revisiones."
+
                         );
 
 
@@ -1691,7 +1749,9 @@
 
 
                         alert(
+
                             "No se encontró la función para consultar los daños y accidentes."
+
                         );
 
 
@@ -1705,7 +1765,7 @@
 
 
                         /* =====================================
-                           INICIAR
+                           ESTADO
                            ===================================== */
 
                         if (
@@ -1742,6 +1802,10 @@
 
 
 
+                        /* =====================================
+                           ACCIDENTES
+                           ===================================== */
+
                         if (
                             status
                         ) {
@@ -1751,15 +1815,6 @@
 
                         }
 
-
-
-                        /* =====================================
-                           ACCIDENTES
-
-                           Lo hacemos DESPUÉS de revisiones,
-                           no Promise.all, para facilitar
-                           identificar cualquier fallo.
-                           ===================================== */
 
                         let allAccidents =
                             [];
@@ -1798,10 +1853,8 @@
 
 
                             /*
-                                AUNQUE Google falle aquí,
-                                vamos a crear la segunda hoja.
-
-                                Así jamás vuelve a desaparecer.
+                                Aunque falle la consulta,
+                                la segunda hoja se crea.
                             */
 
                             allAccidents =
@@ -1812,7 +1865,7 @@
 
 
                         /* =====================================
-                           FILTRADO
+                           ALCANCE
                            ===================================== */
 
                         const scope =
@@ -1842,6 +1895,10 @@
                             allAccidents;
 
 
+
+                        /* =====================================
+                           FILTRAR VEHÍCULO
+                           ===================================== */
 
                         if (
                             scope ===
@@ -1960,8 +2017,6 @@
 
                         /* =====================================
                            HOJA 2
-
-                           SIEMPRE SE EJECUTA.
                            ===================================== */
 
                         addAccidentsSheetASADA(
@@ -1975,7 +2030,7 @@
 
 
                         /* =====================================
-                           VERIFICACIÓN ANTES DE DESCARGAR
+                           COMPROBAR HOJAS
                            ===================================== */
 
                         console.log(
@@ -1990,11 +2045,6 @@
                         );
 
 
-                        /*
-                            Esta comprobación evita descargar
-                            accidentalmente un archivo incompleto.
-                        */
-
                         if (
                             workbook.worksheets.length !==
                             2
@@ -2008,7 +2058,6 @@
                             );
 
                         }
-
 
 
                         if (
@@ -2026,7 +2075,6 @@
                             );
 
                         }
-
 
 
                         if (
@@ -2048,8 +2096,18 @@
 
 
                         /* =====================================
-                           BUFFER
+                           GENERAR ARCHIVO
                            ===================================== */
+
+                        if (
+                            status
+                        ) {
+
+                            status.textContent =
+                                "Generando archivo Excel...";
+
+                        }
+
 
                         const buffer =
                             await workbook.xlsx.writeBuffer();
@@ -2253,7 +2311,7 @@
 
                     console.log(
 
-                        "Excel ASADA nuevo cargado correctamente. Versión 20260914-05."
+                        "Excel ASADA cargado correctamente. Versión 20260914-06."
 
                     );
 
