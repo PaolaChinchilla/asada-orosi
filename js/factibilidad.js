@@ -165,7 +165,7 @@ async function factibilidadCall(
         await callApi(
             action,
             values ||
-                {}
+            {}
         );
 
 
@@ -260,27 +260,18 @@ async function factibilidadGetById(
         : result;
 }
 
+async function factibilidadSave(record) {
+    const result = await factibilidadCall(
+        "saveFactibilidad",
+        {
+            factibilidad: record
+        }
+    );
 
-async function factibilidadSave(
-    record
-) {
-
-    const result =
-        await factibilidadCall(
-            "saveFactibilidad",
-            {
-                factibilidad:
-                    record
-            }
-        );
-
-
-    return result &&
-        result.factibilidad
+    return result && result.factibilidad
         ? result.factibilidad
         : result;
 }
-
 
 /* =========================================================
    FORMULARIO
@@ -373,7 +364,7 @@ async function initFactibilidadForm(
             );
 
         } catch (
-            error
+        error
         ) {
 
             factibilidadSetStatus(
@@ -1324,7 +1315,7 @@ function factibilidadBindForm(
                     );
 
                 } catch (
-                    error
+                error
                 ) {
 
                     event.target.value =
@@ -1406,7 +1397,7 @@ function factibilidadBindForm(
                     );
 
             } catch (
-                error
+            error
             ) {
 
                 submit.disabled =
@@ -1482,13 +1473,13 @@ function factibilidadSyncConditions() {
     factibilidadToggleBlock(
         "factDenialBlock",
         availability ===
-            "No"
+        "No"
     );
 
     factibilidadToggleBlock(
         "factMeterLocationBlock",
         availability ===
-            "Si"
+        "Si"
     );
 }
 
@@ -1569,7 +1560,7 @@ function factibilidadFillForm(
 
             if (
                 form.elements[
-                    name
+                name
                 ]
             ) {
 
@@ -1577,7 +1568,7 @@ function factibilidadFillForm(
                     name
                 ].value =
                     record[
-                        name
+                    name
                     ] ??
                     "";
             }
@@ -1626,7 +1617,7 @@ function factibilidadFillForm(
             ].checked =
                 Boolean(
                     record[
-                        option[0]
+                    option[0]
                     ]
                 );
         }
@@ -2058,7 +2049,7 @@ function factibilidadCaptureGps(
 
             form.elements.altitud.value =
                 position.coords.altitude !==
-                null
+                    null
                     ? position.coords.altitude.toFixed(
                         2
                     )
@@ -2077,10 +2068,10 @@ function factibilidadCaptureGps(
                 )
 
                     ? "Ubicación aceptada correctamente. Precisión aproximada: " +
-                        Math.round(
-                            capturedAccuracy
-                        ) +
-                        " m."
+                    Math.round(
+                        capturedAccuracy
+                    ) +
+                    " m."
 
                     : "Ubicación capturada correctamente.";
 
@@ -2133,7 +2124,7 @@ function factibilidadCaptureGps(
 
             status.textContent =
                 messages[
-                    error.code
+                error.code
                 ] ||
                 "No fue posible capturar la ubicación.";
         },
@@ -2483,7 +2474,7 @@ async function initFactibilidadList(
         factibilidadFilterList();
 
     } catch (
-        error
+    error
     ) {
 
         document.getElementById(
@@ -2542,7 +2533,7 @@ function factibilidadFilterList() {
                     !availability ||
                     (
                         availability ===
-                        "Si"
+                            "Si"
                             ? record.existeDisponibilidadAgua
                             : !record.existeDisponibilidadAgua
                     );
@@ -2593,10 +2584,10 @@ function factibilidadRenderList(
 
     status.textContent =
         records.length ===
-        1
+            1
             ? "1 inspección encontrada."
             : records.length +
-                " inspecciones encontradas.";
+            " inspecciones encontradas.";
 
 
     list.innerHTML =
@@ -2628,12 +2619,12 @@ function factibilidadRenderList(
                                 </div>
 
                                 <span class="fact-badge ${available
-                                    ? "is-approved"
-                                    : "is-denied"}">
+                            ? "is-approved"
+                            : "is-denied"}">
 
                                     ${available
-                                        ? "Agua disponible"
-                                        : "Sin disponibilidad"}
+                            ? "Agua disponible"
+                            : "Sin disponibilidad"}
 
                                 </span>
 
@@ -2645,10 +2636,10 @@ function factibilidadRenderList(
                                 <div>
                                     <dt>Fecha</dt>
                                     <dd>${factibilidadEscape(
-                                        factibilidadDisplayDate(
-                                            record.fechaHoraInspeccion
-                                        )
-                                    )}</dd>
+                                factibilidadDisplayDate(
+                                    record.fechaHoraInspeccion
+                                )
+                            )}</dd>
                                 </div>
 
                                 <div>
@@ -2659,9 +2650,9 @@ function factibilidadRenderList(
                                 <div>
                                     <dt>Inspector</dt>
                                     <dd>${factibilidadEscape(
-                                        record.inspeccionRealizadaPor ||
-                                        "No indicado"
-                                    )}</dd>
+                                record.inspeccionRealizadaPor ||
+                                "No indicado"
+                            )}</dd>
                                 </div>
 
                             </dl>
@@ -2759,7 +2750,7 @@ async function initFactibilidadDetail(
         );
 
     } catch (
-        error
+    error
     ) {
 
         root.innerHTML =
@@ -2782,13 +2773,13 @@ function factibilidadRenderDetail(
 
     const mapUrl =
         record.latitudY !== "" &&
-        record.longitudX !== ""
+            record.longitudX !== ""
             ? "https://www.google.com/maps?q=" +
-                encodeURIComponent(
-                    record.latitudY +
-                    "," +
-                    record.longitudX
-                )
+            encodeURIComponent(
+                record.latitudY +
+                "," +
+                record.longitudX
+            )
             : "";
 
     const imageUrl =
@@ -2853,7 +2844,7 @@ function factibilidadRenderDetail(
             </div>
 
             ${reportUrl
-                ? `
+            ? `
                     <a
                         class="fact-report-link"
                         href="${factibilidadEscape(reportUrl)}"
@@ -2864,179 +2855,179 @@ function factibilidadRenderDetail(
 
                     </a>
                 `
-                : ""}
+            : ""}
 
         </header>
 
 
         ${factibilidadDetailSection(
-            "Información del solicitante",
-            [
+                "Información del solicitante",
                 [
-                    "ID",
-                    record.id
-                ],
-                [
-                    "Nombre del solicitante",
-                    record.nombreSolicitante
-                ],
-                [
-                    "Dirección",
-                    record.direccion
-                ],
-                [
-                    "Ruta",
-                    record.ruta
-                ],
-                [
-                    "Fecha y hora",
-                    factibilidadDisplayDate(
-                        record.fechaHoraInspeccion
-                    )
+                    [
+                        "ID",
+                        record.id
+                    ],
+                    [
+                        "Nombre del solicitante",
+                        record.nombreSolicitante
+                    ],
+                    [
+                        "Dirección",
+                        record.direccion
+                    ],
+                    [
+                        "Ruta",
+                        record.ruta
+                    ],
+                    [
+                        "Fecha y hora",
+                        factibilidadDisplayDate(
+                            record.fechaHoraInspeccion
+                        )
+                    ]
                 ]
-            ]
-        )}
+            )}
 
 
         ${factibilidadDetailSection(
-            "Información de la propiedad",
-            [
+                "Información de la propiedad",
                 [
-                    "Existe paja",
-                    factibilidadYesNo(
+                    [
+                        "Existe paja",
+                        factibilidadYesNo(
+                            record.existePaja
+                        )
+                    ],
+                    [
+                        "Número de paja",
                         record.existePaja
-                    )
-                ],
-                [
-                    "Número de paja",
-                    record.existePaja
-                        ? record.numeroPaja
-                        : "No aplica"
-                ],
-                [
-                    "Tipo de propiedad",
-                    types
+                            ? record.numeroPaja
+                            : "No aplica"
+                    ],
+                    [
+                        "Tipo de propiedad",
+                        types
+                    ]
                 ]
-            ]
-        )}
+            )}
 
 
         ${factibilidadDetailSection(
-            "Condiciones hidráulicas",
-            [
+                "Condiciones hidráulicas",
                 [
-                    "Presión mínima",
-                    record.presionMinimaPSI +
-                    " PSI"
-                ],
-                [
-                    "Presión máxima",
-                    record.presionMaximaPSI +
-                    " PSI"
-                ],
-                [
-                    "Caudal reservado",
-                    record.caudalReservado +
-                    " m³/día"
-                ],
-                [
-                    "Tubería frente a la propiedad",
-                    factibilidadYesNo(
+                    [
+                        "Presión mínima",
+                        record.presionMinimaPSI +
+                        " PSI"
+                    ],
+                    [
+                        "Presión máxima",
+                        record.presionMaximaPSI +
+                        " PSI"
+                    ],
+                    [
+                        "Caudal reservado",
+                        record.caudalReservado +
+                        " m³/día"
+                    ],
+                    [
+                        "Tubería frente a la propiedad",
+                        factibilidadYesNo(
+                            record.existeTuberiaFrente
+                        )
+                    ],
+                    [
+                        "Diámetro de tubería",
                         record.existeTuberiaFrente
-                    )
-                ],
-                [
-                    "Diámetro de tubería",
-                    record.existeTuberiaFrente
-                        ? record.diametroTuberia
-                        : "No aplica"
-                ],
-                [
-                    "Disponibilidad de agua",
-                    factibilidadYesNo(
+                            ? record.diametroTuberia
+                            : "No aplica"
+                    ],
+                    [
+                        "Disponibilidad de agua",
+                        factibilidadYesNo(
+                            record.existeDisponibilidadAgua
+                        )
+                    ],
+                    [
+                        "Motivos de negación",
                         record.existeDisponibilidadAgua
-                    )
-                ],
-                [
-                    "Motivos de negación",
-                    record.existeDisponibilidadAgua
-                        ? "No aplica"
-                        : record.motivosNegacion
-                ],
-                [
-                    "Ubicación del medidor",
-                    record.existeDisponibilidadAgua
-                        ? record.ubicacionMedidor
-                        : "No aplica"
+                            ? "No aplica"
+                            : record.motivosNegacion
+                    ],
+                    [
+                        "Ubicación del medidor",
+                        record.existeDisponibilidadAgua
+                            ? record.ubicacionMedidor
+                            : "No aplica"
+                    ]
                 ]
-            ]
-        )}
+            )}
 
 
         ${factibilidadDetailSection(
-            "Ubicación geográfica",
-            [
+                "Ubicación geográfica",
                 [
-                    "Longitud X",
-                    record.longitudX
-                ],
-                [
-                    "Latitud Y",
-                    record.latitudY
-                ],
-                [
-                    "Altitud",
-                    record.altitud !== ""
-                        ? record.altitud +
+                    [
+                        "Longitud X",
+                        record.longitudX
+                    ],
+                    [
+                        "Latitud Y",
+                        record.latitudY
+                    ],
+                    [
+                        "Altitud",
+                        record.altitud !== ""
+                            ? record.altitud +
                             " m"
-                        : ""
-                ],
-                [
-                    "Precisión GPS",
-                    record.precisionGPS !== ""
-                        ? record.precisionGPS +
+                            : ""
+                    ],
+                    [
+                        "Precisión GPS",
+                        record.precisionGPS !== ""
+                            ? record.precisionGPS +
                             " m"
-                        : ""
-                ],
-                [
-                    "Mapa",
-                    mapUrl
-                        ? {
-                            text:
-                                "Abrir ubicación en Google Maps",
+                            : ""
+                    ],
+                    [
+                        "Mapa",
+                        mapUrl
+                            ? {
+                                text:
+                                    "Abrir ubicación en Google Maps",
 
-                            url:
-                                mapUrl
-                        }
-                        : ""
+                                url:
+                                    mapUrl
+                            }
+                            : ""
+                    ]
                 ]
-            ]
-        )}
+            )}
 
 
         ${factibilidadDetailSection(
-            "Red y dispositivo de medición",
-            [
+                "Red y dispositivo de medición",
                 [
-                    "Existe prevista a la red",
-                    factibilidadYesNo(
-                        record.existePrevistaRed
-                    )
-                ],
-                [
-                    "Material de la calle",
-                    record.materialCalle
-                ],
-                [
-                    "Modalidad de medición",
-                    record.modalidadMedicion
-                ],
-                [
-                    "Diámetro del dispositivo",
-                    record.diametroDispositivo
+                    [
+                        "Existe prevista a la red",
+                        factibilidadYesNo(
+                            record.existePrevistaRed
+                        )
+                    ],
+                    [
+                        "Material de la calle",
+                        record.materialCalle
+                    ],
+                    [
+                        "Modalidad de medición",
+                        record.modalidadMedicion
+                    ],
+                    [
+                        "Diámetro del dispositivo",
+                        record.diametroDispositivo
+                    ]
                 ]
-            ]
-        )}
+            )}
 
 
         <section class="fact-panel">
@@ -3053,7 +3044,7 @@ function factibilidadRenderDetail(
             </div>
 
             ${imageUrl
-                ? `
+            ? `
                     <figure class="fact-detail-image">
 
                         <img
@@ -3061,16 +3052,16 @@ function factibilidadRenderDetail(
                             alt="Frente de la propiedad">
 
                         ${record.imagenFrenteJSON &&
-                        record.imagenFrenteJSON.viewUrl
-                            ? `
+                record.imagenFrenteJSON.viewUrl
+                ? `
                                 <figcaption>
 
                                     <a
                                         href="${factibilidadEscape(
-                                            factibilidadSafeUrl(
-                                                record.imagenFrenteJSON.viewUrl
-                                            )
-                                        )}"
+                    factibilidadSafeUrl(
+                        record.imagenFrenteJSON.viewUrl
+                    )
+                )}"
                                         target="_blank"
                                         rel="noopener">
 
@@ -3080,11 +3071,11 @@ function factibilidadRenderDetail(
 
                                 </figcaption>
                             `
-                            : ""}
+                : ""}
 
                     </figure>
                 `
-                : `
+            : `
                     <p class="fact-empty">
                         No hay fotografía disponible.
                     </p>
@@ -3094,31 +3085,31 @@ function factibilidadRenderDetail(
 
 
         ${factibilidadDetailSection(
-            "Observaciones y responsable",
-            [
+                "Observaciones y responsable",
                 [
-                    "Observaciones",
-                    record.observaciones ||
-                    "Sin observaciones"
-                ],
-                [
-                    "Inspección realizada por",
-                    record.inspeccionRealizadaPor
-                ],
-                [
-                    "Fecha de creación",
-                    factibilidadDisplayDate(
-                        record.fechaCreacion
-                    )
-                ],
-                [
-                    "Última actualización",
-                    factibilidadDisplayDate(
-                        record.fechaActualizacion
-                    )
+                    [
+                        "Observaciones",
+                        record.observaciones ||
+                        "Sin observaciones"
+                    ],
+                    [
+                        "Inspección realizada por",
+                        record.inspeccionRealizadaPor
+                    ],
+                    [
+                        "Fecha de creación",
+                        factibilidadDisplayDate(
+                            record.fechaCreacion
+                        )
+                    ],
+                    [
+                        "Última actualización",
+                        factibilidadDisplayDate(
+                            record.fechaActualizacion
+                        )
+                    ]
                 ]
-            ]
-        )}
+            )}
     `;
 
 
@@ -3186,7 +3177,7 @@ function factibilidadRenderDetail(
                     );
 
                 } catch (
-                    error
+                error
                 ) {
 
                     status.textContent =
@@ -3224,12 +3215,12 @@ function factibilidadDetailSection(
             <dl class="fact-detail-grid">
 
                 ${values
-                    .map(
-                        function (
-                            pair
-                        ) {
+            .map(
+                function (
+                    pair
+                ) {
 
-                            return `
+                    return `
                                 <div>
                                     <dt>
                                         ${factibilidadEscape(pair[0])}
@@ -3240,11 +3231,11 @@ function factibilidadDetailSection(
                                     </dd>
                                 </div>
                             `;
-                        }
-                    )
-                    .join(
-                        ""
-                    )}
+                }
+            )
+            .join(
+                ""
+            )}
 
             </dl>
 
@@ -3329,7 +3320,7 @@ async function factibilidadGeneratePdf(
 
     const frontImage =
         imageResponse &&
-        imageResponse.data
+            imageResponse.data
             ? imageResponse.data
             : "";
 
@@ -3343,7 +3334,7 @@ async function factibilidadGeneratePdf(
             let y =
                 doc.lastAutoTable
                     ? doc.lastAutoTable.finalY +
-                        8
+                    8
                     : 39;
 
 
@@ -3622,14 +3613,14 @@ async function factibilidadGeneratePdf(
                 "Altitud",
                 record.altitud !== ""
                     ? record.altitud +
-                        " m"
+                    " m"
                     : "No indicada"
             ],
             [
                 "Precisión GPS",
                 record.precisionGPS !== ""
                     ? record.precisionGPS +
-                        " m"
+                    " m"
                     : "No indicada"
             ]
         ]
@@ -3668,7 +3659,7 @@ async function factibilidadGeneratePdf(
         let y =
             doc.lastAutoTable
                 ? doc.lastAutoTable.finalY +
-                    10
+                10
                 : 40;
 
         const properties =
@@ -3969,7 +3960,7 @@ function factibilidadPropertyTypes(
 
                     return Boolean(
                         record[
-                            option[0]
+                        option[0]
                         ]
                     );
                 }
@@ -3987,7 +3978,7 @@ function factibilidadPropertyTypes(
 
                         return record.tipoOtroDescripcion
                             ? "Otro: " +
-                                record.tipoOtroDescripcion
+                            record.tipoOtroDescripcion
                             : "Otro";
                     }
 
@@ -4031,21 +4022,21 @@ function factibilidadRenderValue(
             <ul class="fact-value-list">
 
                 ${value
-                    .map(
-                        function (
-                            item
-                        ) {
+                .map(
+                    function (
+                        item
+                    ) {
 
-                            return `
+                        return `
                                 <li>
                                     ${factibilidadEscape(item)}
                                 </li>
                             `;
-                        }
-                    )
-                    .join(
-                        ""
-                    )}
+                    }
+                )
+                .join(
+                    ""
+                )}
 
             </ul>
         `;
@@ -4062,10 +4053,10 @@ function factibilidadRenderValue(
         return `
             <a
                 href="${factibilidadEscape(
-                    factibilidadSafeUrl(
-                        value.url
-                    )
-                )}"
+            factibilidadSafeUrl(
+                value.url
+            )
+        )}"
                 target="_blank"
                 rel="noopener">
 
@@ -4078,8 +4069,8 @@ function factibilidadRenderValue(
 
     const text =
         value === null ||
-        value === undefined ||
-        value === ""
+            value === undefined ||
+            value === ""
             ? "No indicado"
             : String(
                 value
@@ -4215,7 +4206,7 @@ function factibilidadSetStatus(
         (
             type
                 ? " is-" +
-                    type
+                type
                 : ""
         );
 }
@@ -4368,7 +4359,7 @@ function factibilidadEscape(
 
     return String(
         value === null ||
-        value === undefined
+            value === undefined
             ? ""
             : value
     )
