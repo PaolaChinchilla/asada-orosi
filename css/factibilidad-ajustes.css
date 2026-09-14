@@ -82,3 +82,38 @@ html[data-theme="light"] .gps-status-box.gps-error {
     background:
         rgba(255, 107, 107, .09);
 }
+
+/* Ajustes visuales del formulario de factibilidad */
+
+#factibilidadApp .fact-panel {
+    margin-bottom: 24px;
+    overflow: visible;
+}
+
+#factibilidadApp .fact-section-heading {
+    margin-bottom: 20px;
+}
+
+#factibilidadApp .fact-grid {
+    row-gap: 20px;
+}
+
+#factibilidadApp .fact-grid .fact-span-2 {
+    grid-column: 1 / -1;
+}
+
+#factibilidadApp .fact-fieldset {
+    margin: 0 0 20px;
+}
+
+#factibilidadApp .fact-panel + .fact-panel {
+    margin-top: 0;
+}
+
+@media (max-width: 700px) {
+    #factibilidadApp .fact-grid,
+    #factibilidadApp .fact-grid.fact-grid-3,
+    #factibilidadApp .fact-grid.fact-grid-4 {
+        grid-template-columns: 1fr;
+    }
+}
