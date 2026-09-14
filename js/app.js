@@ -2,11 +2,9 @@
    ASADA OROSI - APLICACIÓN PRINCIPAL
    ========================================================= */
 
-
 /* =========================================================
    CONFIGURACIÓN GENERAL
    ========================================================= */
-
 const VEHICLES = [
     {
         nombre: "Toyota Rush",
@@ -22,22 +20,17 @@ const VEHICLES = [
     }
 ];
 
-
 const API_URL =
     "https://script.google.com/macros/s/AKfycbxkIq00buHztZezEuUgN4E-yFYl75qWgBfNX6t89CMf2kbPRkh3uSt1bgmKJZudLlax/exec";
-
 
 const API_RESPONSE_TYPE =
     "ASADA_API_RESPONSE";
 
-
 const API_TIMEOUT_MS =
     120000;
 
-
 const API_PENDING_REQUESTS =
     new Map();
-
 
 /* =========================================================
    COMUNICACIÓN CON GOOGLE APPS SCRIPT
@@ -53,14 +46,12 @@ function createRequestId() {
         return window.crypto.randomUUID();
     }
 
-
     return (
         Date.now().toString(36) +
         "_" +
         Math.random().toString(36).slice(2)
     );
 }
-
 
 /* =========================================================
    RECIBIR RESPUESTA DE APPS SCRIPT
@@ -84,7 +75,6 @@ function handleApiMessage(
         return;
     }
 
-
     const pending =
         API_PENDING_REQUESTS.get(
             message.requestId
@@ -96,16 +86,13 @@ function handleApiMessage(
         return;
     }
 
-
     API_PENDING_REQUESTS.delete(
         message.requestId
     );
 
-
     clearTimeout(
         pending.timeoutId
     );
-
 
     if (
         pending.form &&
@@ -115,7 +102,6 @@ function handleApiMessage(
         pending.form.remove();
     }
 
-
     if (
         pending.iframe &&
         pending.iframe.parentNode
@@ -123,7 +109,6 @@ function handleApiMessage(
 
         pending.iframe.remove();
     }
-
 
     if (
         message.success === true
@@ -136,7 +121,6 @@ function handleApiMessage(
         return;
     }
 
-
     pending.reject(
         new Error(
             message.message ||
@@ -145,12 +129,10 @@ function handleApiMessage(
     );
 }
 
-
 window.addEventListener(
     "message",
     handleApiMessage
 );
-
 
 /* =========================================================
    LLAMAR A GOOGLE APPS SCRIPT
@@ -184,7 +166,6 @@ function callApi(
                     "iframe"
                 );
 
-
             iframe.name =
                 frameName;
 
@@ -198,12 +179,10 @@ function callApi(
                 "true"
             );
 
-
             const form =
                 document.createElement(
                     "form"
                 );
-
 
             form.method =
                 "POST";
@@ -230,14 +209,11 @@ function callApi(
                     "input"
                 );
 
-
             input.type =
                 "hidden";
 
-
             input.name =
                 "payload";
-
 
             input.value =
                 JSON.stringify({
@@ -246,21 +222,17 @@ function callApi(
                     ...values
                 });
 
-
             form.appendChild(
                 input
             );
-
 
             document.body.appendChild(
                 iframe
             );
 
-
             document.body.appendChild(
                 form
             );
-
 
             const timeoutId =
                 window.setTimeout(
@@ -270,7 +242,6 @@ function callApi(
                             requestId
                         );
 
-
                         if (
                             form.parentNode
                         ) {
@@ -278,14 +249,12 @@ function callApi(
                             form.remove();
                         }
 
-
                         if (
                             iframe.parentNode
                         ) {
 
                             iframe.remove();
                         }
-
 
                         reject(
                             new Error(
@@ -296,7 +265,6 @@ function callApi(
                     },
                     API_TIMEOUT_MS
                 );
-
 
             API_PENDING_REQUESTS.set(
                 requestId,
@@ -309,12 +277,10 @@ function callApi(
                 }
             );
 
-
             form.submit();
         }
     );
 }
-
 
 /* =========================================================
    CONSULTAR TODOS LOS REGISTROS
@@ -327,16 +293,13 @@ async function getAllRecordsFromServer() {
             "getAllRecords"
         );
 
-
     return Array.isArray(
         result.records
     )
-
         ? result.records
 
         : [];
 }
-
 
 /* =========================================================
    CONSULTAR REGISTROS POR VEHÍCULO
@@ -354,7 +317,6 @@ async function getRecordsByVehicleFromServer(
             }
         );
 
-
     return Array.isArray(
         result.records
     )
@@ -364,7 +326,6 @@ async function getRecordsByVehicleFromServer(
         : [];
 }
 
-
 /* =========================================================
    CONSULTAR REGISTRO POR ID
    ========================================================= */
@@ -372,7 +333,6 @@ async function getRecordsByVehicleFromServer(
 async function getRecordByIdFromServer(
     id
 ) {
-
     const result =
         await callApi(
             "getRecordById",
@@ -381,11 +341,9 @@ async function getRecordByIdFromServer(
             }
         );
 
-
     return result.record ||
         null;
 }
-
 
 /* =========================================================
    GUARDAR REGISTRO
@@ -395,7 +353,6 @@ async function saveRecordOnServer(
     record,
     mode
 ) {
-
     const result =
         await callApi(
             "saveRecord",
@@ -404,7 +361,6 @@ async function saveRecordOnServer(
                 mode
             }
         );
-
 
     if (
         !result.record
@@ -415,10 +371,8 @@ async function saveRecordOnServer(
         );
     }
 
-
     return result.record;
 }
-
 
 /* =========================================================
    PROBAR SERVIDOR
@@ -431,7 +385,6 @@ async function pingServer() {
     );
 }
 
-
 /* =========================================================
    MENÚ
    ========================================================= */
@@ -443,7 +396,6 @@ function toggleMenu() {
             "sideMenu"
         );
 
-
     if (
         menu
     ) {
@@ -453,7 +405,6 @@ function toggleMenu() {
         );
     }
 }
-
 
 /* =========================================================
    ESTADO DE CONEXIÓN
@@ -469,7 +420,6 @@ function setConnectionStatus(
             "connectionStatus"
         );
 
-
     if (
         !element
     ) {
@@ -477,10 +427,8 @@ function setConnectionStatus(
         return;
     }
 
-
     element.textContent =
         text;
-
 
     element.className =
         online
@@ -489,7 +437,6 @@ function setConnectionStatus(
 
             : "connection offline";
 }
-
 
 function updateConnection() {
 
@@ -504,7 +451,6 @@ function updateConnection() {
     );
 }
 
-
 async function verifyServerConnection() {
 
     if (
@@ -516,11 +462,9 @@ async function verifyServerConnection() {
         return;
     }
 
-
     try {
 
         await pingServer();
-
 
         setConnectionStatus(
             "En línea",
@@ -537,7 +481,6 @@ async function verifyServerConnection() {
             error
         );
 
-
         setConnectionStatus(
             "Sin conexión con el servidor",
             false
@@ -545,18 +488,15 @@ async function verifyServerConnection() {
     }
 }
 
-
 window.addEventListener(
     "online",
     verifyServerConnection
 );
 
-
 window.addEventListener(
     "offline",
     updateConnection
 );
-
 
 /* =========================================================
    FECHA
@@ -565,7 +505,6 @@ window.addEventListener(
 function formatDate(
     date
 ) {
-
     const pad =
         number =>
             String(
@@ -574,7 +513,6 @@ function formatDate(
                 2,
                 "0"
             );
-
 
     return (
         date.getFullYear() +
@@ -597,7 +535,6 @@ function formatDate(
     );
 }
 
-
 /* =========================================================
    PLACA AUTOMÁTICA
    ========================================================= */
@@ -609,12 +546,10 @@ function updatePlate() {
             "vehiculo"
         );
 
-
     const plate =
         document.getElementById(
             "placa"
         );
-
 
     if (
         !select ||
@@ -624,14 +559,12 @@ function updatePlate() {
         return;
     }
 
-
     const vehicle =
         VEHICLES.find(
             item =>
                 item.nombre ===
                 select.value
         );
-
 
     plate.value =
         vehicle
@@ -640,7 +573,6 @@ function updatePlate() {
 
             : "";
 }
-
 
 /* =========================================================
    PROTECCIÓN DE TEXTO
@@ -675,14 +607,12 @@ function esc(
 
             };
 
-
             return replacements[
                 character
             ];
         }
     );
 }
-
 
 function escapeJs(
     value
@@ -700,7 +630,6 @@ function escapeJs(
             "\\'"
         );
 }
-
 
 /* =========================================================
    NORMALIZAR PUNTOS
@@ -728,7 +657,6 @@ function normalizeReviewPoints(
             );
     }
 
-
     if (
         typeof points ===
         "string"
@@ -746,7 +674,6 @@ function normalizeReviewPoints(
                 Boolean
             );
     }
-
 
     return [];
 }
@@ -767,12 +694,10 @@ function hasRecordPhotos(
         return false;
     }
 
-
     const images =
         Array.isArray(
             record.imagenes
         )
-
             ? record.imagenes.filter(
                 image =>
                     Boolean(
@@ -782,12 +707,10 @@ function hasRecordPhotos(
 
             : [];
 
-
     const folderUrl =
         String(
             record.carpetaFotosUrl || ""
         ).trim();
-
 
     /*
         Esto permite manejar también los registros antiguos.
@@ -803,7 +726,6 @@ function hasRecordPhotos(
     );
 }
 
-
 /* =========================================================
    PÁGINA DE REGISTROS
    ========================================================= */
@@ -815,7 +737,6 @@ async function renderRecordsPage() {
             "recordsPage"
         );
 
-
     if (
         !root
     ) {
@@ -823,14 +744,12 @@ async function renderRecordsPage() {
         return;
     }
 
-
     const vehicle =
         new URLSearchParams(
             window.location.search
         ).get(
             "vehicle"
         );
-
 
     if (
         !vehicle
@@ -841,12 +760,10 @@ async function renderRecordsPage() {
         return;
     }
 
-
     await renderVehicleRecords(
         vehicle
     );
 }
-
 
 /* =========================================================
    SELECCIÓN DE VEHÍCULO
@@ -859,14 +776,12 @@ function renderVehicleSelection() {
             "recordsPage"
         );
 
-
     if (
         !root
     ) {
 
         return;
     }
-
 
     root.innerHTML = `
 
@@ -882,7 +797,6 @@ function renderVehicleSelection() {
 
         </div>
 
-
         <div class="page-head">
 
             <div>
@@ -891,11 +805,9 @@ function renderVehicleSelection() {
                     REGISTRO DE REVISIONES
                 </span>
 
-
                 <h1>
                     Seleccione un vehículo
                 </h1>
-
 
                 <p>
                     Seleccione el vehículo cuyos registros desea consultar.
@@ -904,7 +816,6 @@ function renderVehicleSelection() {
             </div>
 
         </div>
-
 
         <div class="vehicle-selection-grid">
 
@@ -922,16 +833,13 @@ function renderVehicleSelection() {
                                 VEHÍCULO
                             </span>
 
-
                             <h2>
                                 ${esc(vehicle.nombre)}
                             </h2>
 
-
                             <p>
                                 Placa: ${esc(vehicle.placa)}
                             </p>
-
 
                             <span class="vehicle-selection-action">
                                 Consultar registros
@@ -940,7 +848,6 @@ function renderVehicleSelection() {
                         </div>
 
                     </button>
-
                 `
     ).join("")}
 
@@ -948,7 +855,6 @@ function renderVehicleSelection() {
 
     `;
 }
-
 
 function selectVehicle(
     vehicleName
@@ -961,12 +867,10 @@ function selectVehicle(
         );
 }
 
-
 function renderVehicles() {
 
     renderVehicleSelection();
 }
-
 
 /* =========================================================
    REGISTROS DE UN VEHÍCULO
@@ -981,7 +885,6 @@ async function renderVehicleRecords(
             "recordsPage"
         );
 
-
     if (
         !root
     ) {
@@ -989,14 +892,12 @@ async function renderVehicleRecords(
         return;
     }
 
-
     const vehicle =
         VEHICLES.find(
             item =>
                 item.nombre ===
                 vehicleName
         );
-
 
     if (
         !vehicle
@@ -1011,9 +912,7 @@ async function renderVehicleRecords(
                     class="btn-back">
 
                     Volver
-
                 </a>
-
 
                 <a
                     href="index.html"
@@ -1025,13 +924,11 @@ async function renderVehicleRecords(
 
             </div>
 
-
             <div class="empty-state">
 
                 <h1>
                     Vehículo no encontrado
                 </h1>
-
 
                 <p>
                     El vehículo solicitado no existe.
@@ -1041,10 +938,8 @@ async function renderVehicleRecords(
 
         `;
 
-
         return;
     }
-
 
     root.innerHTML = `
 
@@ -1058,7 +953,6 @@ async function renderVehicleRecords(
 
             </a>
 
-
             <a
                 href="index.html"
                 class="btn-back">
@@ -1068,7 +962,6 @@ async function renderVehicleRecords(
             </a>
 
         </div>
-
 
         <div class="page-head">
 
@@ -1092,7 +985,6 @@ async function renderVehicleRecords(
 
         </div>
 
-
         <section class="record-filters">
 
             <div class="record-filter-title">
@@ -1101,13 +993,11 @@ async function renderVehicleRecords(
                     Buscar registros
                 </h2>
 
-
                 <p>
                     Puede utilizar uno o varios filtros.
                 </p>
 
             </div>
-
 
             <div class="record-filter-grid">
 
@@ -1121,7 +1011,6 @@ async function renderVehicleRecords(
 
                 </label>
 
-
                 <label>
 
                     Quién utilizó el vehículo
@@ -1133,7 +1022,6 @@ async function renderVehicleRecords(
 
                 </label>
 
-
                 <label>
 
                     Responsable de la Inspección
@@ -1144,7 +1032,6 @@ async function renderVehicleRecords(
                         placeholder="Buscar por responsable">
 
                 </label>
-
 
                 <label>
 
@@ -1161,7 +1048,6 @@ async function renderVehicleRecords(
 
             </div>
 
-
             <div class="search-actions">
 
                 <button
@@ -1172,7 +1058,6 @@ async function renderVehicleRecords(
                     Buscar
 
                 </button>
-
 
                 <button
                     type="button"
@@ -1186,7 +1071,6 @@ async function renderVehicleRecords(
             </div>
 
         </section>
-
 
         <div
             id="vehicleRecordsList"
@@ -1204,14 +1088,12 @@ async function renderVehicleRecords(
 
     `;
 
-
     try {
 
         const records =
             await getRecordsByVehicleFromServer(
                 vehicleName
             );
-
 
         records.sort(
             (
@@ -1227,10 +1109,8 @@ async function renderVehicleRecords(
                 )
         );
 
-
         window.currentVehicleRecords =
             records;
-
 
         renderRecordList(
             records
@@ -1246,12 +1126,10 @@ async function renderVehicleRecords(
             error
         );
 
-
         const list =
             document.getElementById(
                 "vehicleRecordsList"
             );
-
 
         if (
             list
@@ -1265,11 +1143,9 @@ async function renderVehicleRecords(
                         No fue posible cargar los registros
                     </h2>
 
-
                     <p>
                         ${esc(error.message)}
                     </p>
-
 
                     <button
                         type="button"
@@ -1287,7 +1163,6 @@ async function renderVehicleRecords(
     }
 }
 
-
 /* =========================================================
    LISTA DE REGISTROS
    ========================================================= */
@@ -1301,14 +1176,12 @@ function renderRecordList(
             "vehicleRecordsList"
         );
 
-
     if (
         !list
     ) {
 
         return;
     }
-
 
     if (
         !Array.isArray(
@@ -1325,11 +1198,9 @@ function renderRecordList(
                     No hay registros
                 </h2>
 
-
                 <p>
                     No existen revisiones que coincidan con la búsqueda.
                 </p>
-
 
                 <a
                     href="mantenimiento.html"
@@ -1343,10 +1214,8 @@ function renderRecordList(
 
         `;
 
-
         return;
     }
-
 
     list.innerHTML =
         records.map(
@@ -1362,20 +1231,17 @@ function renderRecordList(
                                 REGISTRO
                             </span>
 
-
                             <h2>
                                 ${esc(record.id)}
                             </h2>
 
                         </div>
 
-
                         <div class="record-vehicle">
 
                             <strong>
                                 ${esc(record.vehiculo)}
                             </strong>
-
 
                             <span>
                                 ${esc(record.placa)}
@@ -1385,7 +1251,6 @@ function renderRecordList(
 
                     </div>
 
-
                     <div class="record-data-grid">
 
                         <div class="record-data">
@@ -1394,13 +1259,11 @@ function renderRecordList(
                                 Fecha y hora
                             </span>
 
-
                             <strong>
                                 ${esc(record.fechaHora || "Sin información")}
                             </strong>
 
                         </div>
-
 
                         <div class="record-data">
 
@@ -1408,20 +1271,17 @@ function renderRecordList(
                                 El carro lo utilizó
                             </span>
 
-
                             <strong>
                                 ${esc(record.usuario || "Sin información")}
                             </strong>
 
                         </div>
 
-
                         <div class="record-data">
 
                             <span>
                                 Responsable de la Inspección
                             </span>
-
 
                             <strong>
                                 ${esc(record.responsable || "Sin información")}
@@ -1430,7 +1290,6 @@ function renderRecordList(
                         </div>
 
                     </div>
-
 
                     <div class="record-card-actions">
 
@@ -1450,7 +1309,6 @@ function renderRecordList(
         ).join("");
 }
 
-
 /* =========================================================
    FILTROS
    ========================================================= */
@@ -1467,14 +1325,12 @@ function filterVehicleRecords() {
             "filterDate"
         )?.value || "";
 
-
     const user =
         document.getElementById(
             "filterUser"
         )?.value
             .trim()
             .toLowerCase() || "";
-
 
     const responsible =
         document.getElementById(
@@ -1483,14 +1339,12 @@ function filterVehicleRecords() {
             .trim()
             .toLowerCase() || "";
 
-
     const id =
         document.getElementById(
             "filterId"
         )?.value
             .trim()
             .toUpperCase() || "";
-
 
     const filtered =
         records.filter(
@@ -1541,12 +1395,10 @@ function filterVehicleRecords() {
             )
         );
 
-
     renderRecordList(
         filtered
     );
 }
-
 
 /* =========================================================
    LIMPIAR FILTROS
@@ -1578,7 +1430,6 @@ function clearVehicleFilters() {
         }
     );
 
-
     renderRecordList(
         window.currentVehicleRecords ||
         []
@@ -1597,7 +1448,6 @@ async function initMaintenanceForm() {
             "maintenanceForm"
         );
 
-
     if (
         !form
     ) {
@@ -1605,22 +1455,17 @@ async function initMaintenanceForm() {
         return;
     }
 
-
     window._existingImages =
         [];
-
 
     window._existingPhotoFolderUrl =
         "";
 
-
     window._pendingPhotoData =
         [];
 
-
     window._lastSaveWasEditing =
         null;
-
 
     const id =
         new URLSearchParams(
@@ -1629,15 +1474,12 @@ async function initMaintenanceForm() {
             "id"
         );
 
-
     if (
         id
     ) {
-
         await loadRecord(
             id
         );
-
 
     } else {
 
@@ -1645,7 +1487,6 @@ async function initMaintenanceForm() {
             document.getElementById(
                 "fechaHora"
             );
-
 
         if (
             dateInput
@@ -1657,7 +1498,6 @@ async function initMaintenanceForm() {
                 );
         }
     }
-
 
     document
         .querySelectorAll(
@@ -1681,17 +1521,14 @@ async function initMaintenanceForm() {
                                     )
                             );
 
-
                         this.classList.add(
                             "selected"
                         );
-
 
                         const hidden =
                             document.getElementById(
                                 "usuario"
                             );
-
 
                         if (
                             hidden
@@ -1704,7 +1541,6 @@ async function initMaintenanceForm() {
                 );
             }
         );
-
 
     document
         .querySelectorAll(
@@ -1728,17 +1564,14 @@ async function initMaintenanceForm() {
                                     )
                             );
 
-
                         this.classList.add(
                             "selected"
                         );
-
 
                         const hidden =
                             document.getElementById(
                                 "condicion"
                             );
-
 
                         if (
                             hidden
@@ -1748,13 +1581,11 @@ async function initMaintenanceForm() {
                                 this.dataset.value;
                         }
 
-
                         toggleConditionComment();
                     }
                 );
             }
         );
-
 
     document
         .querySelectorAll(
@@ -1771,7 +1602,6 @@ async function initMaintenanceForm() {
                             "selected"
                         );
 
-
                         updateSelectedPointsHidden();
                     }
                 );
@@ -1784,27 +1614,22 @@ async function initMaintenanceForm() {
             "imagenes"
         );
 
-
     if (
         imageInput
     ) {
-
         imageInput.addEventListener(
             "change",
             previewImages
         );
     }
 
-
     form.addEventListener(
         "submit",
         saveMaintenanceForm
     );
 
-
     updateConnection();
 }
-
 
 /* =========================================================
    ACTUALIZAR PUNTOS OCULTOS
@@ -1817,14 +1642,12 @@ function updateSelectedPointsHidden() {
             "puntosHidden"
         );
 
-
     if (
         !hidden
     ) {
 
         return;
     }
-
 
     hidden.value =
         [
@@ -1841,7 +1664,6 @@ function updateSelectedPointsHidden() {
             );
 }
 
-
 /* =========================================================
    GUARDAR FORMULARIO
    ========================================================= */
@@ -1852,16 +1674,13 @@ async function saveMaintenanceForm(
 
     event.preventDefault();
 
-
     const form =
         event.currentTarget;
-
 
     const submit =
         form.querySelector(
             'button[type="submit"]'
         );
-
 
     const originalText =
         submit
@@ -1870,25 +1689,21 @@ async function saveMaintenanceForm(
 
             : "";
 
-
     const user =
         document.getElementById(
             "usuario"
         )?.value || "";
-
 
     const condition =
         document.getElementById(
             "condicion"
         )?.value || "";
 
-
     const conditionComment =
         document.getElementById(
             "comentarioCondicion"
         )?.value
             .trim() || "";
-
 
     if (
         !user
@@ -1898,10 +1713,8 @@ async function saveMaintenanceForm(
             "Seleccione quién utilizará el vehículo."
         );
 
-
         return;
     }
-
 
     if (
         !condition
@@ -1911,10 +1724,8 @@ async function saveMaintenanceForm(
             "Seleccione la condición del vehículo."
         );
 
-
         return;
     }
-
 
     if (
         (
@@ -1928,10 +1739,8 @@ async function saveMaintenanceForm(
             "Debe escribir un comentario cuando la condición sea Regular o Sucio."
         );
 
-
         return;
     }
-
 
     if (
         !navigator.onLine
@@ -1941,10 +1750,8 @@ async function saveMaintenanceForm(
             "Se necesita conexión a Internet para guardar el registro en Google."
         );
 
-
         return;
     }
-
 
     const existingId =
         document.getElementById(
@@ -1952,12 +1759,10 @@ async function saveMaintenanceForm(
         )?.value
             .trim() || "";
 
-
     const isEditing =
         Boolean(
             existingId
         );
-
 
     const record = {
 
@@ -2024,13 +1829,11 @@ async function saveMaintenanceForm(
             Array.isArray(
                 window._pendingPhotoData
             )
-
                 ? window._pendingPhotoData
 
                 : []
 
     };
-
 
     if (
         submit
@@ -2038,7 +1841,6 @@ async function saveMaintenanceForm(
 
         submit.disabled =
             true;
-
 
         submit.textContent =
             isEditing
@@ -2048,11 +1850,9 @@ async function saveMaintenanceForm(
                 : "Guardando registro...";
     }
 
-
     showSavingConfirmation(
         isEditing
     );
-
 
     try {
 
@@ -2066,7 +1866,6 @@ async function saveMaintenanceForm(
                     : "create"
             );
 
-
         window._existingImages =
             Array.isArray(
                 savedRecord.imagenes
@@ -2076,21 +1875,17 @@ async function saveMaintenanceForm(
 
                 : [];
 
-
         window._existingPhotoFolderUrl =
             savedRecord.carpetaFotosUrl ||
             "";
 
-
         window._pendingPhotoData =
             [];
-
 
         const recordId =
             document.getElementById(
                 "recordId"
             );
-
 
         if (
             recordId
@@ -2100,15 +1895,12 @@ async function saveMaintenanceForm(
                 savedRecord.id;
         }
 
-
         renderImagePreview();
-
 
         showSaveConfirmation(
             savedRecord,
             isEditing
         );
-
 
     } catch (
     error
@@ -2119,15 +1911,12 @@ async function saveMaintenanceForm(
             error
         );
 
-
         hideSaveConfirmation();
-
 
         alert(
             error.message ||
             "No fue posible guardar el registro."
         );
-
 
     } finally {
 
@@ -2138,13 +1927,11 @@ async function saveMaintenanceForm(
             submit.disabled =
                 false;
 
-
             submit.textContent =
                 originalText;
         }
     }
 }
-
 
 /* =========================================================
    MOSTRAR CUADRO MIENTRAS GUARDA
@@ -2159,7 +1946,6 @@ function showSavingConfirmation(
             "saveConfirmation"
         );
 
-
     if (
         !modal
     ) {
@@ -2167,36 +1953,30 @@ function showSavingConfirmation(
         return;
     }
 
-
     const title =
         document.getElementById(
             "confirmationTitle"
         );
-
 
     const message =
         document.getElementById(
             "confirmationMessage"
         );
 
-
     const id =
         document.getElementById(
             "confirmationRecordId"
         );
-
 
     const idBox =
         modal.querySelector(
             ".confirmation-id-box"
         );
 
-
     const buttons =
         modal.querySelectorAll(
             ".confirmation-actions button"
         );
-
 
     if (
         title
@@ -2210,7 +1990,6 @@ function showSavingConfirmation(
                 : "Guardando registro";
     }
 
-
     if (
         message
     ) {
@@ -2223,7 +2002,6 @@ function showSavingConfirmation(
                 : "Estamos guardando la información. Espere un momento.";
     }
 
-
     if (
         id
     ) {
@@ -2231,7 +2009,6 @@ function showSavingConfirmation(
         id.textContent =
             "";
     }
-
 
     if (
         idBox
@@ -2241,7 +2018,6 @@ function showSavingConfirmation(
             "none";
     }
 
-
     buttons.forEach(
         button => {
 
@@ -2250,17 +2026,14 @@ function showSavingConfirmation(
         }
     );
 
-
     modal.classList.remove(
         "hidden"
     );
-
 
     document.body.classList.add(
         "modal-open"
     );
 }
-
 
 /* =========================================================
    CONFIRMACIÓN DE GUARDADO
@@ -2276,10 +2049,8 @@ function showSaveConfirmation(
             "saveConfirmation"
         );
 
-
     window._lastSaveWasEditing =
         isEditing;
-
 
     if (
         !modal
@@ -2293,46 +2064,38 @@ function showSaveConfirmation(
                 : "Registro creado correctamente."
         );
 
-
         return;
     }
-
 
     const title =
         document.getElementById(
             "confirmationTitle"
         );
 
-
     const message =
         document.getElementById(
             "confirmationMessage"
         );
-
 
     const id =
         document.getElementById(
             "confirmationRecordId"
         );
 
-
     const viewRecords =
         document.getElementById(
             "confirmationViewRecords"
         );
-
 
     const idBox =
         modal.querySelector(
             ".confirmation-id-box"
         );
 
-
     const buttons =
         modal.querySelectorAll(
             ".confirmation-actions button"
         );
-
 
     if (
         idBox
@@ -2342,7 +2105,6 @@ function showSaveConfirmation(
             "";
     }
 
-
     buttons.forEach(
         button => {
 
@@ -2350,7 +2112,6 @@ function showSaveConfirmation(
                 false;
         }
     );
-
 
     if (
         title
@@ -2364,7 +2125,6 @@ function showSaveConfirmation(
                 : "Registro creado correctamente";
     }
 
-
     if (
         message
     ) {
@@ -2377,7 +2137,6 @@ function showSaveConfirmation(
                 : "La revisión fue registrada correctamente.";
     }
 
-
     if (
         id
     ) {
@@ -2385,7 +2144,6 @@ function showSaveConfirmation(
         id.textContent =
             record.id;
     }
-
 
     if (
         viewRecords
@@ -2402,7 +2160,6 @@ function showSaveConfirmation(
             };
     }
 
-
     modal.classList.remove(
         "hidden"
     );
@@ -2412,7 +2169,6 @@ function showSaveConfirmation(
         "modal-open"
     );
 }
-
 
 /* =========================================================
    OCULTAR CUADRO
@@ -2425,7 +2181,6 @@ function hideSaveConfirmation() {
             "saveConfirmation"
         );
 
-
     if (
         modal
     ) {
@@ -2435,12 +2190,10 @@ function hideSaveConfirmation() {
         );
     }
 
-
     document.body.classList.remove(
         "modal-open"
     );
 }
-
 
 /* =========================================================
    CERRAR CONFIRMACIÓN
@@ -2449,7 +2202,6 @@ function hideSaveConfirmation() {
 function closeSaveConfirmation() {
 
     hideSaveConfirmation();
-
 
     if (
         window._lastSaveWasEditing ===
@@ -2472,14 +2224,12 @@ function resetMaintenanceForm() {
             "maintenanceForm"
         );
 
-
     if (
         !form
     ) {
 
         return;
     }
-
 
     form.reset();
 
@@ -2489,7 +2239,6 @@ function resetMaintenanceForm() {
             "recordId"
         );
 
-
     if (
         recordId
     ) {
@@ -2498,12 +2247,10 @@ function resetMaintenanceForm() {
             "";
     }
 
-
     const vehicle =
         document.getElementById(
             "vehiculo"
         );
-
 
     if (
         vehicle
@@ -2512,17 +2259,14 @@ function resetMaintenanceForm() {
         vehicle.disabled =
             false;
 
-
         vehicle.value =
             "";
     }
-
 
     const plate =
         document.getElementById(
             "placa"
         );
-
 
     if (
         plate
@@ -2532,12 +2276,10 @@ function resetMaintenanceForm() {
             "";
     }
 
-
     const dateInput =
         document.getElementById(
             "fechaHora"
         );
-
 
     if (
         dateInput
@@ -2549,12 +2291,10 @@ function resetMaintenanceForm() {
             );
     }
 
-
     const user =
         document.getElementById(
             "usuario"
         );
-
 
     if (
         user
@@ -2563,7 +2303,6 @@ function resetMaintenanceForm() {
         user.value =
             "";
     }
-
 
     document
         .querySelectorAll(
@@ -2578,7 +2317,6 @@ function resetMaintenanceForm() {
             }
         );
 
-
     document
         .querySelectorAll(
             ".multi-choice"
@@ -2592,12 +2330,10 @@ function resetMaintenanceForm() {
             }
         );
 
-
     const points =
         document.getElementById(
             "puntosHidden"
         );
-
 
     if (
         points
@@ -2607,12 +2343,10 @@ function resetMaintenanceForm() {
             "";
     }
 
-
     const condition =
         document.getElementById(
             "condicion"
         );
-
 
     if (
         condition
@@ -2621,7 +2355,6 @@ function resetMaintenanceForm() {
         condition.value =
             "";
     }
-
 
     document
         .querySelectorAll(
@@ -2636,12 +2369,10 @@ function resetMaintenanceForm() {
             }
         );
 
-
     const conditionComment =
         document.getElementById(
             "comentarioCondicion"
         );
-
 
     if (
         conditionComment
@@ -2650,17 +2381,14 @@ function resetMaintenanceForm() {
         conditionComment.value =
             "";
 
-
         conditionComment.required =
             false;
     }
-
 
     const conditionWrap =
         document.getElementById(
             "conditionCommentWrap"
         );
-
 
     if (
         conditionWrap
@@ -2671,12 +2399,10 @@ function resetMaintenanceForm() {
         );
     }
 
-
     const imageInput =
         document.getElementById(
             "imagenes"
         );
-
 
     if (
         imageInput
@@ -2686,28 +2412,21 @@ function resetMaintenanceForm() {
             "";
     }
 
-
     window._existingImages =
         [];
-
 
     window._existingPhotoFolderUrl =
         "";
 
-
     window._pendingPhotoData =
         [];
 
-
     renderImagePreview();
-
 
     const title =
         document.getElementById(
             "formTitle"
         );
-
-
     if (
         title
     ) {
@@ -2716,11 +2435,9 @@ function resetMaintenanceForm() {
             "Nueva revisión diaria";
     }
 
-
     window._lastSaveWasEditing =
         false;
 }
-
 
 /* =========================================================
    CREAR OTRO REGISTRO
@@ -2731,7 +2448,6 @@ function createAnotherRecord() {
     window.location.href =
         "mantenimiento.html";
 }
-
 
 /* =========================================================
    COMENTARIO DE CONDICIÓN
@@ -2744,18 +2460,15 @@ function toggleConditionComment() {
             "condicion"
         );
 
-
     const wrapper =
         document.getElementById(
             "conditionCommentWrap"
         );
 
-
     const comment =
         document.getElementById(
             "comentarioCondicion"
         );
-
 
     if (
         !condition ||
@@ -2766,21 +2479,17 @@ function toggleConditionComment() {
         return;
     }
 
-
     const required =
         condition.value === "Regular" ||
         condition.value === "Sucio";
-
 
     wrapper.classList.toggle(
         "hidden",
         !required
     );
 
-
     comment.required =
         required;
-
 
     if (
         !required
@@ -2790,7 +2499,6 @@ function toggleConditionComment() {
             "";
     }
 }
-
 
 /* =========================================================
    FOTOGRAFÍAS DEL FORMULARIO
@@ -2805,15 +2513,12 @@ async function previewImages(
             event.target.files ||
             []
         );
-
-
     if (
         !files.length
     ) {
 
         return;
     }
-
 
     const current =
         Array.isArray(
@@ -2824,7 +2529,6 @@ async function previewImages(
 
             : 0;
 
-
     if (
         current +
         files.length >
@@ -2834,21 +2538,17 @@ async function previewImages(
         event.target.value =
             "";
 
-
         alert(
             "Puede agregar un máximo de 10 fotografías nuevas por cada guardado."
         );
 
-
         return;
     }
-
 
     try {
 
         const newImages =
             [];
-
 
         for (
             const file of files
@@ -2861,24 +2561,19 @@ async function previewImages(
             );
         }
 
-
         window._pendingPhotoData =
             Array.isArray(
                 window._pendingPhotoData
             )
-
                 ? window._pendingPhotoData
 
                 : [];
-
 
         window._pendingPhotoData.push(
             ...newImages
         );
 
-
         renderImagePreview();
-
 
     } catch (
     error
@@ -2889,18 +2584,15 @@ async function previewImages(
             error
         );
 
-
         alert(
             error.message ||
             "No fue posible procesar una de las imágenes seleccionadas."
         );
     }
 
-
     event.target.value =
         "";
 }
-
 
 /* =========================================================
    COMPRIMIR FOTOGRAFÍA
@@ -9751,3 +9443,201 @@ function clearAccidentFilters() {
             : []
     );
 }
+
+/* =========================================================
+   NAVEGACIÓN DE FACTIBILIDADES
+   ========================================================= */
+
+(function addFactibilidadNavigation() {
+
+    function installLinks() {
+
+        const sideMenu =
+            document.getElementById(
+                "sideMenu"
+            );
+
+
+        if (
+            sideMenu &&
+            !sideMenu.querySelector(
+                'a[href="factibilidades.html"]'
+            )
+        ) {
+
+            const excelLink =
+                sideMenu.querySelector(
+                    'a[href="excel.html"]'
+                );
+
+            const createLink =
+                document.createElement(
+                    "a"
+                );
+
+            createLink.href =
+                "crear-factibilidad.html";
+
+            createLink.textContent =
+                "Crear inspección de factibilidad";
+
+            const listLink =
+                document.createElement(
+                    "a"
+                );
+
+            listLink.href =
+                "factibilidades.html";
+
+            listLink.textContent =
+                "Listado de factibilidades";
+
+
+            if (
+                excelLink
+            ) {
+
+                sideMenu.insertBefore(
+                    createLink,
+                    excelLink
+                );
+
+                sideMenu.insertBefore(
+                    listLink,
+                    excelLink
+                );
+
+            } else {
+
+                sideMenu.appendChild(
+                    createLink
+                );
+
+                sideMenu.appendChild(
+                    listLink
+                );
+            }
+        }
+
+
+        const dashboard =
+            document.querySelector(
+                ".menu-grid"
+            );
+
+
+        if (
+            dashboard &&
+            !dashboard.querySelector(
+                'a[href="factibilidades.html"]'
+            )
+        ) {
+
+            const excelCard =
+                dashboard.querySelector(
+                    'a[href="excel.html"]'
+                );
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+            wrapper.innerHTML = `
+                <a
+                    class="menu-card"
+                    href="crear-factibilidad.html">
+
+                    <div>
+
+                        <h2>
+                            Crear inspección de factibilidad
+                        </h2>
+
+                        <p>
+                            Registre la inspección técnica para determinar
+                            la factibilidad de agua potable.
+                        </p>
+
+                    </div>
+
+                    <span>
+                        Crear inspección
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="menu-card"
+                    href="factibilidades.html">
+
+                    <div>
+
+                        <h2>
+                            Listado de factibilidades
+                        </h2>
+
+                        <p>
+                            Consulte las inspecciones, fotografías,
+                            ubicación y reportes PDF.
+                        </p>
+
+                    </div>
+
+                    <span>
+                        Ver inspecciones
+                    </span>
+
+                </a>
+            `;
+
+
+            const cards =
+                Array.from(
+                    wrapper.children
+                );
+
+
+            cards.forEach(
+                function (
+                    card
+                ) {
+
+                    if (
+                        excelCard
+                    ) {
+
+                        dashboard.insertBefore(
+                            card,
+                            excelCard
+                        );
+
+                    } else {
+
+                        dashboard.appendChild(
+                            card
+                        );
+                    }
+                }
+            );
+        }
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            installLinks
+        );
+
+    } else {
+
+        installLinks();
+    }
+
+})();

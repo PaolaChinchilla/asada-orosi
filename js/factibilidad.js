@@ -4466,3 +4466,503 @@ function factibilidadErrorTemplate(
         </section>
     `;
 }
+
+/* =========================================================
+   ADAPTAR FACTIBILIDAD AL DISEÑO GENERAL
+   ========================================================= */
+
+(function installFactibilidadStyleAdapter() {
+
+    function addClasses(
+        root,
+        selector,
+        classes
+    ) {
+
+        root
+            .querySelectorAll(
+                selector
+            )
+            .forEach(
+                function (
+                    element
+                ) {
+
+                    classes.forEach(
+                        function (
+                            className
+                        ) {
+
+                            element.classList.add(
+                                className
+                            );
+                        }
+                    );
+                }
+            );
+    }
+
+
+    function syncChoices(
+        root
+    ) {
+
+        root
+            .querySelectorAll(
+                ".choice, .multi-choice"
+            )
+            .forEach(
+                function (
+                    choice
+                ) {
+
+                    const input =
+                        choice.querySelector(
+                            'input[type="radio"], input[type="checkbox"]'
+                        );
+
+                    choice.classList.toggle(
+                        "selected",
+                        Boolean(
+                            input &&
+                            input.checked
+                        )
+                    );
+                }
+            );
+    }
+
+
+    function applyStyles(
+        root
+    ) {
+
+        root.classList.add(
+            "factibility-module"
+        );
+
+
+        /* ---------------------------------------------
+           CLASES COMPARTIDAS
+           --------------------------------------------- */
+
+        addClasses(
+            root,
+            ".fact-hero",
+            [
+                "page-head"
+            ]
+        );
+
+        addClasses(
+            root,
+            ".fact-eyebrow",
+            [
+                "eyebrow"
+            ]
+        );
+
+        addClasses(
+            root,
+            ".fact-primary-button",
+            [
+                "btn",
+                "primary"
+            ]
+        );
+
+        addClasses(
+            root,
+            ".fact-secondary-button",
+            [
+                "btn",
+                "secondary"
+            ]
+        );
+
+        addClasses(
+            root,
+            ".fact-status, .fact-inline-status, .fact-muted, .fact-empty",
+            [
+                "note"
+            ]
+        );
+
+        addClasses(
+            root,
+            ".fact-error-panel",
+            [
+                "empty-state"
+            ]
+        );
+
+        addClasses(
+            root,
+            ".fact-hero .fact-actions-row",
+            [
+                "nav-actions"
+            ]
+        );
+
+
+        /* ---------------------------------------------
+           FORMULARIO
+           --------------------------------------------- */
+
+        if (
+            root.dataset.view ===
+            "form"
+        ) {
+
+            addClasses(
+                root,
+                ".fact-form",
+                [
+                    "form-shell"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-panel",
+                [
+                    "form-section"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-grid",
+                [
+                    "form-grid"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-inline-options",
+                [
+                    "choice-row"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-choice-grid, .fact-check-list",
+                [
+                    "multi-grid"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-conditional",
+                [
+                    "detail-field"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-image-preview",
+                [
+                    "photo-grid"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-submit-panel",
+                [
+                    "form-actions"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-section-heading p, .fact-field small",
+                [
+                    "note"
+                ]
+            );
+
+
+            root
+                .querySelectorAll(
+                    ".fact-choice"
+                )
+                .forEach(
+                    function (
+                        choice
+                    ) {
+
+                        const radio =
+                            choice.querySelector(
+                                'input[type="radio"]'
+                            );
+
+
+                        choice.classList.add(
+                            radio
+                                ? "choice"
+                                : "multi-choice"
+                        );
+                    }
+                );
+
+
+            addClasses(
+                root,
+                ".fact-check",
+                [
+                    "multi-choice"
+                ]
+            );
+        }
+
+
+        /* ---------------------------------------------
+           LISTADO
+           --------------------------------------------- */
+
+        if (
+            root.dataset.view ===
+            "list"
+        ) {
+
+            addClasses(
+                root,
+                ".fact-filter-panel",
+                [
+                    "record-filters",
+                    "record-filter-grid"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-record-list",
+                [
+                    "records-list"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-record-card",
+                [
+                    "record-card"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-record-header",
+                [
+                    "record-card-top"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-record-id",
+                [
+                    "record-label"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-record-data",
+                [
+                    "record-data-grid"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-record-data > div",
+                [
+                    "record-data"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-card-actions",
+                [
+                    "record-card-actions"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-badge",
+                [
+                    "tag"
+                ]
+            );
+        }
+
+
+        /* ---------------------------------------------
+           DETALLE
+           --------------------------------------------- */
+
+        if (
+            root.dataset.view ===
+            "detail"
+        ) {
+
+            addClasses(
+                root,
+                ".fact-panel",
+                [
+                    "detail-card"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-section-heading",
+                [
+                    "detail-card-header"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-detail-grid",
+                [
+                    "detail-grid"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-detail-grid > div",
+                [
+                    "detail-field"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-detail-grid dt",
+                [
+                    "detail-label"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-detail-grid dd",
+                [
+                    "detail-field-value"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-detail-image",
+                [
+                    "detail-photo"
+                ]
+            );
+
+            addClasses(
+                root,
+                ".fact-report-link",
+                [
+                    "btn",
+                    "secondary"
+                ]
+            );
+        }
+
+
+        syncChoices(
+            root
+        );
+    }
+
+
+    function start() {
+
+        const root =
+            document.getElementById(
+                "factibilidadApp"
+            );
+
+
+        if (
+            !root
+        ) {
+
+            return;
+        }
+
+
+        applyStyles(
+            root
+        );
+
+
+        root.addEventListener(
+            "change",
+            function () {
+
+                syncChoices(
+                    root
+                );
+            }
+        );
+
+
+        const observer =
+            new MutationObserver(
+                function () {
+
+                    applyStyles(
+                        root
+                    );
+                }
+            );
+
+
+        observer.observe(
+            root,
+            {
+                childList:
+                    true,
+
+                subtree:
+                    true,
+
+                attributes:
+                    true,
+
+                attributeFilter: [
+                    "hidden"
+                ]
+            }
+        );
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            start
+        );
+
+    } else {
+
+        start();
+    }
+
+})();
