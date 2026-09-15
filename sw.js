@@ -3,7 +3,7 @@
    ========================================================= */
 
 const CACHE_NAME =
-    "asada-static-v60";
+    "asada-static-v61";
 
 const STATIC_FILES = [
 
@@ -44,6 +44,8 @@ const STATIC_FILES = [
     "./js/app.js",
 
     "./manifest.json",
+
+    "./img/asada.png",
 
     "./img/asadalogo.png"
 
