@@ -3295,747 +3295,432 @@ function factibilidadDetailSection(
     `;
 }
 
-
 /* =========================================================
    PDF
    ========================================================= */
 
-async function factibilidadGeneratePdf(
-    record
-) {
+async function factibilidadGeneratePdf(record) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error("No se pudo cargar el generador de PDF.");
+    }
 
-    if (
-        !window.jspdf ||
-        !window.jspdf.jsPDF
-    ) {
+    const jsPDF = window.jspdf.jsPDF;
+    const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "letter",
+        compress: true
+    });
 
+    if (typeof doc.autoTable !== "function") {
+        throw new Error("No se pudo cargar el complemento de tablas del PDF.");
+    }
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const left = 19;
+    const right = 19;
+    const tableWidth = pageWidth - left - right;
+
+    doc.setProperties({
+        title: "Reporte oficial de inspección de factibilidad de agua potable",
+        subject: "Inspección de factibilidad de agua potable",
+        author: "ASADA Orosi",
+        creator: "Sistema de control de ASADA Orosi"
+    });
+
+    const logo = await factibilidadUrlToData("img/asadalogo.png")
+        .catch(() => "");
+
+    const imageResponse = await factibilidadCall(
+        "getFactibilidadImageData",
+        { id: record.id }
+    ).catch(() => null);
+
+    const frontImage = imageResponse && imageResponse.data
+        ? imageResponse.data
+        : "";
+
+    const mapResponse = await factibilidadCall(
+        "getFactibilidadMapData",
+        { id: record.id }
+    ).catch(() => null);
+
+    const reportMapImage = mapResponse
+        ? typeof mapResponse === "string"
+            ? mapResponse
+            : mapResponse.data || mapResponse.map?.data || ""
+        : "";
+
+    if (!reportMapImage) {
         throw new Error(
-            "No se pudo cargar el generador de PDF."
+            "No se pudo obtener el mapa. Verifique getFactibilidadMapData y publique una nueva versión de Apps Script."
         );
     }
 
-
-    const jsPDF =
-        window.jspdf.jsPDF;
-
-    const doc =
-        new jsPDF({
-
-            orientation:
-                "portrait",
-
-            unit:
-                "mm",
-
-            format:
-                "letter"
-
-        });
-
-
-    if (
-        typeof doc.autoTable !==
-        "function"
-    ) {
-
-        throw new Error(
-            "No se pudo cargar el complemento de tablas del PDF."
-        );
-    }
-
-
-    const logo =
-        await factibilidadUrlToData(
-            "img/asadalogo.png"
-        )
-            .catch(
-                function () {
-
-                    return "";
-                }
-            );
-
-    const imageResponse =
-        await factibilidadCall(
-            "getFactibilidadImageData",
-            {
-                id:
-                    record.id
-            }
-        )
-            .catch(
-                function () {
-
-                    return null;
-                }
-            );
-
-    const frontImage =
-        imageResponse &&
-            imageResponse.data
-            ? imageResponse.data
-            : "";
-
-    const mapResponse =
-        await factibilidadCall(
-            "getFactibilidadMapData",
-            { id: record.id }
-        ).catch(function () {
-            return null;
-        });
-
-    const reportMapImage =
-        mapResponse && mapResponse.data
-            ? mapResponse.data
-            : "";
-
-
-    const addSection =
-        function (
-            title,
-            rows,
-            forceNewPage
-        ) {
-
-            let y;
-
-            if (forceNewPage) {
-                doc.addPage();
-                y = 39;
-            } else {
-                y = doc.lastAutoTable
-                    ? doc.lastAutoTable.finalY + 8
-                    : 39;
-            }
-
-
-            if (
-                y > 263
-            ) {
-
-                doc.addPage();
-
-                y =
-                    39;
-            }
-
-
-            doc.setFont(
-                "helvetica",
-                "bold"
-            );
-
-            doc.setFontSize(
-                11
-            );
-
-            doc.setTextColor(
-                24,
-                89,
-                79
-            );
-
-            doc.text(
-                title,
-                16,
-                y
-            );
-
-
-            doc.autoTable({
-
-                startY:
-                    y + 3,
-
-                body:
-                    rows.map(
-                        function (
-                            row
-                        ) {
-
-                            return [
-
-                                row[0],
-
-                                factibilidadPdfValue(
-                                    row[1]
-                                )
-
-                            ];
-                        }
-                    ),
-
-                theme:
-                    "grid",
-
-                margin: {
-
-                    top:
-                        35,
-
-                    right:
-                        16,
-
-                    bottom:
-                        18,
-
-                    left:
-                        16
-
-                },
-
-                styles: {
-
-                    font:
-                        "helvetica",
-
-                    fontSize:
-                        8.7,
-
-                    cellPadding:
-                        2.4,
-
-                    lineColor:
-                        [
-                            202,
-                            213,
-                            211
-                        ],
-
-                    lineWidth:
-                        0.2,
-
-                    textColor:
-                        [
-                            32,
-                            38,
-                            41
-                        ],
-
-                    overflow:
-                        "linebreak",
-
-                    valign:
-                        "top"
-
-                },
-
-                columnStyles: {
-
-                    0: {
-
-                        cellWidth:
-                            59,
-
-                        fontStyle:
-                            "bold",
-
-                        fillColor:
-                            [
-                                234,
-                                244,
-                                241
-                            ],
-
-                        textColor:
-                            [
-                                25,
-                                79,
-                                71
-                            ]
-
-                    },
-
-                    1: {
-
-                        cellWidth:
-                            119
-
-                    }
-
-                }
-
-            });
-        };
-
-
-    const propertyTypes =
-        factibilidadPropertyTypes(
-            record
-        );
-
-
-    addSection(
-        "Información del solicitante",
-        [
-            [
-                "Número de inspección",
-                record.id
-            ],
-            [
-                "Nombre del solicitante",
-                record.nombreSolicitante
-            ],
-            [
-                "Dirección",
-                record.direccion
-            ],
-            [
-                "Ruta",
-                record.ruta
-            ],
-            [
-                "Fecha y hora",
-                factibilidadDisplayDate(
-                    record.fechaHoraInspeccion
-                )
-            ]
-        ]
-    );
-
-
-    addSection(
-        "Información de la propiedad",
-        [
-            [
-                "Existe paja",
-                factibilidadYesNo(
-                    record.existePaja
-                )
-            ],
-            [
-                "Número de paja",
-                record.existePaja
-                    ? record.numeroPaja
-                    : "No aplica"
-            ],
-            [
-                "Tipo de propiedad",
-                propertyTypes
-            ]
-        ]
-    );
-
-
-    addSection(
-        "Condiciones hidráulicas",
-        [
-            [
-                "Presión mínima",
-                record.presionMinimaPSI +
-                " PSI"
-            ],
-            [
-                "Presión máxima",
-                record.presionMaximaPSI +
-                " PSI"
-            ],
-            [
-                "Caudal reservado",
-                record.caudalReservado +
-                " m³/día"
-            ],
-            [
-                "Tubería frente a la propiedad",
-                factibilidadYesNo(
-                    record.existeTuberiaFrente
-                )
-            ],
-            [
-                "Diámetro de tubería",
-                record.existeTuberiaFrente
-                    ? record.diametroTuberia
-                    : "No aplica"
-            ],
-            [
-                "Disponibilidad de agua",
-                factibilidadYesNo(
-                    record.existeDisponibilidadAgua
-                )
-            ],
-            [
-                "Motivos de negación",
-                record.existeDisponibilidadAgua
-                    ? "No aplica"
-                    : record.motivosNegacion
-            ],
-            [
-                "Ubicación prevista del medidor",
-                record.existeDisponibilidadAgua
-                    ? record.ubicacionMedidor
-                    : "No aplica"
-            ]
-        ]
-    );
-
-
-    addSection(
-        "Ubicación geográfica",
-        [
-            [
-                "Lugar, dirección o referencia",
-                record.direccion || "No indicada"
-            ],
-            [
-                "Longitud X",
-                record.longitudX
-            ],
-            [
-                "Latitud Y",
-                record.latitudY
-            ],
-            [
-                "Altitud",
-                record.altitud !== ""
-                    ? record.altitud +
-                    " m"
-                    : "No indicada"
-            ],
-            [
-                "Precisión GPS",
-                record.precisionGPS !== ""
-                    ? record.precisionGPS +
-                    " m"
-                    : "No indicada"
-            ]
-        ]
-    );
-
-    if (reportMapImage) {
-        doc.addPage();
-
-        const mapY = 42;
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.setTextColor(24, 89, 79);
-        doc.text("Mapa de la ubicación registrada", 16, mapY);
-        doc.addImage(reportMapImage, "PNG", 16, mapY + 5, 178, 100);
-    }
-
-
-    addSection(
-        "Red y dispositivo de medición",
-        [
-            [
-                "Existe prevista a la red",
-                factibilidadYesNo(
-                    record.existePrevistaRed
-                )
-            ],
-            [
-                "Material de la calle",
-                record.materialCalle
-            ],
-            [
-                "Modalidad de medición",
-                record.modalidadMedicion
-            ],
-            [
-                "Diámetro del dispositivo",
-                record.diametroDispositivo
-            ]
-        ],
-        Boolean(reportMapImage)
-    );
-
-
-    if (
-        frontImage
-    ) {
-
-        let y =
-            doc.lastAutoTable
-                ? doc.lastAutoTable.finalY +
-                10
-                : 40;
-
-        const properties =
-            doc.getImageProperties(
-                frontImage
-            );
-
-        const maximumWidth =
-            178;
-
-        const maximumHeight =
-            105;
-
-        let width =
-            maximumWidth;
-
-        let height =
-            width *
-            properties.height /
-            properties.width;
-
-
-        if (
-            height >
-            maximumHeight
-        ) {
-
-            height =
-                maximumHeight;
-
-            width =
-                height *
-                properties.width /
-                properties.height;
+    const isYes = value => {
+        if (value === true || value === 1) {
+            return true;
         }
 
+        const text = String(value ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase();
 
-        if (
-            y + height + 15 >
-            278
-        ) {
+        return ["si", "true", "1", "yes", "y"].includes(text);
+    };
 
-            doc.addPage();
+    const yesNo = value => isYes(value) ? "Sí" : "No";
+    const available = isYes(record.existeDisponibilidadAgua);
+    const hasPaja = isYes(record.existePaja);
+    const hasPipe = isYes(record.existeTuberiaFrente);
+    const hasNetwork = isYes(record.existePrevistaRed);
 
-            y =
-                40;
+    const formatLongDate = value => {
+        if (!value) {
+            return "No indicada";
         }
 
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-        doc.setFontSize(
-            11
-        );
-
-        doc.setTextColor(
-            24,
-            89,
-            79
-        );
-
-        doc.text(
-            "Fotografía del frente de la propiedad",
-            16,
-            y
-        );
-
-
-        const format =
-            frontImage.startsWith(
-                "data:image/png"
+        const text = String(value).trim();
+        const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        const date = match
+            ? new Date(
+                Number(match[1]),
+                Number(match[2]) - 1,
+                Number(match[3])
             )
+            : new Date(text);
+
+        if (Number.isNaN(date.getTime())) {
+            return factibilidadDisplayDate(value);
+        }
+
+        const result = new Intl.DateTimeFormat("es-CR", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }).format(date);
+
+        return result.charAt(0).toLowerCase() + result.slice(1);
+    };
+
+    const textValue = value => {
+        if (value === null || value === undefined || value === "") {
+            return "No indicada";
+        }
+
+        return String(value);
+    };
+
+    const coordinate = value => textValue(value);
+
+    const propertyTypes = factibilidadPropertyTypes(record);
+
+    const addFirstPageHeader = () => {
+        if (logo) {
+            const logoFormat = /^data:image\/png/i.test(logo)
                 ? "PNG"
                 : "JPEG";
 
+            doc.addImage(logo, logoFormat, 20, 17, 27, 27);
+        }
+
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("times", "bold");
+        doc.setFontSize(15);
+        doc.text("ASADA OROSI", pageWidth / 2, 31, { align: "center" });
+
+        doc.setFontSize(12.5);
+        doc.text(
+            "REPORTE OFICIAL DE INSPECCIÓN DE",
+            pageWidth / 2,
+            39,
+            { align: "center" }
+        );
+        doc.text(
+            "FACTIBILIDAD DE AGUA POTABLE",
+            pageWidth / 2,
+            46,
+            { align: "center" }
+        );
+
+        doc.setFontSize(11);
+        doc.text(
+            "Registro N.° " + textValue(record.id),
+            pageWidth / 2,
+            54,
+            { align: "center" }
+        );
+
+        doc.setFont("times", "normal");
+        doc.setFontSize(10.5);
+        doc.text(
+            formatLongDate(record.fechaHoraInspeccion || record.fechaCreacion),
+            pageWidth / 2,
+            61,
+            { align: "center" }
+        );
+
+        doc.setDrawColor(100, 100, 100);
+        doc.setLineWidth(0.25);
+        doc.line(left, 69, pageWidth - right, 69);
+    };
+
+    addFirstPageHeader();
+
+    let cursorY = 80;
+
+    const addHeading = (number, title) => {
+        doc.setFont("times", "bold");
+        doc.setFontSize(10.8);
+        doc.setTextColor(0, 0, 0);
+        doc.text(
+            number ? number + ". " + title : title,
+            left,
+            cursorY
+        );
+        cursorY += 5;
+    };
+
+    const ensureSpace = minimum => {
+        if (cursorY + minimum > pageHeight - 31) {
+            doc.addPage();
+            cursorY = 25;
+        }
+    };
+
+    const addTable = rows => {
+        const body = rows.map(row => [
+            String(row[0]),
+            factibilidadPdfValue(row[1])
+        ]);
+
+        doc.autoTable({
+            startY: cursorY,
+            body,
+            theme: "grid",
+            margin: {
+                left,
+                right,
+                top: 18,
+                bottom: 39
+            },
+            tableWidth,
+            styles: {
+                font: "times",
+                fontSize: 9.2,
+                cellPadding: 2.4,
+                lineColor: [0, 0, 0],
+                lineWidth: 0.25,
+                textColor: [0, 0, 0],
+                overflow: "linebreak",
+                valign: "top"
+            },
+            columnStyles: {
+                0: {
+                    cellWidth: tableWidth * 0.49,
+                    fontStyle: "bold",
+                    fillColor: [239, 243, 243]
+                },
+                1: {
+                    cellWidth: tableWidth * 0.51
+                }
+            }
+        });
+
+        cursorY = doc.lastAutoTable.finalY + 9;
+    };
+
+    const addSection = (number, title, rows, minimumSpace = 35) => {
+        ensureSpace(minimumSpace);
+        addHeading(number, title);
+        addTable(rows);
+    };
+
+    addSection(1, "Información general", [
+        ["ID del registro", record.id],
+        ["Fecha y hora", factibilidadDisplayDate(record.fechaHoraInspeccion)],
+        ["Nombre del solicitante", record.nombreSolicitante],
+        ["Dirección", record.direccion],
+        ["Ruta", record.ruta]
+    ]);
+
+    addSection(2, "Información de la propiedad", [
+        ["¿Existe una paja abasteciendo la propiedad?", yesNo(hasPaja)],
+        ["Número de paja", hasPaja ? record.numeroPaja : "No aplica"],
+        ["Tipo de propiedad", propertyTypes]
+    ]);
+
+    addSection(3, "Condiciones hidráulicas y de medición", [
+        ["Presión mínima", textValue(record.presionMinimaPSI) + " PSI"],
+        ["Presión máxima", textValue(record.presionMaximaPSI) + " PSI"],
+        ["Caudal reservado", textValue(record.caudalReservado) + " m3/día"],
+        ["¿Existe tubería frente a la propiedad?", yesNo(hasPipe)],
+        ["Diámetro de la tubería", hasPipe ? record.diametroTuberia : "No aplica"],
+        ["¿Existe disponibilidad de agua?", yesNo(available)],
+        [
+            "Motivos de negación",
+            available ? "No aplica" : record.motivosNegacion
+        ],
+        [
+            "Ubicación prevista para el medidor",
+            available ? record.ubicacionMedidor : "No aplica"
+        ],
+        ["¿Existe prevista a la red?", yesNo(hasNetwork)],
+        ["Material de la calle", record.materialCalle],
+        ["Modalidad de medición", record.modalidadMedicion],
+        ["Diámetro del dispositivo", record.diametroDispositivo]
+    ], 45);
+
+    addSection(4, "Ubicación geográfica", [
+        ["Lugar, dirección o referencia", record.direccion || "No indicada"],
+        ["Coordenada Y - Latitud", coordinate(record.latitudY)],
+        ["Coordenada X - Longitud", coordinate(record.longitudX)],
+        ["Altitud (m)", record.altitud !== "" ? record.altitud : "No disponible"],
+        [
+            "Precisión (m)",
+            record.precisionGPS !== "" ? record.precisionGPS : "No disponible"
+        ]
+    ], 45);
+
+    // El mapa continúa después de la tabla geográfica. Si ya no hay
+    // espacio suficiente, pasa automáticamente a la página siguiente.
+    ensureSpace(105);
+    addHeading("", "Mapa de la ubicación registrada");
+
+    const mapWidth = 126;
+    const mapHeight = 74;
+    const mapX = (pageWidth - mapWidth) / 2;
+
+    doc.addImage(
+        reportMapImage,
+        "PNG",
+        mapX,
+        cursorY + 4,
+        mapWidth,
+        mapHeight
+    );
+
+    cursorY += mapHeight + 16;
+
+    ensureSpace(60);
+    addHeading(5, "Evidencia fotográfica");
+    cursorY += 3;
+
+    if (frontImage) {
+        doc.setFont("times", "bold");
+        doc.setFontSize(10);
+        doc.text("Fotografía 1", left, cursorY);
+        cursorY += 5;
+
+        const properties = doc.getImageProperties(frontImage);
+        const maxWidth = 106;
+        const maxHeight = 98;
+        let imageWidth = maxWidth;
+        let imageHeight = imageWidth * properties.height / properties.width;
+
+        if (imageHeight > maxHeight) {
+            imageHeight = maxHeight;
+            imageWidth = imageHeight * properties.width / properties.height;
+        }
+
+        if (cursorY + imageHeight > pageHeight - 36) {
+            doc.addPage();
+            cursorY = 25;
+            addHeading(5, "Evidencia fotográfica");
+            cursorY += 8;
+        }
+
+        const imageX = (pageWidth - imageWidth) / 2;
+        const imageFormat = /^data:image\/png/i.test(frontImage)
+            ? "PNG"
+            : "JPEG";
 
         doc.addImage(
             frontImage,
-            format,
-            16,
-            y + 4,
-            width,
-            height
+            imageFormat,
+            imageX,
+            cursorY,
+            imageWidth,
+            imageHeight
         );
+
+        cursorY += imageHeight + 12;
+    } else {
+        doc.setFont("times", "italic");
+        doc.setFontSize(9.5);
+        doc.text("No hay fotografía disponible.", left, cursorY + 8);
+        cursorY += 22;
     }
 
-
-    addSection(
-        "Observaciones y responsable",
+    addSection(6, "Observaciones y responsable", [
+        ["Observaciones", record.observaciones || "Sin observaciones"],
+        ["Inspección realizada por", record.inspeccionRealizadaPor],
+        ["Fecha de creación", factibilidadDisplayDate(record.fechaCreacion)],
         [
-            [
-                "Observaciones",
-                record.observaciones ||
-                "Sin observaciones"
-            ],
-            [
-                "Inspección realizada por",
-                record.inspeccionRealizadaPor
-            ]
+            "Última actualización",
+            factibilidadDisplayDate(record.fechaActualizacion)
         ]
+    ], 45);
+
+    const pageCount = doc.internal.getNumberOfPages();
+    const lastPage = pageCount;
+
+    // El cierre institucional se coloca únicamente en la última página,
+    // igual que en el documento de referencia.
+    doc.setPage(lastPage);
+    const footerY = pageHeight - 29;
+
+    doc.setDrawColor(100, 100, 100);
+    doc.setLineWidth(0.25);
+    doc.line(left, footerY - 5, pageWidth - right, footerY - 5);
+
+    doc.setFont("times", "normal");
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8.7);
+
+    const footerText = doc.splitTextToSize(
+        "Este documento corresponde al registro oficial de inspección de factibilidad de agua potable almacenado en el sistema de ASADA Orosi.",
+        tableWidth
     );
 
+    doc.text(footerText, left, footerY + 2);
 
-    const pageCount =
-        doc.internal.getNumberOfPages();
+    doc.setFont("times", "italic");
+    doc.setFontSize(9);
+    doc.text(
+        "Documento generado electrónicamente por ASADA Orosi.",
+        pageWidth / 2,
+        pageHeight - 12,
+        { align: "center" }
+    );
 
-
-    for (
-        let page = 1;
-        page <= pageCount;
-        page++
-    ) {
-
-        doc.setPage(
-            page
-        );
-
-
-        if (
-            logo
-        ) {
-
-            const logoFormat =
-                logo.startsWith(
-                    "data:image/jpeg"
-                )
-                    ? "JPEG"
-                    : "PNG";
-
-            doc.addImage(
-                logo,
-                logoFormat,
-                18,
-                8,
-                25,
-                25
-            );
-        }
-
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-        doc.setTextColor(
-            26,
-            73,
-            67
-        );
-
-        doc.setFontSize(
-            14
-        );
-
-        doc.text(
-            "ASADA OROSI",
-            105,
-            14,
-            {
-                align:
-                    "center"
-            }
-        );
-
-
-        doc.setFontSize(
-            10.5
-        );
-
-        doc.text(
-            "REPORTE DE INSPECCIÓN DE FACTIBILIDAD DE AGUA POTABLE",
-            105,
-            21,
-            {
-                align:
-                    "center"
-            }
-        );
-
-
-        doc.setDrawColor(
-            42,
-            194,
-            166
-        );
-
-        doc.setLineWidth(
-            0.8
-        );
-
-        doc.line(
-            16,
-            32,
-            194,
-            32
-        );
-
-
-        doc.setFont(
-            "helvetica",
-            "normal"
-        );
-
-        doc.setTextColor(
-            90,
-            98,
-            101
-        );
-
-        doc.setFontSize(
-            8
-        );
-
-        doc.text(
-            "Registro " +
-            record.id,
-            16,
-            doc.internal.pageSize.getHeight() - 10
-        );
-
-        doc.text(
-            "Página " +
-            page +
-            " de " +
-            pageCount,
-            194,
-            doc.internal.pageSize.getHeight() - 10,
-            {
-                align:
-                    "right"
-            }
-        );
-    }
-
-
-    const filename =
-        "Reporte_Factibilidad_" +
-        record.id +
-        ".pdf";
-
-    const data =
-        doc.output(
-            "datauristring"
-        );
-
+    const filename = "Reporte_Factibilidad_" + record.id + ".pdf";
+    const data = doc.output("datauristring");
     let saved;
 
-
     try {
-
-        saved =
-            await factibilidadCall(
-                "saveFactibilidadPdf",
-                {
-
-                    id:
-                        record.id,
-
-                    archivo: {
-
-                        name:
-                            filename,
-
-                        type:
-                            "application/pdf",
-
-                        data:
-                            data
-
-                    }
-
+        saved = await factibilidadCall(
+            "saveFactibilidadPdf",
+            {
+                id: record.id,
+                archivo: {
+                    name: filename,
+                    type: "application/pdf",
+                    data
                 }
-            );
-
-    } finally {
-
-        doc.save(
-            filename
+            }
         );
+    } finally {
+        doc.save(filename);
     }
-
 
     return saved;
 }
+
 
 
 /* =========================================================
