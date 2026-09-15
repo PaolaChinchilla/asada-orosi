@@ -3329,7 +3329,7 @@
             creator: "Sistema de control de ASADA Orosi"
         });
 
-        const logo = await factibilidadUrlToData("img/asadalogo.png")
+        const logo = await factibilidadUrlToData("img/asada.png")
             .catch(() => "");
 
         const imageResponse = await factibilidadCall(
