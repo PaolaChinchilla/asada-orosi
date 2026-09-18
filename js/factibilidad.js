@@ -98,6 +98,39 @@
     };
 
 
+    window.ASADA_FACTIBILIDAD_DRAFT_IMAGE =
+        null;
+
+
+    window.ASADA_APPLY_FACTIBILIDAD_DRAFT_IMAGE =
+        function (image) {
+
+            if (
+                image &&
+                image.data
+            ) {
+
+                factibilidadState.newImage =
+                    image;
+
+                window.ASADA_FACTIBILIDAD_DRAFT_IMAGE =
+                    image;
+
+                factibilidadShowImage(
+                    image.data
+                );
+
+            } else {
+
+                factibilidadState.newImage =
+                    null;
+
+                window.ASADA_FACTIBILIDAD_DRAFT_IMAGE =
+                    null;
+            }
+        };
+
+
     /* =========================================================
        INICIO
        ========================================================= */
@@ -1297,6 +1330,9 @@
                                 file
                             );
 
+                        window.ASADA_FACTIBILIDAD_DRAFT_IMAGE =
+                            factibilidadState.newImage;
+
                         factibilidadShowImage(
                             factibilidadState.newImage.data
                         );
@@ -1314,6 +1350,9 @@
                             "";
 
                         factibilidadState.newImage =
+                            null;
+
+                        window.ASADA_FACTIBILIDAD_DRAFT_IMAGE =
                             null;
 
                         factibilidadSetStatus(
@@ -1379,6 +1418,28 @@
                         throw new Error(
                             "El servidor no devolvió el identificador del registro."
                         );
+                    }
+
+
+                    if (
+                        typeof window.asadaShowPostSavePreview ===
+                        "function"
+                    ) {
+
+                        submit.disabled =
+                            false;
+
+                        factibilidadSetStatus(
+                            "Inspección enviada correctamente.",
+                            "success"
+                        );
+
+                        window.asadaShowPostSavePreview(
+                            "factibilidad",
+                            saved
+                        );
+
+                        return;
                     }
 
 
@@ -2763,10 +2824,11 @@
                 record
             );
 
-        const imageUrl =
-            factibilidadSafeUrl(
-                record.imagenFrenteURL
-            );
+        const hasImage = Boolean(
+            record.imagenFrenteURL ||
+            record.imagenFrenteJSON?.id ||
+            record.imagenFrenteJSON?.fileId
+        );
 
         const reportUrl =
             factibilidadSafeUrl(
@@ -3027,35 +3089,14 @@
 
             </div>
 
-            ${imageUrl
+            ${hasImage
                 ? `
                     <figure class="fact-detail-image">
 
                         <img
-                            src="${factibilidadEscape(imageUrl)}"
+                            id="factDetailImage"
+                            src=""
                             alt="Frente de la propiedad">
-
-                        ${record.imagenFrenteJSON &&
-                    record.imagenFrenteJSON.viewUrl
-                    ? `
-                                <figcaption>
-
-                                    <a
-                                        href="${factibilidadEscape(
-                        factibilidadSafeUrl(
-                            record.imagenFrenteJSON.viewUrl
-                        )
-                    )}"
-                                        target="_blank"
-                                        rel="noopener">
-
-                                        Abrir fotografía en Drive
-
-                                    </a>
-
-                                </figcaption>
-                            `
-                    : ""}
 
                     </figure>
                 `
@@ -3098,7 +3139,10 @@
 
 
         window.setTimeout(
-            initializeFactibilidadDetailMap,
+            function () {
+                initializeFactibilidadDetailMap();
+                loadPrivateFactibilidadImage(record.id);
+            },
             0
         );
 
@@ -3180,6 +3224,70 @@
                     }
                 }
             );
+    }
+
+
+    async function loadPrivateFactibilidadImage(
+        id
+    ) {
+
+        const image =
+            document.getElementById(
+                "factDetailImage"
+            );
+
+        if (
+            !image
+        ) {
+
+            return;
+        }
+
+        try {
+
+            const response =
+                await factibilidadCall(
+                    "getFactibilidadImageData",
+                    {
+                        id:
+                            id
+                    }
+                );
+
+            const data =
+                typeof response ===
+                    "string"
+                    ? response
+                    : response &&
+                        response.data
+                        ? response.data
+                        : "";
+
+            if (
+                data
+            ) {
+
+                image.src =
+                    data;
+
+            } else {
+
+                image.alt =
+                    "No fue posible cargar la fotografía";
+            }
+
+        } catch (
+        error
+        ) {
+
+            image.alt =
+                "No fue posible cargar la fotografía";
+
+            console.warn(
+                "No fue posible cargar la fotografía privada de factibilidad.",
+                error
+            );
+        }
     }
 
     function initializeFactibilidadDetailMap() {
