@@ -1,0 +1,9 @@
+{
+  "name": "Mantenimiento ASADA",
+  "short_name": "ASADA",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#101214",
+  "theme_color": "#16181c",
+  "icons": []
+}
