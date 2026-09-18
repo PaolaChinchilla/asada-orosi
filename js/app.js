@@ -143,6 +143,17 @@ function callApi(
     values = {}
 ) {
 
+    if (
+        typeof navigator !== "undefined" &&
+        navigator.onLine === false
+    ) {
+        return Promise.reject(
+            new Error(
+                "No hay conexión con Internet. El formulario quedó guardado como borrador local."
+            )
+        );
+    }
+
     return new Promise(
         (
             resolve,
