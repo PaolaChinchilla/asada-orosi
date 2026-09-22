@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="theme-color"
+        content="#16181c">
+
+    <meta
+        name="description"
+        content="Listado de daños y accidentes de vehículos de ASADA Orosi.">
+
+    <link
+        rel="manifest"
+        href="manifest.json">
+
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260921-8">
+
+    <link
+        rel="stylesheet"
+        href="css/seguridad.css?v=20260921-8">
+
+    <title>
+        Daños y accidentes | ASADA Orosi
+    </title>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BARRA SUPERIOR
+         ===================================================== -->
+
+    <header class="topbar">
+
+        <button
+            type="button"
+            class="menu-btn"
+            onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">
+
+            ☰
+
+        </button>
+
+
+        <div class="brand">
+
+            <img
+                src="img/asadalogo.png"
+                alt="Logo ASADA Orosi"
+                class="brand-logo">
+
+            <span>
+                ASADA OROSI
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MENÚ LATERAL
+         ===================================================== -->
+
+     <aside
+        id="sideMenu"
+        class="side-menu">
+
+        <a href="index.html">Inicio</a>
+
+        <a href="registros.html">
+            Listado de revisiones
+        </a>
+
+        <a href="mantenimiento.html">
+            Crear nueva revisión
+        </a>
+
+        <a href="crear-accidente.html">
+            Crear daño y accidente
+        </a>
+
+        <a href="crear-factibilidad.html">
+            Crear inspección de factibilidad
+        </a>
+
+        <a href="factibilidades.html">
+            Listado de factibilidades
+        </a>
+
+        <a href="excel.html">
+            Descargar Excel
+        </a>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <main class="page">
+
+        <div
+            id="accidentsPage"
+            aria-live="polite">
+
+            <div class="empty-state">
+
+                <p>
+                    Cargando daños y accidentes...
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         APP.JS
+         ===================================================== -->
+
+    <script src="js/app.js?v=20260921-8"></script>
+
+
+
+    <!-- =====================================================
+         MEJORA DE LISTADO Y DETALLE INSTANTÁNEO
+         ===================================================== -->
+
+    <script>
+
+        /* =====================================================
+           GUARDAR ACCIDENTE TEMPORALMENTE
+           ===================================================== */
+
+        function cacheAccidentForDetail(
+            accident
+        ) {
+
+            if (
+                !accident ||
+                !accident.id
+            ) {
+
+                return;
+
+            }
+
+
+            try {
+
+                sessionStorage.setItem(
+
+                    "asada-accident-detail:" +
+                    String(
+                        accident.id
+                    ).toUpperCase(),
+
+                    JSON.stringify(
+                        accident
+                    )
+
+                );
+
+
+            } catch (
+                error
+            ) {
+
+                console.warn(
+                    "No fue posible guardar temporalmente el accidente.",
+                    error
+                );
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           ABRIR DETALLE
+           ===================================================== */
+
+        function openAccidentDetail(
+            accidentId
+        ) {
+
+            const id =
+                String(
+                    accidentId ||
+                    ""
+                )
+                    .trim()
+                    .toUpperCase();
+
+
+            if (
+                !id
+            ) {
+
+                return;
+
+            }
+
+
+            const accidents =
+                Array.isArray(
+                    window.currentVehicleAccidents
+                )
+
+                    ? window.currentVehicleAccidents
+
+                    : [];
+
+
+            const accident =
+                accidents.find(
+                    item =>
+                        String(
+                            item.id ||
+                            ""
+                        )
+                            .trim()
+                            .toUpperCase() ===
+                        id
+                );
+
+
+            if (
+                accident
+            ) {
+
+                cacheAccidentForDetail(
+                    accident
+                );
+
+            }
+
+
+            window.location.href =
+
+                "detalle-accidente.html?id=" +
+
+                encodeURIComponent(
+                    id
+                );
+
+        }
+
+
+
+        /* =====================================================
+           REEMPLAZAR LISTA DE ACCIDENTES
+           ===================================================== */
+
+        /*
+            app.js ya trae esta función.
+
+            La redefinimos aquí para agregar el almacenamiento
+            temporal del accidente antes de abrir el detalle.
+
+            Así detalle-accidente.html puede mostrar los datos
+            inmediatamente sin esperar otra consulta a Google.
+        */
+
+        window.renderAccidentList =
+            function (
+                accidents
+            ) {
+
+                const list =
+                    document.getElementById(
+                        "vehicleAccidentsList"
+                    );
+
+
+                if (
+                    !list
+                ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    !Array.isArray(
+                        accidents
+                    ) ||
+                    accidents.length === 0
+                ) {
+
+                    list.innerHTML = `
+
+                        <div class="empty-state">
+
+                            <h2>
+                                No hay daños o accidentes
+                            </h2>
+
+                            <p>
+                                No existen reportes que coincidan
+                                con la búsqueda.
+                            </p>
+
+                            <a
+                                href="crear-accidente.html"
+                                class="btn primary">
+
+                                Crear registro de daño o accidente
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+
+                    return;
+
+                }
+
+
+                list.innerHTML =
+                    accidents
+                        .map(
+                            accident => {
+
+                                const canContinue =
+                                    String(
+                                        accident.puedeContinuarUso ||
+                                        ""
+                                    ).trim();
+
+
+                                const canContinueText =
+
+                                    canContinue === "Sí"
+
+                                        ? "Sí"
+
+                                        : canContinue === "No"
+
+                                            ? "No"
+
+                                            : "Sin información";
+
+
+                                const id =
+                                    String(
+                                        accident.id ||
+                                        ""
+                                    )
+                                        .trim()
+                                        .toUpperCase();
+
+
+                                return `
+
+                                    <article class="record-card">
+
+
+                                        <div class="record-card-top">
+
+
+                                            <div>
+
+                                                <span class="record-label">
+
+                                                    DAÑO / ACCIDENTE
+
+                                                </span>
+
+
+                                                <h2>
+
+                                                    ${esc(
+                                                        id ||
+                                                        "Sin ID"
+                                                    )}
+
+                                                </h2>
+
+                                            </div>
+
+
+                                            <div class="record-vehicle">
+
+                                                <strong>
+
+                                                    ${esc(
+                                                        accident.vehiculo ||
+                                                        "Sin vehículo"
+                                                    )}
+
+                                                </strong>
+
+
+                                                <span>
+
+                                                    ${esc(
+                                                        accident.placa ||
+                                                        ""
+                                                    )}
+
+                                                </span>
+
+                                            </div>
+
+
+                                        </div>
+
+
+
+                                        <div class="record-data-grid">
+
+
+                                            <div class="record-data">
+
+                                                <span>
+                                                    Fecha y hora
+                                                </span>
+
+                                                <strong>
+
+                                                    ${esc(
+                                                        accident.fechaHora ||
+                                                        "Sin información"
+                                                    )}
+
+                                                </strong>
+
+                                            </div>
+
+
+
+                                            <div class="record-data">
+
+                                                <span>
+                                                    Chofer
+                                                </span>
+
+                                                <strong>
+
+                                                    ${esc(
+                                                        accident.chofer ||
+                                                        "Sin información"
+                                                    )}
+
+                                                </strong>
+
+                                            </div>
+
+
+
+                                            <div class="record-data">
+
+                                                <span>
+                                                    Reportado a
+                                                </span>
+
+                                                <strong>
+
+                                                    ${esc(
+                                                        accident.personaReportada ||
+                                                        "Sin información"
+                                                    )}
+
+                                                </strong>
+
+                                            </div>
+
+
+
+                                            <div class="record-data">
+
+                                                <span>
+                                                    Puede continuar en uso
+                                                </span>
+
+                                                <strong>
+
+                                                    ${esc(
+                                                        canContinueText
+                                                    )}
+
+                                                </strong>
+
+                                            </div>
+
+
+                                        </div>
+
+
+
+                                        <div class="record-card-actions">
+
+                                            <button
+                                                type="button"
+                                                class="btn primary"
+                                                onclick="openAccidentDetail('${escapeJs(
+                                                    id
+                                                )}')">
+
+                                                Consultar registro
+
+                                            </button>
+
+                                        </div>
+
+
+                                    </article>
+
+                                `;
+
+                            }
+                        )
+                        .join(
+                            ""
+                        );
+
+            };
+
+
+
+        /* =====================================================
+           INICIAR LISTADO
+           ===================================================== */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                if (
+                    typeof renderAccidentsPage ===
+                    "function"
+                ) {
+
+                    renderAccidentsPage();
+
+                    return;
+
+                }
+
+
+                const root =
+                    document.getElementById(
+                        "accidentsPage"
+                    );
+
+
+                if (
+                    root
+                ) {
+
+                    root.innerHTML = `
+
+                        <div class="empty-state">
+
+                            <h2>
+                                No fue posible cargar el listado
+                            </h2>
+
+                            <p>
+
+                                No se encontró la función del listado
+                                de daños y accidentes.
+
+                            </p>
+
+                        </div>
+
+                    `;
+
+                }
+
+            }
+        );
+
+    </script>
+
+    <script src="js/seguridad.js?v=20260921-8"></script>
+
+
+</body>
+
+</html>
