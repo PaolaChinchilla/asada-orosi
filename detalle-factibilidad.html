@@ -1,0 +1,83 @@
+<!--
+    ARCHIVO: detalle-factibilidad.html
+    Reemplaza el contenido completo por este código.
+    El archivo debe estar junto a index.html y la carpeta js.
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16181c">
+    <meta
+        name="description"
+        content="Detalle de inspección de factibilidad de agua potable de ASADA Orosi.">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css?v=20260924-7">
+    <link rel="stylesheet" href="css/factibilidad.css?v=20260924-7">
+    <link rel="stylesheet" href="css/factibilidad-ajustes.css?v=20260924-7">
+    <link rel="stylesheet" href="css/seguridad.css?v=20260924-7">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <title>Detalle de factibilidad | ASADA Orosi</title>
+    <link rel="icon" type="image/png" href="img/asadalogo.png">
+</head>
+
+<body>
+
+    <header class="topbar">
+        <button
+            type="button"
+            class="menu-btn"
+            onclick="toggleMenu()"
+            aria-label="Abrir menú">
+            ☰
+        </button>
+
+        <div class="brand">
+            <img
+                src="img/asadalogo.png"
+                alt="Logo ASADA Orosi"
+                class="brand-logo">
+            <span>ASADA OROSI</span>
+        </div>
+    </header>
+
+    <aside id="sideMenu" class="side-menu">
+        <a href="index.html">Inicio</a>
+        <a href="registros.html">Listado de revisiones</a>
+        <a href="mantenimiento.html">Crear nueva revisión</a>
+        <a href="crear-accidente.html">Crear daño y accidente</a>
+        <a href="accidentes.html">Listado de daños y accidentes</a>
+        <a href="crear-factibilidad.html">Crear inspección de factibilidad</a>
+        <a href="factibilidades.html">Listado de factibilidades</a>
+        <a href="excel.html">Descargar Excel</a>
+    </aside>
+
+    <main
+        id="factibilidadApp"
+        class="page fact-page factibility-module"
+        data-view="detail">
+        <div class="fact-status note">Cargando inspección...</div>
+    </main>
+
+    <script src="js/avisos.js?v=20260924-7"></script>
+    <script src="js/app.js?v=20260924-7"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        window.ASADA_LEAFLET = window.L;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/factibilidad.js?v=20260924-7"></script>
+    <script src="js/factibilidad-ajustes.js?v=20260924-7"></script>
+    <script src="js/seguridad.js?v=20260924-7"></script>
+
+</body>
+
+</html>
