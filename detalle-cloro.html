@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16181c">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css?v=20260924-6">
+    <link rel="stylesheet" href="css/seguridad.css?v=20260924-6">
+    <link rel="stylesheet" href="css/cloro_aforo.css?v=20260924-6">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <title>Detalle de cloro | ASADA Orosi</title>
+    <link rel="icon" type="image/png" href="img/asadalogo.png">
+</head>
+
+<body>
+    <header class="topbar"><button type="button" class="menu-btn" onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">☰</button>
+        <div class="brand"><img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo"><span>ASADA
+                OROSI</span></div>
+    </header>
+    <aside id="sideMenu" class="side-menu"><a href="index.html">Inicio</a><a href="crear-cloro.html">Crear control de
+            cloro</a><a href="cloros.html">Listado de cloro</a><a href="crear-aforo.html">Crear aforo</a><a
+            href="aforos.html">Listado de aforos</a><a href="borradores.html">Ver borradores</a></aside>
+    <main class="page module-page">
+        <div class="nav-actions"><a href="cloros.html" class="btn-back">Volver al listado</a></div>
+        <div id="cloroDetail">
+            <div class="empty-state">
+                <p>Cargando registro...</p>
+            </div>
+        </div>
+    </main>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/app.js?v=20260924-6"></script>
+    <script src="js/cloro_aforo.js?v=20260924-6"></script>
+    <script src="js/seguridad.js?v=20260924-6"></script>
+</body>
+
+</html>
