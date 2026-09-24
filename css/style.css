@@ -77,6 +77,92 @@ a {
     object-fit: cover;
 }
 
+/* =========================================================
+   AVISOS Y CONFIRMACIONES DEL SITIO
+   ========================================================= */
+
+.asada-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(5, 8, 11, .68);
+}
+
+.asada-dialog {
+    width: min(100%, 480px);
+    overflow: hidden;
+    border: 1px solid rgba(32, 205, 176, .32);
+    border-radius: 18px;
+    background: #202027;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .48);
+}
+
+.asada-dialog-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    color: #f7f8fa;
+    font-weight: 700;
+}
+
+.asada-dialog-brand-mark {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    border: 2px solid #20cdb0;
+    border-radius: 50%;
+    color: #20cdb0;
+    font-size: .82rem;
+}
+
+.asada-dialog-content {
+    padding: 24px 22px 8px;
+}
+
+.asada-dialog-content h2 {
+    margin: 0 0 12px;
+    color: #ffffff;
+    font-size: 1.25rem;
+}
+
+.asada-dialog-content p {
+    margin: 0;
+    color: #e4e7ea;
+    font-size: 1rem;
+    line-height: 1.55;
+    white-space: pre-line;
+}
+
+.asada-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 18px 22px 22px;
+}
+
+.asada-accessibility-control {
+    transform-origin: bottom left !important;
+}
+
+html[data-theme="light"] .asada-dialog {
+    background: #ffffff;
+    border-color: #b8e8df;
+}
+
+html[data-theme="light"] .asada-dialog-content h2,
+html[data-theme="light"] .asada-dialog-brand {
+    color: #151719;
+}
+
+html[data-theme="light"] .asada-dialog-content p {
+    color: #3e464d;
+}
+
 
 /* =========================================================
    MENÚ LATERAL
