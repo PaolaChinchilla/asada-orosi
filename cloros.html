@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16181c">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css?v=20260925-12">
+    <link rel="stylesheet" href="css/seguridad.css?v=20260925-12">
+    <link rel="stylesheet" href="css/cloro_aforo.css?v=20260925-12">
+    <title>Listado de cloro | ASADA Orosi</title>
+    <link rel="icon" type="image/png" href="img/asadalogo.png">
+</head>
+
+<body>
+    <header class="topbar"><button type="button" class="menu-btn" onclick="toggleMenu()"
+            aria-label="Abrir menú de navegación">☰</button>
+        <div class="brand"><img src="img/asadalogo.png" alt="Logo ASADA Orosi" class="brand-logo"><span>ASADA
+                OROSI</span></div>
+    </header>
+    <aside id="sideMenu" class="side-menu"><a href="index.html">Inicio</a><a href="crear-cloro.html">Crear control de
+            cloro</a><a href="cloros.html">Listado de cloro</a><a href="crear-aforo.html">Crear aforo</a><a
+            href="aforos.html">Listado de aforos</a><a href="borradores.html">Ver borradores</a></aside>
+    <main class="page module-page">
+        <div class="nav-actions"><a href="index.html" class="btn-back">Volver al inicio</a></div>
+        <div class="page-head"><span class="eyebrow">CONSULTA</span>
+            <h1>Controles de cloro residual</h1>
+            <p>Consulte las sesiones de muestreo registradas.</p>
+        </div>
+        <div id="clorosPage">
+            <div class="empty-state">
+                <p>Cargando controles...</p>
+            </div>
+        </div>
+    </main>
+    <script src="js/avisos.js?v=20260925-12"></script>
+    <script src="js/app.js?v=20260925-12"></script>
+    <script src="js/cloro_aforo.js?v=20260925-12"></script>
+    <script src="js/seguridad.js?v=20260925-12"></script>
+</body>
+
+</html>
