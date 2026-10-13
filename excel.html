@@ -972,10 +972,11 @@
                     }
                 });
                 sheet.views = [{ state: "frozen", ySplit: 1 }];
-                sheet.autoFilter = {
-                    from: "A1",
-                    to: `${String.fromCharCode(64 + widths.length)}1`
-                };
+                let lastColumn = "";
+                for (let number = widths.length; number > 0; number = Math.floor((number - 1) / 26)) {
+                    lastColumn = String.fromCharCode(65 + ((number - 1) % 26)) + lastColumn;
+                }
+                sheet.autoFilter = { from: "A1", to: `${lastColumn}1` };
                 sheet.columns = widths.map(width => ({ width }));
             }
 
@@ -992,7 +993,7 @@
                 ];
                 return [
                     "ID del registro", "Zona", "Fecha y hora", "Condición del clima", "Quién realiza",
-                    "Ingresado por", "Punto de aforo", "Litros (L)", "Segundos toma 1", "Segundos toma 2", "Segundos toma 3", "Segundos toma 4", "Segundos toma 5", "Litros por segundo (L/s)", "Fecha y hora del punto", "Latitud", "Longitud",
+                    "Ingresado por", "Punto de aforo", "Litros (L)", "Segundos toma 1", "Segundos toma 2", "Segundos toma 3", "Segundos toma 4", "Segundos toma 5", ...Array.from({ length: 10 }, (_, take) => `Canal ${Math.floor(take / 5) + 2} - segundos toma ${(take % 5) + 1}`), "Litros por segundo (L/s)", "Fecha y hora del punto", "Latitud", "Longitud",
                     "Altitud (m)", "Precisión GPS (m)", "Se pudo realizar", "Observaciones", "Descargar PDF"
                 ];
             }
@@ -1000,7 +1001,7 @@
             function moduleExportWidthsASADA(kind) {
                 if (kind === "presion") return [16, 22, 18, 24, 30, 24, 10, 30, 14, 14, 24, 16, 16, 14, 16, 20, 36, 21];
                 if (kind === "cloro") return [16, 18, 22, 22, 30, 24, 30, 24, 14, 16, 12, 14, 16, 16, 16, 14, 16, 20, 36, 21];
-                return [16, 18, 22, 22, 22, 24, 30, 18, 18, 18, 18, 18, 18, 22, 24, 16, 16, 14, 16, 20, 36, 21];
+                return [16, 18, 22, 22, 22, 24, 30, 18, ...Array(15).fill(18), 22, 24, 16, 16, 14, 16, 20, 36, 21];
             }
 
             function combinedModuleObservationsASADA(record, row) {
@@ -1030,7 +1031,7 @@
                 return [
                     record.id || "", zone, record.fecha || "", record.condicionClima || "", record.perfil || "",
                     record.ingresadoPor || "", exportPlaceNameASADA(row), row.litros ?? row.caudalAforado ?? "",
-                    ...Array.from({ length: 5 }, (_, take) => row.segundos?.[take] ?? ""),
+                    ...Array.from({ length: 15 }, (_, take) => row.segundos?.[take] ?? ""),
                     row.litrosSegundo ?? "", row.fechaHora || "", row.latitud ?? "", row.longitud ?? "", row.altitud ?? "", row.precisionGps ?? "",
                     isNoRealizadoASADA(row.noRealizado) ? "No" : "Sí", combinedModuleObservationsASADA(record, row), report
                 ];

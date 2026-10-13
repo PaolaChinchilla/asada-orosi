@@ -3,7 +3,7 @@
    ========================================================= */
 
 const CACHE_NAME =
-    "asada-static-v149";
+    "asada-static-v150";
 
 const STATIC_FILES = [
 

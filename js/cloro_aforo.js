@@ -133,11 +133,16 @@
     }
 
     function aforoSeconds(row) {
-        return Array.isArray(row.segundos) ? row.segundos.join(" / ") : "—";
+        if (!Array.isArray(row.segundos)) return "—";
+        if (row.segundos.length === 15) {
+            return Array.from({ length: 3 }, (_, channel) =>
+                `Canal ${channel + 1}: ${row.segundos.slice(channel * 5, channel * 5 + 5).join(" / ")}`).join("\n");
+        }
+        return row.segundos.join(" / ");
     }
 
     function aforoTakeCount(site) {
-        return clean(site).toLocaleLowerCase("es-CR") === "truchas" ? 3 : 5;
+        return clean(site).toLocaleLowerCase("es-CR") === "truchas" ? 15 : 5;
     }
 
     function calculateAforoFlow(litros, segundos, site) {
@@ -146,7 +151,17 @@
         if (!Number.isFinite(volume) || volume <= 0 || segundos.length !== takeCount) return "";
         const times = segundos.map(value => clean(value) === "" ? NaN : Number(value));
         if (times.some(value => !Number.isFinite(value) || value <= 0)) return "";
-        return Number((times.reduce((sum, seconds) => sum + volume / seconds, 0) / takeCount).toFixed(6));
+        const channelFlows = aforoChannelFlows(volume, times, site);
+        return Number(channelFlows.reduce((sum, channel) => sum + channel.litrosSegundo, 0).toFixed(6));
+    }
+
+    function aforoChannelFlows(litros, segundos, site) {
+        const count = aforoTakeCount(site) === 15 ? 3 : 1;
+        return Array.from({ length: count }, (_, channel) => {
+            const times = segundos.slice(channel * 5, channel * 5 + 5).map(Number);
+            return { numero: channel + 1, segundos: times,
+                litrosSegundo: times.reduce((sum, seconds) => sum + Number(litros) / seconds, 0) / 5 };
+        });
     }
 
     function syncRecordDate(form, rows) {
@@ -258,7 +273,7 @@
         button.textContent = unavailable ? "Restablecer punto" : "No se pudo realizar";
         const definitions = kind === "cloro"
             ? [["turbiedad", "0"], ["cloro", "0"], ["ph", "0"], ["olor", "No aplica"], ["temperatura", "0"]]
-            : [["litros", ""], ...Array.from({ length: 5 }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
+            : [["litros", ""], ...Array.from({ length: aforoTakeCount((AFORO_SITES[valueFromForm(form, "[name=zona]")] || [])[index]) }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
         definitions.forEach(([name, defaultValue]) => {
             const input = form.querySelector(`[name="${name}_${index}"]`);
             if (!input) return;
@@ -501,6 +516,13 @@
             const volume = escapeHtml(unavailable ? "" : clean(row.litros));
             const seconds = Array.isArray(row.segundos) ? row.segundos : [];
             const takeCount = aforoTakeCount(site);
+            const renderTakes = (channel = 0) => `<div class="aforo-takes">${Array.from({ length: 5 }, (_, take) => {
+                const absolute = channel * 5 + take;
+                return `<label>Toma ${take + 1} · segundos<input type="number" min="0.000001" step="any" name="segundos${absolute + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1}${takeCount === 15 ? ` de canal ${channel + 1}` : ""} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[absolute]))}"${required}${disabled}></label>`;
+            }).join("")}</div>`;
+            const takesHtml = takeCount === 15
+                ? `<div class="aforo-channels">${Array.from({ length: 3 }, (_, channel) => `<fieldset class="aforo-channel"><legend>Canal ${channel + 1}</legend>${renderTakes(channel)}</fieldset>`).join("")}</div>`
+                : renderTakes();
             const litros = escapeHtml(unavailable ? "0" : stripUnit(row.litrosSegundo));
             const coordinates = unavailable
                 ? { latitud: 0, longitud: 0, altitud: 0, precisionGps: 0 }
@@ -509,7 +531,7 @@
                 <tr>
                     <th scope="row">${escapeHtml(site)}</th>
                     <td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td>
-                    <td><div class="aforo-takes">${Array.from({ length: takeCount }, (_, take) => `<label>Toma ${take + 1} · segundos<input type="number" min="0.000001" step="any" name="segundos${take + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[take]))}"${required}${disabled}></label>`).join("")}</div></td>
+                    <td>${takesHtml}</td>
                     <td><div class="module-unit-input"><input type="number" min="0" step="any" name="litrosSegundo_${index}" inputmode="decimal" aria-label="Litros por segundo (L/s) de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
                     <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : pointDateTime(row, valueFromForm(form, "[name=fecha]")))}"${required}${disabled}></td>
                     <td class="sample-coordinate-cell">
@@ -543,6 +565,8 @@
                 lugar,
                 litros: noRealizado ? "" : get("litros"),
                 segundos: noRealizado ? [] : segundos,
+                canales: !noRealizado && litrosSegundo !== "" && aforoTakeCount(lugar) === 15
+                    ? aforoChannelFlows(get("litros"), segundos, lugar).map(channel => ({ ...channel, litrosSegundo: Number(channel.litrosSegundo.toFixed(6)) })) : [],
                 litrosSegundo,
                 fechaHora: noRealizado ? "" : get("fechaHora"),
                 latitud: noRealizado ? "0" : get("latitudAforo"),
@@ -954,7 +978,7 @@
                     altitud: primaryCoordinates.altitud || "",
                     precisionGps: primaryCoordinates.precisionGps || "",
                     muestras: samples,
-                    responsableCampo: valueFromForm(form, "[name=responsableCampo]"),
+
                     ingresadoPor: valueFromForm(form, "[name=ingresadoPor]"),
                     observaciones: valueFromForm(form, "[name=observaciones]")
                 };
@@ -1059,7 +1083,7 @@
             form.querySelector("[name=id]").value = record.id;
             form.querySelector("[name=zona]").value = record.zona;
             form.querySelector("[name=fechaMuestreo]").value = dateInputValue(record.fechaMuestreo);
-            form.querySelector("[name=responsableCampo]").value = record.responsableCampo || "";
+
             form.querySelector("[name=perfil]").value = record.perfil || "";
             form.querySelector("[name=ingresadoPor]").value = record.ingresadoPor || "";
             form.querySelector("[name=observaciones]").value = record.observaciones || "";
@@ -1172,7 +1196,7 @@
                     condicionClima: valueFromForm(form, "[name=condicionClima]"),
                     perfil: valueFromForm(form, "[name=perfil]"),
                     mediciones: measurements,
-                    responsableCampo: valueFromForm(form, "[name=responsableCampo]"),
+
                     ingresadoPor: valueFromForm(form, "[name=ingresadoPor]"),
                     observaciones: valueFromForm(form, "[name=observaciones]")
                 };
@@ -1277,7 +1301,7 @@
             form.querySelector("[name=zona]").value = record.zona;
             form.querySelector("[name=fecha]").value = dateInputValue(record.fecha);
             form.querySelector("[name=condicionClima]").value = record.condicionClima || "";
-            form.querySelector("[name=responsableCampo]").value = record.responsableCampo || "";
+
             form.querySelector("[name=perfil]").value = record.perfil || "";
             form.querySelector("[name=ingresadoPor]").value = record.ingresadoPor || "";
             form.querySelector("[name=observaciones]").value = record.observaciones || "";
@@ -1355,8 +1379,7 @@
             moduleListRecordMatches(record, filters, {
                 id: value => value.id,
                 zona: value => value.zona,
-                quienRealiza: value => value.perfil,
-                responsable: value => value.responsableCampo
+                quienRealiza: value => value.perfil
             }) && modulePointRowsMatch(record.muestras, filters, {
                 lugar: row => row?.lugar,
                 olor: row => row?.olor,
@@ -1391,7 +1414,6 @@
                 id: value => value.id,
                 zona: value => value.zona,
                 clima: value => value.condicionClima,
-                responsable: value => value.responsableCampo,
                 ingresadoPor: value => value.ingresadoPor
             }) && modulePointRowsMatch(record.mediciones, filters, {
                 punto: row => row?.lugar,
