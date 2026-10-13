@@ -139,6 +139,17 @@
         return `X/Longitud: ${lng} · Y/Latitud: ${lat}\nAltitud: ${alt || "No disponible"} m · Precisión: ${accuracy || "No disponible"} m`;
     }
 
+    function formatPdfCoordinates(row) {
+        const lat = numberText(row?.latitud, 7);
+        const lng = numberText(row?.longitud, 7);
+        if (!lat || !lng) return "Sin coordenadas";
+        const alt = numberText(row?.altitud, 2);
+        const accuracy = numberText(row?.precisionGps, 2);
+        return [`X/Longitud: ${lng}`, `Y/Latitud: ${lat}`,
+            alt ? `Altitud: ${alt}\u00a0m` : "Altitud: No disponible",
+            accuracy ? `Precisión: ${accuracy}\u00a0m` : "Precisión: No disponible"].join("\n");
+    }
+
     function buildRows(form, existingRows) {
         const tbody = form.querySelector("[data-presion-rows]");
         if (!tbody) return;
@@ -359,7 +370,7 @@
             clean(row.presionPsi),
             formatPressureMca(row.presionPsi),
             displayPointDateTime(row),
-            formatCoordinates(row),
+            formatPdfCoordinates(row),
             isNoRealizado(row.noRealizado) ? "No" : "Sí",
             pressureReportPointObservation_(record, row)
         ]);
@@ -431,6 +442,7 @@
             head: [["Ruta", "Lugar de medición", "Presión\nPSI", "Presión\nMCA", "Fecha y hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"]],
             body: reportRows(record),
             theme: "grid",
+            rowPageBreak: "avoid",
             styles: {
                 font: "helvetica",
                 fontSize: 9.5,
@@ -448,13 +460,13 @@
             margin: { left: 18, right: 18, bottom: 16 },
             columnStyles: {
                 0: { cellWidth: 16, halign: "center" },
-                1: { cellWidth: 43 },
-                2: { cellWidth: 21, halign: "center" },
-                3: { cellWidth: 22, halign: "center" },
-                4: { cellWidth: 28, halign: "center" },
-                5: { cellWidth: 39 },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 19, halign: "center" },
+                3: { cellWidth: 20, halign: "center" },
+                4: { cellWidth: 29, halign: "center" },
+                5: { cellWidth: 48 },
                 6: { cellWidth: 23, halign: "center" },
-                7: { cellWidth: 51 }
+                7: { cellWidth: 48 }
             },
             didDrawPage: () => {
                 doc.setFont("helvetica", "normal");

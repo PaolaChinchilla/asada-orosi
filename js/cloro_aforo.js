@@ -98,6 +98,7 @@
     }
 
     function formatDate(value) {
+        if (!clean(value)) return "Sin fecha";
         const date = new Date(value || 0);
         return Number.isFinite(date.getTime())
             ? new Intl.DateTimeFormat("es-CR", { dateStyle: "medium", timeStyle: "short" }).format(date)
@@ -135,12 +136,17 @@
         return Array.isArray(row.segundos) ? row.segundos.join(" / ") : "—";
     }
 
-    function calculateAforoFlow(litros, segundos) {
+    function aforoTakeCount(site) {
+        return clean(site).toLocaleLowerCase("es-CR") === "truchas" ? 3 : 5;
+    }
+
+    function calculateAforoFlow(litros, segundos, site) {
+        const takeCount = aforoTakeCount(site);
         const volume = clean(litros) === "" ? NaN : Number(litros);
-        if (!Number.isFinite(volume) || volume <= 0 || segundos.length !== 5) return "";
+        if (!Number.isFinite(volume) || volume <= 0 || segundos.length !== takeCount) return "";
         const times = segundos.map(value => clean(value) === "" ? NaN : Number(value));
         if (times.some(value => !Number.isFinite(value) || value <= 0)) return "";
-        return Number((times.reduce((sum, seconds) => sum + volume / seconds, 0) / 5).toFixed(6));
+        return Number((times.reduce((sum, seconds) => sum + volume / seconds, 0) / takeCount).toFixed(6));
     }
 
     function syncRecordDate(form, rows) {
@@ -262,6 +268,10 @@
             input.disabled = unavailable;
             input.required = !unavailable && name !== "litrosSegundo";
         });
+        if (kind === "aforo") {
+            const date = form.querySelector(`[name="fechaHora_${index}"]`);
+            if (date) { date.disabled = unavailable; date.required = !unavailable; }
+        }
         const coordinateNames = kind === "cloro"
             ? ["latitud", "longitud", "altitud", "precisionGps"]
             : ["latitudAforo", "longitudAforo", "altitudAforo", "precisionGpsAforo"];
@@ -296,6 +306,21 @@
             accuracy ? `Precisión: ${accuracy} m` : ""
         ].filter(Boolean).join(" · ");
         return [position, elevation].filter(Boolean).join("\n") || "Sin coordenadas";
+    }
+
+    function formatPdfCoordinates(sample) {
+        const values = [
+            ["X/Longitud", clean(sample?.longitud), ""],
+            ["Y/Latitud", clean(sample?.latitud), ""],
+            ["Altitud", clean(sample?.altitud), "\u00a0m"],
+            ["Precisión", clean(sample?.precisionGps), "\u00a0m"]
+        ];
+        return values.filter(([, value]) => value !== "")
+            .map(([label, value, unit]) => `${label}: ${value}${unit}`).join("\n") || "Sin coordenadas";
+    }
+
+    function displayAforoPointDateTime(row) {
+        return isNoRealizado(row.noRealizado) ? "No aplica" : displayPointDateTime(row);
     }
 
     function sampleHasCoordinates(sample) {
@@ -475,6 +500,7 @@
             const disabled = unavailable ? " disabled" : "";
             const volume = escapeHtml(unavailable ? "" : clean(row.litros));
             const seconds = Array.isArray(row.segundos) ? row.segundos : [];
+            const takeCount = aforoTakeCount(site);
             const litros = escapeHtml(unavailable ? "0" : stripUnit(row.litrosSegundo));
             const coordinates = unavailable
                 ? { latitud: 0, longitud: 0, altitud: 0, precisionGps: 0 }
@@ -483,9 +509,9 @@
                 <tr>
                     <th scope="row">${escapeHtml(site)}</th>
                     <td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td>
-                    <td><div class="aforo-takes">${Array.from({ length: 5 }, (_, take) => `<label>Toma ${take + 1}<input type="number" min="0.000001" step="any" name="segundos${take + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[take]))}"${required}${disabled}></label>`).join("")}</div></td>
+                    <td><div class="aforo-takes">${Array.from({ length: takeCount }, (_, take) => `<label>Toma ${take + 1} · segundos<input type="number" min="0.000001" step="any" name="segundos${take + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[take]))}"${required}${disabled}></label>`).join("")}</div></td>
                     <td><div class="module-unit-input"><input type="number" min="0" step="any" name="litrosSegundo_${index}" inputmode="decimal" aria-label="Litros por segundo (L/s) de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
-                    <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(pointDateTime(row, valueFromForm(form, "[name=fecha]")))}" required></td>
+                    <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : pointDateTime(row, valueFromForm(form, "[name=fecha]")))}"${required}${disabled}></td>
                     <td class="sample-coordinate-cell">
                         <input type="hidden" name="latitudAforo_${index}" value="${escapeHtml(clean(coordinates.latitud))}">
                         <input type="hidden" name="longitudAforo_${index}" value="${escapeHtml(clean(coordinates.longitud))}">
@@ -509,8 +535,8 @@
             const button = form.querySelector(`[data-aforo-no-realizado-index="${index}"]`);
             const noRealizado = button?.dataset.noRealizado === "true";
             const get = name => valueFromForm(form, `[name="${name}_${index}"]`);
-            const segundos = Array.from({ length: 5 }, (_, take) => get("segundos" + (take + 1)));
-            const litrosSegundo = noRealizado ? "0" : calculateAforoFlow(get("litros"), segundos);
+            const segundos = Array.from({ length: aforoTakeCount(lugar) }, (_, take) => get("segundos" + (take + 1)));
+            const litrosSegundo = noRealizado ? "0" : calculateAforoFlow(get("litros"), segundos, lugar);
             const result = form.querySelector(`[name="litrosSegundo_${index}"]`);
             if (result) result.value = litrosSegundo;
             return {
@@ -518,7 +544,7 @@
                 litros: noRealizado ? "" : get("litros"),
                 segundos: noRealizado ? [] : segundos,
                 litrosSegundo,
-                fechaHora: get("fechaHora"),
+                fechaHora: noRealizado ? "" : get("fechaHora"),
                 latitud: noRealizado ? "0" : get("latitudAforo"),
                 longitud: noRealizado ? "0" : get("longitudAforo"),
                 altitud: noRealizado ? "0" : get("altitudAforo"),
@@ -1507,7 +1533,7 @@
                 <div><dt>Ingresado al sistema por</dt><dd>${escapeHtml(record.ingresadoPor || "")}</dd></div>
                 ${clean(record.observaciones) ? `<div><dt>Observaciones</dt><dd>${escapeHtml(record.observaciones).replace(/\r?\n/g, "<br>")}</dd></div>` : ""}
             </dl></section>
-            <section class="detail-card module-detail-card"><h2>Puntos aforados</h2>${detailTable(measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Punto", "Litros (L)", "Segundos (5 tomas)", "Litros por segundo (L/s)", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
+            <section class="detail-card module-detail-card"><h2>Puntos aforados</h2>${detailTable(measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayAforoPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Punto", "Litros (L)", "Segundos (tomas)", "Litros por segundo (L/s)", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
             <div class="detail-actions module-actions"><button type="button" class="btn primary" data-download-aforo>Descargar PDF</button><a class="btn secondary" href="crear-aforo.html?id=${encodeURIComponent(record.id)}">Editar</a><a class="btn secondary" href="aforos.html">Volver al listado</a></div>`;
         bindReportPdfButton(root, "[data-download-aforo]", "aforo", () => downloadAforoPdf(record));
     }
@@ -1680,6 +1706,7 @@
             head: [tableHeaders],
             body: rows,
             theme: "grid",
+            rowPageBreak: "avoid",
             styles: {
                 fontSize: tableFontSize,
                 cellPadding: Number(options.cellPadding) || (options.compact ? 1.6 : 2.2),
@@ -1690,7 +1717,7 @@
                 textColor: 255,
                 fontSize: Number(options.headFontSize) || tableFontSize
             },
-            margin: { left: 18, right: 18 },
+            margin: { left: 18, right: 18, bottom: 16 },
             columnStyles: options.columnStyles || undefined
         });
         doc.setFont("helvetica", "normal");
@@ -1716,7 +1743,7 @@
 
     async function downloadCloroPdf(record, settings = {}) {
         const samples = record.muestras || [];
-        const rows = samples.map(row => [row.lugar, isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.turbiedad, "NTU"), isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.cloro, "mg/L"), row.ph, row.olor, row.temperatura, displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
+        const rows = samples.map(row => [row.lugar, isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.turbiedad, "NTU"), isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.cloro, "mg/L"), row.ph, row.olor, row.temperatura, displayPointDateTime(row), formatPdfCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
         const details = [["Quién realiza", record.perfil], ["Ingresado al sistema por", record.ingresadoPor || "____________________"]];
         if (clean(record.observaciones) && !reportHasUnperformedPoint(samples)) details.push(["Observaciones", record.observaciones]);
         return await createPdf(
@@ -1746,16 +1773,16 @@
                 headFontSize: 9.5,
                 cellPadding: 3,
                 columnStyles: {
-                    0: { cellWidth: 28 },
-                    1: { cellWidth: 27 },
-                    2: { cellWidth: 20 },
+                    0: { cellWidth: 26 },
+                    1: { cellWidth: 22 },
+                    2: { cellWidth: 18 },
                     3: { cellWidth: 12 },
                     4: { cellWidth: 17 },
                     5: { cellWidth: 29 },
-                    6: { cellWidth: 28 },
-                    7: { cellWidth: 27 },
-                    8: { cellWidth: 22 },
-                    9: { cellWidth: 33 }
+                    6: { cellWidth: 26 },
+                    7: { cellWidth: 39 },
+                    8: { cellWidth: 20 },
+                    9: { cellWidth: 34 }
                 }
             }
         );
@@ -1763,14 +1790,14 @@
 
     async function downloadAforoPdf(record, settings = {}) {
         const measurements = record.mediciones || [];
-        const rows = measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
+        const rows = measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayAforoPointDateTime(row), formatPdfCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
         const details = [["Condición del clima", record.condicionClima], ["Quién realiza", record.perfil], ["Ingresado al sistema por", record.ingresadoPor || "____________________"]];
         if (clean(record.observaciones) && !reportHasUnperformedPoint(measurements)) details.push(["Observaciones", record.observaciones]);
         return await createPdf(
             "Hoja de registro de aforos",
             `${record.zona} · ${formatDate(record.fecha)} · ID ${record.id}`,
             rows,
-            ["Punto", "Litros (L)", "Segundos\n(5 tomas)", "Litros por segundo\n(L/s)", "Fecha y hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"],
+            ["Punto", "Litros (L)", "Segundos\n(tomas)", "Litros por segundo\n(L/s)", "Fecha y hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"],
             `Reporte_Aforo_${record.id}.pdf`,
             details,
             {
@@ -1796,14 +1823,14 @@
                 headFontSize: 10,
                 cellPadding: 3,
                 columnStyles: {
-                    0: { cellWidth: 37 },
-                    1: { cellWidth: 20 },
-                    2: { cellWidth: 31 },
-                    3: { cellWidth: 28 },
+                    0: { cellWidth: 34 },
+                    1: { cellWidth: 17 },
+                    2: { cellWidth: 28 },
+                    3: { cellWidth: 25 },
                     4: { cellWidth: 32 },
-                    5: { cellWidth: 45 },
+                    5: { cellWidth: 50 },
                     6: { cellWidth: 20 },
-                    7: { cellWidth: 30 }
+                    7: { cellWidth: 37 }
                 }
             }
         );
