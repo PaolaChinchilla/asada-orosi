@@ -1526,6 +1526,7 @@
             }
         );
 
+        form.dataset.previstaRedAnterior = factibilidadRadioValue(form, "existePrevistaRed");
         factibilidadSyncConditions();
     }
 
@@ -1622,16 +1623,13 @@
                 const isNoNetwork =
                     network === "No";
 
-                if (isNoNetwork) {
+                if (isNoNetwork && (form.dataset.previstaRedAnterior !== "No" || !control.value)) {
                     control.value =
                         networkDefaults[name];
-                    control.disabled = true;
-                    control.required = false;
-                    return;
                 }
 
                 control.disabled = false;
-                control.required = true;
+                control.required = !isNoNetwork;
 
                 if (
                     network === "Si" &&
@@ -1641,6 +1639,7 @@
                 }
             }
         );
+        form.dataset.previstaRedAnterior = network;
     }
 
 
@@ -1828,6 +1827,7 @@
         }
 
 
+        form.dataset.previstaRedAnterior = factibilidadRadioValue(form, "existePrevistaRed");
         factibilidadSyncConditions();
     }
 
@@ -1844,6 +1844,7 @@
             form.elements.precisionGPS.required = false;
         }
 
+        form.dataset.previstaRedAnterior = factibilidadRadioValue(form, "existePrevistaRed");
         factibilidadSyncConditions();
 
         if (

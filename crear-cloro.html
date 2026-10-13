@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/style.css?v=20260925-13">
     <link rel="stylesheet" href="css/seguridad.css?v=20260929-1">
-    <link rel="stylesheet" href="css/cloro_aforo.css?v=20260929-4">
+    <link rel="stylesheet" href="css/cloro_aforo.css?v=20261013-1">
     <title>Crear control de cloro | ASADA Orosi</title>
     <link rel="icon" type="image/png" href="img/asadalogo.png">
 </head>
@@ -36,7 +36,7 @@
         <div class="nav-actions"><a href="index.html" class="btn-back">Volver al inicio</a></div>
         <div class="page-head"><span class="eyebrow">CONTROL OPERATIVO</span>
             <h1>Registrar cloro residual</h1>
-            <p>Complete una sesión de muestreo. La fecha y hora se colocan automáticamente. En cada punto pulse «Mi ubicación» para guardar sus coordenadas. Si no se pudo realizar, márquelo y, en Observaciones, indique el lugar o los lugares y el motivo.</p>
+            <p>Complete una sesión de muestreo. Indique manualmente la fecha y hora en cada punto. En cada punto pulse «Mi ubicación» para guardar sus coordenadas. Si no se pudo realizar, márquelo y, en Observaciones, indique el lugar o los lugares y el motivo.</p>
         </div>
         <form id="cloroForm" class="form-shell module-form-shell module-cloro-form">
             <input type="hidden" name="id">
@@ -49,11 +49,10 @@
                             <option>Orosi</option>
                             <option>Alto de Araya</option>
                         </select></label>
-                    <label>Fecha y hora de muestreo<input type="datetime-local" name="fechaMuestreo" readonly required></label>
+                    <input type="hidden" name="fechaMuestreo">
                     <label>Quién realiza<input name="perfil" required placeholder="Escriba el nombre de quien realiza"></label>
-                    <label>Responsable de campo<input name="responsableCampo"
-                            required placeholder="Escriba el nombre del responsable"></label>
-                    <label>Ingresado al sistema por<input name="ingresadoPor" required
+                    <input type="hidden" name="responsableCampo">
+                    <label>Ingresado al sistema por (opcional)<input name="ingresadoPor"
                             placeholder="Escriba el nombre de quien ingresa"></label>
                 </div>
             </section>
@@ -69,7 +68,7 @@
                                 <th>PH</th>
                                 <th>Olor</th>
                                 <th>Temperatura</th>
-                                <th>Hora</th>
+                                <th>Fecha y hora</th>
                                 <th>Coordenadas</th>
                                 <th>Resultado del muestreo</th>
                             </tr>
@@ -94,9 +93,9 @@
         </form>
     </main>
     <script src="js/avisos.js?v=20260925-13"></script>
-    <script src="js/app.js?v=20260928-4"></script>
-    <script src="js/cloro_aforo.js?v=20260929-8"></script>
-    <script src="js/seguridad.js?v=20261002-1"></script>
+    <script src="js/app.js?v=20261013-1"></script>
+    <script src="js/cloro_aforo.js?v=20261013-1"></script>
+    <script src="js/seguridad.js?v=20261013-1"></script>
 </body>
 
 </html>

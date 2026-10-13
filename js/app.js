@@ -470,6 +470,15 @@ function toggleMenu() {
     }
 }
 
+// Cerrar el menú al pulsar fuera de él, también en pantallas táctiles.
+document.addEventListener("click", event => {
+    const menu = document.getElementById("sideMenu");
+    if (menu?.classList.contains("open") && !menu.contains(event.target) &&
+        !event.target.closest(".menu-btn")) {
+        menu.classList.remove("open");
+    }
+});
+
 /* =========================================================
    ESTADO DE CONEXIÓN
    ========================================================= */

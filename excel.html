@@ -310,7 +310,7 @@
          ===================================================== -->
 
     <script src="js/avisos.js?v=20260925-13"></script>
-    <script src="js/app.js?v=20260928-4"></script>
+    <script src="js/app.js?v=20261013-1"></script>
 
 
 
@@ -966,9 +966,9 @@
                     if (reportCell.value && reportCell.value.hyperlink) {
                         reportCell.font = { color: { argb: "FF0563C1" }, underline: true };
                     }
-                    // En el Excel de controles de cloro, Cloro (mg/L) está en la columna K.
+                    // La columna de cloro conserva sus colores con la nueva distribución.
                     if (kind === "cloro") {
-                        styleCloroResultCellASADA(row.getCell(11));
+                        styleCloroResultCellASADA(row.getCell(moduleExportHeadersASADA(kind).indexOf("Cloro (mg/L)") + 1));
                     }
                 });
                 sheet.views = [{ state: "frozen", ySplit: 1 }];
@@ -981,26 +981,26 @@
 
             function moduleExportHeadersASADA(kind) {
                 if (kind === "presion") return [
-                    "ID del registro", "Fecha y hora del control", "Zona", "Responsable", "Correo", "Ingresado por",
-                    "Ruta", "Lugar de medición", "Presión PSI", "Presión MCA", "Hora del punto", "Latitud", "Longitud",
+                    "ID del registro", "Fecha y hora del control", "Zona", "Quién realiza", "Correo", "Ingresado por",
+                    "Ruta", "Lugar de medición", "Presión PSI", "Presión MCA", "Fecha y hora del punto", "Latitud", "Longitud",
                     "Altitud (m)", "Precisión GPS (m)", "Se pudo realizar", "Observaciones", "Descargar PDF"
                 ];
                 if (kind === "cloro") return [
-                    "ID del registro", "Zona", "Fecha de muestreo", "Perfil", "Responsable de campo", "Correo", "Ingresado por",
-                    "Lugar", "Hora", "Turbiedad", "Cloro (mg/L)", "pH", "Olor", "Temperatura", "Latitud", "Longitud",
+                    "ID del registro", "Zona", "Fecha de muestreo", "Quién realiza", "Correo", "Ingresado por",
+                    "Lugar", "Fecha y hora del punto", "Turbiedad", "Cloro (mg/L)", "pH", "Olor", "Temperatura", "Latitud", "Longitud",
                     "Altitud (m)", "Precisión GPS (m)", "Se pudo realizar", "Observaciones", "Descargar PDF"
                 ];
                 return [
-                    "ID del registro", "Zona", "Fecha y hora", "Condición del clima", "Quién realiza", "Responsable de campo",
-                    "Ingresado por", "Punto de aforo", "Caudal aforado", "Litros por segundo (L/s)", "Latitud", "Longitud",
+                    "ID del registro", "Zona", "Fecha y hora", "Condición del clima", "Quién realiza",
+                    "Ingresado por", "Punto de aforo", "Litros (L)", "Segundos toma 1", "Segundos toma 2", "Segundos toma 3", "Segundos toma 4", "Segundos toma 5", "Litros por segundo (L/s)", "Fecha y hora del punto", "Latitud", "Longitud",
                     "Altitud (m)", "Precisión GPS (m)", "Se pudo realizar", "Observaciones", "Descargar PDF"
                 ];
             }
 
             function moduleExportWidthsASADA(kind) {
-                if (kind === "presion") return [16, 22, 18, 24, 30, 24, 10, 30, 14, 14, 14, 16, 16, 14, 16, 20, 36, 21];
-                if (kind === "cloro") return [16, 18, 22, 22, 24, 30, 24, 30, 14, 14, 16, 12, 14, 16, 16, 16, 14, 16, 20, 36, 21];
-                return [16, 18, 22, 22, 22, 24, 24, 30, 18, 22, 16, 16, 14, 16, 20, 36, 21];
+                if (kind === "presion") return [16, 22, 18, 24, 30, 24, 10, 30, 14, 14, 24, 16, 16, 14, 16, 20, 36, 21];
+                if (kind === "cloro") return [16, 18, 22, 22, 30, 24, 30, 24, 14, 16, 12, 14, 16, 16, 16, 14, 16, 20, 36, 21];
+                return [16, 18, 22, 22, 22, 24, 30, 18, 18, 18, 18, 18, 18, 22, 24, 16, 16, 14, 16, 20, 36, 21];
             }
 
             function combinedModuleObservationsASADA(record, row) {
@@ -1015,13 +1015,13 @@
                 if (kind === "presion") return [
                     record.id || "", record.fecha || "", zone, record.responsable || "", record.correo || "", record.ingresadoPor || "",
                     row.ruta || exportPressurePointASADA(row)?.ruta || "", exportPlaceNameASADA(row), row.presionPsi ?? "",
-                    row.presionMca ?? "", row.hora || "", row.latitud ?? "", row.longitud ?? "", row.altitud ?? "",
+                    row.presionMca ?? "", row.fechaHora || row.hora || "", row.latitud ?? "", row.longitud ?? "", row.altitud ?? "",
                     row.precisionGps ?? "", isNoRealizadoASADA(row.noRealizado) ? "No" : "Sí",
                     combinedModuleObservationsASADA(record, row), report
                 ];
                 if (kind === "cloro") return [
-                    record.id || "", zone, record.fechaMuestreo || "", record.perfil || "", record.responsableCampo || "",
-                    record.correo || "", record.ingresadoPor || "", exportPlaceNameASADA(row), row.hora || "", row.turbiedad ?? "",
+                    record.id || "", zone, record.fechaMuestreo || "", record.perfil || "",
+                    record.correo || "", record.ingresadoPor || "", exportPlaceNameASADA(row), row.fechaHora || row.hora || "", row.turbiedad ?? "",
                     row.cloro ?? "", row.ph ?? row.pH ?? "", row.olor || "", row.temperatura ?? "",
                     row.latitud ?? record.latitud ?? "", row.longitud ?? record.longitud ?? "",
                     row.altitud ?? record.altitud ?? "", row.precisionGps ?? record.precisionGps ?? "",
@@ -1029,8 +1029,9 @@
                 ];
                 return [
                     record.id || "", zone, record.fecha || "", record.condicionClima || "", record.perfil || "",
-                    record.responsableCampo || "", record.ingresadoPor || "", exportPlaceNameASADA(row), row.caudalAforado ?? "",
-                    row.litrosSegundo ?? "", row.latitud ?? "", row.longitud ?? "", row.altitud ?? "", row.precisionGps ?? "",
+                    record.ingresadoPor || "", exportPlaceNameASADA(row), row.litros ?? row.caudalAforado ?? "",
+                    ...Array.from({ length: 5 }, (_, take) => row.segundos?.[take] ?? ""),
+                    row.litrosSegundo ?? "", row.fechaHora || "", row.latitud ?? "", row.longitud ?? "", row.altitud ?? "", row.precisionGps ?? "",
                     isNoRealizadoASADA(row.noRealizado) ? "No" : "Sí", combinedModuleObservationsASADA(record, row), report
                 ];
             }
@@ -3008,7 +3009,7 @@
 
     </script>
 
-    <script src="js/seguridad.js?v=20261002-1"></script>
+    <script src="js/seguridad.js?v=20261013-1"></script>
 
 
 </body>

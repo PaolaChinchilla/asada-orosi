@@ -93,6 +93,18 @@
             : "Sin fecha";
     }
 
+    function pointDateTime(row, recordDate) {
+        if (clean(row.fechaHora)) return clean(row.fechaHora);
+        if (!row.lugar || !clean(recordDate)) return "";
+        const date = localDateTimeValue(recordDate);
+        return /^\d{2}:\d{2}$/.test(clean(row.hora))
+            ? `${date.slice(0, 10)}T${row.hora}` : date;
+    }
+
+    function displayPointDateTime(row) {
+        return clean(row.fechaHora) ? formatDate(row.fechaHora) : clean(row.hora) || "—";
+    }
+
     function currentUserName() {
         const user = window.ASADA_USER || {};
         return clean(user.name) || clean(user.email) || "Usuario";
@@ -151,7 +163,7 @@
                     <td>${escapeHtml(point.lugar)}</td>
                     <td><input type="number" min="0" max="500" step="0.01" inputmode="decimal" name="psi_${index}" aria-label="Presión PSI de ${escapeHtml(point.lugar)}" value="${escapeHtml(psi)}"${required}${disabled}></td>
                     <td><output class="pressure-mca-output" data-pressure-mca="${index}">${escapeHtml(mca || "—")}</output></td>
-                    <td><input type="${unavailable ? "text" : "time"}" name="hora_${index}" aria-label="Hora de ${escapeHtml(point.lugar)}" value="${escapeHtml(unavailable ? "No aplica" : clean(row.hora))}"${required}${disabled}></td>
+                    <td><input type="datetime-local" name="fechaHora_${index}" aria-label="Fecha y hora de ${escapeHtml(point.lugar)}" value="${escapeHtml(pointDateTime(row, form.querySelector('[name="fecha"]')?.value))}" required></td>
                     <td class="sample-coordinate-cell pressure-coordinate-cell">
                         <input type="hidden" name="latitud_${index}" value="${escapeHtml(clean(coordinates.latitud))}">
                         <input type="hidden" name="longitud_${index}" value="${escapeHtml(clean(coordinates.longitud))}">
@@ -176,18 +188,10 @@
         button.setAttribute("aria-pressed", String(unavailable));
         button.textContent = unavailable ? "Restablecer punto" : "No se pudo realizar";
         const psi = form.querySelector(`[name="psi_${index}"]`);
-        const hour = form.querySelector(`[name="hora_${index}"]`);
         if (psi) {
             psi.value = unavailable ? "0" : "";
             psi.disabled = unavailable;
             psi.required = !unavailable;
-        }
-        if (hour) {
-            if (unavailable && hour.type === "time") hour.type = "text";
-            if (!unavailable && hour.type === "text") hour.type = "time";
-            hour.value = unavailable ? "No aplica" : "";
-            hour.disabled = unavailable;
-            hour.required = !unavailable;
         }
         ["latitud", "longitud", "altitud", "precisionGps"].forEach(name => {
             const input = form.querySelector(`[name="${name}_${index}"]`);
@@ -223,7 +227,8 @@
                 lugar: point.lugar,
                 presionPsi: noRealizado ? 0 : psi,
                 presionMca: Number.isFinite(psiNumber) ? Number((psiNumber / MCA_FACTOR).toFixed(2)) : "",
-                hora: noRealizado ? "No aplica" : get("hora"),
+                fechaHora: get("fechaHora"),
+                hora: noRealizado ? "No aplica" : get("fechaHora").slice(11, 16),
                 latitud: noRealizado ? 0 : get("latitud"),
                 longitud: noRealizado ? 0 : get("longitud"),
                 altitud: noRealizado ? 0 : get("altitud"),
@@ -234,6 +239,8 @@
         });
         const hidden = form.querySelector('[name="medicionesJson"]');
         if (hidden) hidden.value = JSON.stringify(rows);
+        const dateInput = form.querySelector('[name="fecha"]');
+        if (dateInput) dateInput.value = rows.find(row => clean(row.fechaHora))?.fechaHora || "";
         return rows;
     }
 
@@ -351,7 +358,7 @@
             row.lugar,
             clean(row.presionPsi),
             formatPressureMca(row.presionPsi),
-            clean(row.hora),
+            displayPointDateTime(row),
             formatCoordinates(row),
             isNoRealizado(row.noRealizado) ? "No" : "Sí",
             pressureReportPointObservation_(record, row)
@@ -413,15 +420,15 @@
             doc.text(lines, valueX, y);
             return Math.max(7, lines.length * 7);
         };
-        let detailsHeight = detailLine("Responsable", record.responsable, 68);
-        detailsHeight += detailLine("Ingresado por", record.ingresadoPor, 68 + detailsHeight);
+        let detailsHeight = detailLine("Quién realiza", record.responsable, 68);
+        detailsHeight += detailLine("Ingresado al sistema por", record.ingresadoPor || "____________________", 68 + detailsHeight);
         if (clean(record.observaciones) && !pressureReportHasUnperformedPoint_(record)) {
             detailsHeight += detailLine("Observaciones", record.observaciones, 68 + detailsHeight);
         }
 
         doc.autoTable({
             startY: 68 + detailsHeight + 4,
-            head: [["Ruta", "Lugar de medición", "Presión\nPSI", "Presión\nMCA", "Hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"]],
+            head: [["Ruta", "Lugar de medición", "Presión\nPSI", "Presión\nMCA", "Fecha y hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"]],
             body: reportRows(record),
             theme: "grid",
             styles: {
@@ -444,8 +451,8 @@
                 1: { cellWidth: 43 },
                 2: { cellWidth: 21, halign: "center" },
                 3: { cellWidth: 22, halign: "center" },
-                4: { cellWidth: 19, halign: "center" },
-                5: { cellWidth: 48 },
+                4: { cellWidth: 28, halign: "center" },
+                5: { cellWidth: 39 },
                 6: { cellWidth: 23, halign: "center" },
                 7: { cellWidth: 51 }
             },
@@ -484,7 +491,7 @@
         return `<article class="record-card module-card">
             <div class="record-card-top"><div><span class="eyebrow">CONTROL DE PRESIONES</span><h2>${escapeHtml(record.id)}</h2></div></div>
             <div class="pressure-card-meta">
-                <div><span>Responsable</span><strong>${escapeHtml(record.responsable || "No indicado")}</strong></div>
+                <div><span>Quién realiza</span><strong>${escapeHtml(record.responsable || "No indicado")}</strong></div>
                 <div><span>Fecha y hora</span><strong>${escapeHtml(formatDate(record.fecha))}</strong></div>
                 <div><span>Puntos registrados</span><strong>${escapeHtml(String(record.mediciones?.length || 0))} · Rutas ${escapeHtml(routes || "—")}</strong></div>
             </div>
@@ -559,12 +566,12 @@
             row.lugar,
             row.presionPsi,
             formatPressureMca(row.presionPsi),
-            row.hora,
+            displayPointDateTime(row),
             formatCoordinates(row),
             isNoRealizado(row.noRealizado) ? "No" : "Sí",
             pressureDetailPointObservation_(record, row)
         ]);
-        const headers = ["Ruta", "Lugar de medición", "Presión PSI", "Presión MCA", "Hora", "Coordenadas", "Se pudo realizar", "Observaciones"];
+        const headers = ["Ruta", "Lugar de medición", "Presión PSI", "Presión MCA", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"];
         const columnClass = header => header === "Observaciones"
             ? "module-col-observaciones"
             : header === "Coordenadas"
@@ -582,8 +589,8 @@
         root.innerHTML = `
             <div class="module-detail-head"><span class="eyebrow">CONTROL DE PRESIONES</span><h1>${escapeHtml(record.responsable || "Registro de presiones")}</h1><p>Registro ${escapeHtml(record.id)} · ${escapeHtml(formatDate(record.fecha))}</p></div>
             <section class="detail-card module-detail-card"><h2>Información del registro</h2><dl class="module-detail-grid">
-                <div><dt>Responsable</dt><dd>${escapeHtml(record.responsable || "No indicado")}</dd></div>
-                <div><dt>Ingresado por</dt><dd>${escapeHtml(record.ingresadoPor || "No indicado")}</dd></div>
+                <div><dt>Quién realiza</dt><dd>${escapeHtml(record.responsable || "No indicado")}</dd></div>
+                <div><dt>Ingresado al sistema por</dt><dd>${escapeHtml(record.ingresadoPor || "")}</dd></div>
                 <div><dt>Fecha y hora</dt><dd>${escapeHtml(formatDate(record.fecha))}</dd></div>
                 <div><dt>Puntos de medición</dt><dd>${escapeHtml(String(record.mediciones?.length || 0))}</dd></div>
                 ${clean(record.observaciones) ? `<div><dt>Observaciones</dt><dd>${escapeHtml(record.observaciones).replace(/\r?\n/g, "<br>")}</dd></div>` : ""}
@@ -629,7 +636,6 @@
         if (!form) return;
         const dateInput = form.querySelector('[name="fecha"]');
         const id = getQueryId();
-        if (!id && dateInput) dateInput.value = localDateTimeValue();
         await waitForAuth();
         buildRows(form);
 
@@ -641,6 +647,7 @@
                 form.querySelector('[name="id"]').value = record.id;
                 form.querySelector('[name="fecha"]').value = localDateTimeValue(record.fecha);
                 form.querySelector('[name="responsable"]').value = record.responsable || "";
+                form.querySelector('[name="ingresadoPor"]').value = record.ingresadoPor || "";
                 form.querySelector('[name="observaciones"]').value = record.observaciones || "";
                 buildRows(form, record.mediciones || []);
                 const title = document.querySelector(".page-head h1");
@@ -750,7 +757,7 @@
                     mode: recordId ? "update" : "create",
                     fecha: form.querySelector('[name="fecha"]').value,
                     responsable: form.querySelector('[name="responsable"]').value,
-                    ingresadoPor: currentUserName(),
+                    ingresadoPor: clean(form.querySelector('[name="ingresadoPor"]')?.value),
                     observaciones: form.querySelector('[name="observaciones"]').value,
                     mediciones: rows
                 };
@@ -818,6 +825,7 @@
     window.ASADA_APPLY_PRESION_DRAFT = function (draft) {
         const form = document.getElementById("presionForm");
         if (!form || !draft) return;
+        if (draft.fecha) form.querySelector('[name="fecha"]').value = localDateTimeValue(draft.fecha);
         if (draft.observaciones !== undefined) form.querySelector('[name="observaciones"]').value = draft.observaciones || "";
         const rows = Array.isArray(draft.mediciones)
             ? draft.mediciones
@@ -836,7 +844,7 @@
         if (hidden) hidden.value = "[]";
         buildRows(form, []);
         const dateInput = form.querySelector('[name="fecha"]');
-        if (dateInput) dateInput.value = localDateTimeValue();
+        if (dateInput) dateInput.value = "";
         const status = form.querySelector("[data-module-status]");
         if (status) setMessage(status, "", "");
     };

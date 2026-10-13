@@ -1349,7 +1349,6 @@
         }
 
         if (!draftHasMeaningfulContent(draft)) {
-            await deleteLocalDraft(kind);
             return false;
         }
 
@@ -1914,15 +1913,15 @@
                 return;
             }
 
-            if (kind === "presion" && /^(psi|hora)_\d+$/.test(key)) {
+            if (kind === "presion" && /^(psi|hora|fechaHora)_\d+$/.test(key)) {
                 return;
             }
 
-            if (kind === "cloro" && /^(turbiedad|cloro|ph|olor|temperatura|hora)_\d+$/.test(key)) {
+            if (kind === "cloro" && /^(turbiedad|cloro|ph|olor|temperatura|hora|fechaHora)_\d+$/.test(key)) {
                 return;
             }
 
-            if (kind === "aforo" && /^(caudalAforado|litrosSegundo)_\d+$/.test(key)) {
+            if (kind === "aforo" && /^(caudalAforado|litros|segundos[1-5]|litrosSegundo|fechaHora)_\d+$/.test(key)) {
                 return;
             }
 
@@ -2006,13 +2005,10 @@
 
                 rows.push({
                     label: `Ruta ${row.ruta} · ${row.lugar}`,
-                    value: `${shown(row.presionPsi)} PSI · ${shown(row.presionMca)} MCA · ${shown(row.hora) === "—" ? "Sin hora" : shown(row.hora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
+                    value: `${shown(row.presionPsi)} PSI · ${shown(row.presionMca)} MCA · ${shown(row.fechaHora || row.hora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
                 });
             });
 
-            const user = window.ASADA_USER || window.ASADA_AUTH_USER || {};
-            const enteredBy = String(user.name || user.email || "").trim();
-            if (enteredBy) rows.push({ label: "Ingresado por", value: enteredBy });
         }
 
         if (kind === "cloro" || kind === "aforo") {
@@ -2036,8 +2032,8 @@
                 rows.push({
                     label: kind === "cloro" ? `Punto de muestreo · ${row.lugar}` : `Punto de aforo · ${row.lugar}`,
                     value: kind === "cloro"
-                        ? `Turbiedad ${shown(row.turbiedad)} NTU · Cloro ${shown(row.cloro)} mg/L · pH ${shown(row.ph)} · Olor ${shown(row.olor)} · Temperatura ${shown(row.temperatura)} · Hora ${shown(row.hora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
-                        : `Caudal ${shown(row.caudalAforado)} · ${shown(row.litrosSegundo)} L/s · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
+                        ? `Turbiedad ${shown(row.turbiedad)} NTU · Cloro ${shown(row.cloro)} mg/L · pH ${shown(row.ph)} · Olor ${shown(row.olor)} · Temperatura ${shown(row.temperatura)} · Fecha y hora ${shown(row.fechaHora || row.hora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
+                        : `Litros ${shown(row.litros ?? row.caudalAforado)} · Segundos ${Array.isArray(row.segundos) ? row.segundos.join(" / ") : "—"} · ${shown(row.litrosSegundo)} L/s · Fecha y hora ${shown(row.fechaHora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
                 });
             });
         }
@@ -2139,6 +2135,9 @@
                     }
                 });
 
+            if (kind === "factibilidad") {
+                form.dataset.previstaRedAnterior = form.querySelector('[name="existePrevistaRed"]:checked')?.value || "";
+            }
             form.dispatchEvent(new Event("input", { bubbles: true }));
             form.dispatchEvent(new Event("change", { bubbles: true }));
         } finally {
@@ -2315,7 +2314,6 @@
 
     async function persistDraftLocally(form, draft) {
         if (!draftHasMeaningfulContent(draft)) {
-            await deleteLocalDraft(draft.tipo);
             return false;
         }
 
@@ -2377,13 +2375,7 @@
         const draft = buildDraftPayload(form);
 
         if (!draftHasMeaningfulContent(draft)) {
-            deleteLocalDraft(draft.tipo);
-            if (navigator.onLine && state.user) {
-                window.callApi("deleteDraft", {
-                    tipo: draft.tipo,
-                    clienteId: getDraftClientId()
-                }).catch(() => {});
-            }
+            // Vaciar campos no equivale a solicitar la eliminación de un borrador.
             state.formStates.set(form, { timer: null, lastDraft: null });
             return;
         }
@@ -2400,16 +2392,7 @@
             }
 
             const latestDraft = buildDraftPayload(form);
-            if (!draftHasMeaningfulContent(latestDraft)) {
-                await deleteLocalDraft(kind);
-                if (navigator.onLine) {
-                    window.callApi("deleteDraft", {
-                        tipo: kind,
-                        clienteId: getDraftClientId()
-                    }).catch(() => {});
-                }
-                return;
-            }
+            if (!draftHasMeaningfulContent(latestDraft)) return;
 
             await syncDraftToServer(form, latestDraft);
         }, hasMedia ? SERVER_DRAFT_DELAY_MS : SERVER_TEXT_DRAFT_DELAY_MS);
@@ -2430,10 +2413,6 @@
         }
 
         let localDraft = await getLocalDraft(kind);
-        if (localDraft && !draftHasMeaningfulContent(localDraft)) {
-            await deleteLocalDraft(kind);
-            localDraft = null;
-        }
 
         // Aplicar primero la copia local para que el formulario aparezca
         // rápido. La consulta del servidor queda como reconciliación posterior.
@@ -2451,13 +2430,6 @@
                     clienteId: getDraftClientId()
                 });
                 serverDraft = response && response.draft;
-                if (serverDraft && !draftHasMeaningfulContent(serverDraft)) {
-                    await window.callApi("deleteDraft", {
-                        tipo: kind,
-                        clienteId: getDraftClientId()
-                    });
-                    serverDraft = null;
-                }
             }
         } catch (error) {
             serverDraft = null;
@@ -2506,7 +2478,6 @@
 
             for (const entry of localEntries) {
                 if (entry.draft && !draftHasMeaningfulContent(entry.draft)) {
-                    await deleteLocalDraft(entry.kind);
                     continue;
                 }
                 if (entry.draft?.datos && draftHasMeaningfulContent(entry.draft)) {
@@ -2646,7 +2617,7 @@
 
         return summary.length
             ? summary.slice(0, 2).join(" · ")
-            : "Formulario parcialmente completado";
+            : "Borrador pendiente de completar";
     }
 
     async function initializeDraftsPage() {
@@ -2677,7 +2648,7 @@
 
         const renderEntries = (entries, final) => {
             const available = entries.filter(
-                entry => entry.draft && draftHasMeaningfulContent(entry.draft)
+                entry => entry.draft
             );
 
             if (!available.length) {
@@ -2763,13 +2734,6 @@
 
         const serverEntries = draftTypes.map(kind => {
             const draft = serverByKind.get(kind) || null;
-            if (draft && !draftHasMeaningfulContent(draft)) {
-                window.callApi("deleteDraft", {
-                    tipo: kind,
-                    clienteId: getDraftClientId()
-                }).catch(() => {});
-                return { kind, draft: null };
-            }
             return { kind, draft };
         });
 
@@ -3249,7 +3213,7 @@
             }
             const expectedCount = kind === "presion"
                 ? form.querySelectorAll('[name^="psi_"]').length
-                : form.querySelectorAll(kind === "cloro" ? '[name^="turbiedad_"]' : '[name^="caudalAforado_"]').length;
+                : form.querySelectorAll(kind === "cloro" ? '[name^="turbiedad_"]' : '[name^="litros_"]').length;
             if (!Array.isArray(rows) || !expectedCount || rows.length !== expectedCount) {
                 setFormStatus(form, "Complete y revise todas las mediciones antes de confirmar.", true);
                 return false;

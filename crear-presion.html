@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/style.css?v=20260928-4">
     <link rel="stylesheet" href="css/seguridad.css?v=20260929-1">
-    <link rel="stylesheet" href="css/cloro_aforo.css?v=20260929-4">
+    <link rel="stylesheet" href="css/cloro_aforo.css?v=20261013-1">
     <title>Crear control de presiones | ASADA Orosi</title>
     <link rel="icon" type="image/png" href="img/asadalogo.png">
 </head>
@@ -37,7 +37,7 @@
         <div class="page-head">
             <span class="eyebrow">CONTROL OPERATIVO</span>
             <h1>Registrar presiones</h1>
-            <p>Complete los 22 puntos del machote. La presión MCA se calcula automáticamente dividiendo PSI entre 1,42; registre manualmente la hora de cada punto y capture su ubicación. Si no se pudo realizar una medición, márquela y, en Observaciones, indique el lugar o los lugares y el motivo.</p>
+            <p>Complete los 22 puntos del machote. La presión MCA se calcula automáticamente dividiendo PSI entre 1,42; registre manualmente la fecha y hora de cada punto y capture su ubicación. Si no se pudo realizar una medición, márquela y, en Observaciones, indique el lugar o los lugares y el motivo.</p>
         </div>
 
         <form id="presionForm" class="form-shell module-form-shell pressure-form" novalidate>
@@ -46,12 +46,13 @@
             <section class="form-section">
                 <h2>Datos del control</h2>
                 <div class="module-grid">
-                    <label>Responsable
-                        <input name="responsable" required maxlength="160" autocomplete="name" placeholder="Nombre de la persona responsable">
+                    <label>Quién realiza
+                        <input name="responsable" required maxlength="160" autocomplete="name" placeholder="Escriba el nombre de quien realiza">
                     </label>
-                    <label>Fecha y hora del control
-                        <input type="datetime-local" name="fecha" readonly required>
+                    <label>Ingresado al sistema por (opcional)
+                        <input name="ingresadoPor" maxlength="160" placeholder="Escriba el nombre de quien ingresa">
                     </label>
+                    <input type="hidden" name="fecha">
                 </div>
             </section>
 
@@ -59,7 +60,7 @@
                 <div class="pressure-section-heading">
                     <div>
                         <h2>Puntos de medición</h2>
-                        <p class="note">Ingrese PSI, la hora real de cada punto y use «Mi ubicación» para asociar sus coordenadas.</p>
+                        <p class="note">Ingrese PSI, la fecha y hora reales de cada punto y use «Mi ubicación» para asociar sus coordenadas.</p>
                     </div>
                     <span class="pressure-point-count">22 puntos · 11 rutas</span>
                 </div>
@@ -71,7 +72,7 @@
                                 <th>Lugar de medición</th>
                                 <th>Presión PSI</th>
                                 <th>Presión MCA</th>
-                                <th>Hora</th>
+                                <th>Fecha y hora</th>
                                 <th>Coordenadas</th>
                                 <th>Resultado de la medición</th>
                             </tr>
@@ -100,8 +101,8 @@
     </main>
 
     <script src="js/avisos.js?v=20260928-4"></script>
-    <script src="js/app.js?v=20260928-4"></script>
-    <script src="js/presiones.js?v=20260929-8"></script>
-    <script src="js/seguridad.js?v=20261002-1"></script>
+    <script src="js/app.js?v=20261013-1"></script>
+    <script src="js/presiones.js?v=20261013-1"></script>
+    <script src="js/seguridad.js?v=20261013-1"></script>
 </body>
 </html>

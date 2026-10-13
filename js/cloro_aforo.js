@@ -118,17 +118,34 @@
         return clean(user.name) || currentProfile();
     }
 
-    function setAutomaticFields(form) {
-        if (!form) {
-            return;
-        }
+    // Los formularios nuevos quedan sin fecha; los registros antiguos conservan la suya.
+    function pointDateTime(row, recordDate) {
+        if (clean(row.fechaHora)) return clean(row.fechaHora);
+        if (!row.lugar || !clean(recordDate)) return "";
+        const date = dateInputValue(recordDate);
+        return /^\d{2}:\d{2}$/.test(clean(row.hora))
+            ? `${date.slice(0, 10)}T${row.hora}` : date;
+    }
 
-        const dateField = form.querySelector("[name=fechaMuestreo], [name=fecha]");
-        if (dateField && !queryId()) {
-            dateField.value = dateInputValue();
-            dateField.readOnly = true;
-        }
+    function displayPointDateTime(row) {
+        return clean(row.fechaHora) ? formatDate(row.fechaHora) : clean(row.hora) || "—";
+    }
 
+    function aforoSeconds(row) {
+        return Array.isArray(row.segundos) ? row.segundos.join(" / ") : "—";
+    }
+
+    function calculateAforoFlow(litros, segundos) {
+        const volume = clean(litros) === "" ? NaN : Number(litros);
+        if (!Number.isFinite(volume) || volume <= 0 || segundos.length !== 5) return "";
+        const times = segundos.map(value => clean(value) === "" ? NaN : Number(value));
+        if (times.some(value => !Number.isFinite(value) || value <= 0)) return "";
+        return Number((times.reduce((sum, seconds) => sum + volume / seconds, 0) / 5).toFixed(6));
+    }
+
+    function syncRecordDate(form, rows) {
+        const field = form.querySelector("[name=fechaMuestreo], [name=fecha]");
+        if (field) field.value = rows.find(row => clean(row.fechaHora))?.fechaHora || "";
     }
 
     function setMessage(root, text, type) {
@@ -234,8 +251,8 @@
         button.setAttribute("aria-pressed", String(unavailable));
         button.textContent = unavailable ? "Restablecer punto" : "No se pudo realizar";
         const definitions = kind === "cloro"
-            ? [["turbiedad", "0"], ["cloro", "0"], ["ph", "0"], ["olor", "No aplica"], ["temperatura", "0"], ["hora", "No aplica"]]
-            : [["caudalAforado", "No aplica"], ["litrosSegundo", "0"]];
+            ? [["turbiedad", "0"], ["cloro", "0"], ["ph", "0"], ["olor", "No aplica"], ["temperatura", "0"]]
+            : [["litros", ""], ...Array.from({ length: 5 }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
         definitions.forEach(([name, defaultValue]) => {
             const input = form.querySelector(`[name="${name}_${index}"]`);
             if (!input) return;
@@ -243,7 +260,7 @@
             if (!unavailable && input.type === "text" && name === "hora") input.type = "time";
             input.value = unavailable ? defaultValue : "";
             input.disabled = unavailable;
-            input.required = !unavailable;
+            input.required = !unavailable && name !== "litrosSegundo";
         });
         const coordinateNames = kind === "cloro"
             ? ["latitud", "longitud", "altitud", "precisionGps"]
@@ -396,7 +413,7 @@
                     <td><input type="number" min="0" max="14" step="any" name="ph_${index}" inputmode="decimal" aria-label="pH de ${escapeHtml(site)}" value="${val("ph", "0")}"${required}${disabled}></td>
                     <td><input name="olor_${index}" aria-label="Olor de ${escapeHtml(site)}" value="${val("olor", "No aplica")}"${required}${disabled}></td>
                     <td><input type="number" min="0" step="any" name="temperatura_${index}" inputmode="decimal" aria-label="Temperatura de ${escapeHtml(site)}" value="${val("temperatura", "0")}"${required}${disabled}></td>
-                    <td><input name="hora_${index}" type="${unavailable ? "text" : "time"}" aria-label="Hora de ${escapeHtml(site)}" value="${val("hora", "No aplica")}"${required}${disabled}></td>
+                    <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(pointDateTime(row, valueFromForm(form, "[name=fechaMuestreo]")))}" required></td>
                     <td class="sample-coordinate-cell">
                         <input type="hidden" name="latitud_${index}" value="${escapeHtml(clean(coordinates.latitud))}">
                         <input type="hidden" name="longitud_${index}" value="${escapeHtml(clean(coordinates.longitud))}">
@@ -427,7 +444,8 @@
                 ph: noRealizado ? "0" : get("ph"),
                 olor: noRealizado ? "No aplica" : get("olor"),
                 temperatura: noRealizado ? "0" : stripUnit(get("temperatura")),
-                hora: noRealizado ? "No aplica" : get("hora"),
+                fechaHora: get("fechaHora"),
+                hora: noRealizado ? "No aplica" : get("fechaHora").slice(11, 16),
                 latitud: noRealizado ? "0" : get("latitud"),
                 longitud: noRealizado ? "0" : get("longitud"),
                 altitud: noRealizado ? "0" : get("altitud"),
@@ -438,6 +456,7 @@
         });
         const hidden = form.querySelector("[name=muestrasJson]");
         if (hidden) hidden.value = JSON.stringify(rows);
+        syncRecordDate(form, rows);
         return rows;
     }
 
@@ -454,7 +473,8 @@
             const unavailable = isNoRealizado(row.noRealizado);
             const required = unavailable ? "" : " required";
             const disabled = unavailable ? " disabled" : "";
-            const caudal = escapeHtml(unavailable ? "No aplica" : clean(row.caudalAforado));
+            const volume = escapeHtml(unavailable ? "" : clean(row.litros));
+            const seconds = Array.isArray(row.segundos) ? row.segundos : [];
             const litros = escapeHtml(unavailable ? "0" : stripUnit(row.litrosSegundo));
             const coordinates = unavailable
                 ? { latitud: 0, longitud: 0, altitud: 0, precisionGps: 0 }
@@ -462,8 +482,10 @@
             return `
                 <tr>
                     <th scope="row">${escapeHtml(site)}</th>
-                    <td><input name="caudalAforado_${index}" aria-label="Caudal aforado de ${escapeHtml(site)}" value="${caudal}"${required}${disabled}></td>
-                    <td><div class="module-unit-input"><input type="number" min="0" step="any" name="litrosSegundo_${index}" inputmode="decimal" aria-label="Litros por segundo (L/s) de ${escapeHtml(site)}" value="${litros}"${required}${disabled}><span>L/s</span></div></td>
+                    <td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td>
+                    <td><div class="aforo-takes">${Array.from({ length: 5 }, (_, take) => `<label>Toma ${take + 1}<input type="number" min="0.000001" step="any" name="segundos${take + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[take]))}"${required}${disabled}></label>`).join("")}</div></td>
+                    <td><div class="module-unit-input"><input type="number" min="0" step="any" name="litrosSegundo_${index}" inputmode="decimal" aria-label="Litros por segundo (L/s) de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
+                    <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(pointDateTime(row, valueFromForm(form, "[name=fecha]")))}" required></td>
                     <td class="sample-coordinate-cell">
                         <input type="hidden" name="latitudAforo_${index}" value="${escapeHtml(clean(coordinates.latitud))}">
                         <input type="hidden" name="longitudAforo_${index}" value="${escapeHtml(clean(coordinates.longitud))}">
@@ -487,10 +509,16 @@
             const button = form.querySelector(`[data-aforo-no-realizado-index="${index}"]`);
             const noRealizado = button?.dataset.noRealizado === "true";
             const get = name => valueFromForm(form, `[name="${name}_${index}"]`);
+            const segundos = Array.from({ length: 5 }, (_, take) => get("segundos" + (take + 1)));
+            const litrosSegundo = noRealizado ? "0" : calculateAforoFlow(get("litros"), segundos);
+            const result = form.querySelector(`[name="litrosSegundo_${index}"]`);
+            if (result) result.value = litrosSegundo;
             return {
                 lugar,
-                caudalAforado: noRealizado ? "No aplica" : get("caudalAforado"),
-                litrosSegundo: noRealizado ? "0" : stripUnit(get("litrosSegundo")),
+                litros: noRealizado ? "" : get("litros"),
+                segundos: noRealizado ? [] : segundos,
+                litrosSegundo,
+                fechaHora: get("fechaHora"),
                 latitud: noRealizado ? "0" : get("latitudAforo"),
                 longitud: noRealizado ? "0" : get("longitudAforo"),
                 altitud: noRealizado ? "0" : get("altitudAforo"),
@@ -501,6 +529,7 @@
         });
         const hidden = form.querySelector("[name=medicionesJson]");
         if (hidden) hidden.value = JSON.stringify(rows);
+        syncRecordDate(form, rows);
         return rows;
     }
 
@@ -823,8 +852,6 @@
             }
         });
         buildCloroRows(form);
-        setAutomaticFields(form);
-        waitForAuth().then(() => setAutomaticFields(form));
         form.addEventListener("submit", async event => {
             // Always stop the browser's native form navigation. Without this,
             // a missing/stale confirmation script reloads the page and clears
@@ -1050,8 +1077,6 @@
             fillAforoCoordinates(form, Number(gpsButton.dataset.aforoGpsIndex));
         });
         buildAforoRows(form);
-        setAutomaticFields(form);
-        waitForAuth().then(() => setAutomaticFields(form));
         form.addEventListener("submit", async event => {
             // Stop the browser's default navigation in every path. If the
             // shared confirmation script is stale or missing, the page must
@@ -1455,15 +1480,15 @@
         root.innerHTML = `
             <div class="module-detail-head"><span class="eyebrow">CONTROL DE CLORO RESIDUAL</span><h1>${escapeHtml(record.zona)}</h1><p>Registro ${escapeHtml(record.id)} · ${escapeHtml(formatDate(record.fechaMuestreo))}</p></div>
             <section class="detail-card module-detail-card"><h2>Información del registro</h2><dl class="module-detail-grid">
-                <div><dt>Perfil</dt><dd>${escapeHtml(record.perfil || record.ingresadoPor)}</dd></div>
-                <div><dt>Responsable de campo</dt><dd>${escapeHtml(record.responsableCampo || "No indicado")}</dd></div>
+                <div><dt>Quién realiza</dt><dd>${escapeHtml(record.perfil || record.ingresadoPor)}</dd></div>
+                <div><dt>Ingresado al sistema por</dt><dd>${escapeHtml(record.ingresadoPor || "")}</dd></div>
                 <div><dt>Latitud</dt><dd>${escapeHtml(record.latitud)}</dd></div>
                 <div><dt>Longitud</dt><dd>${escapeHtml(record.longitud)}</dd></div>
                 <div><dt>Altitud</dt><dd>${escapeHtml(record.altitud || "No disponible")}</dd></div>
                 <div><dt>Precisión GPS</dt><dd>${escapeHtml(record.precisionGps || "No disponible")}</dd></div>
                 ${clean(record.observaciones) ? `<div><dt>Observaciones</dt><dd>${escapeHtml(record.observaciones).replace(/\r?\n/g, "<br>")}</dd></div>` : ""}
             </dl></section>
-            <section class="detail-card module-detail-card"><h2>Puntos de muestreo</h2>${detailTable(samples.map(row => [row.lugar, isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.turbiedad, "NTU"), isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.cloro, "mg/L"), row.ph, row.olor, row.temperatura, row.hora, formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Lugar", "Turbiedad (NTU)", "Cloro (mg/L)", "pH", "Olor", "Temperatura", "Hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
+            <section class="detail-card module-detail-card"><h2>Puntos de muestreo</h2>${detailTable(samples.map(row => [row.lugar, isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.turbiedad, "NTU"), isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.cloro, "mg/L"), row.ph, row.olor, row.temperatura, displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Lugar", "Turbiedad (NTU)", "Cloro (mg/L)", "pH", "Olor", "Temperatura", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
             <div class="detail-actions module-actions"><button type="button" class="btn primary" data-download-cloro>Descargar PDF</button><a class="btn secondary" href="crear-cloro.html?id=${encodeURIComponent(record.id)}">Editar</a><a class="btn secondary" href="cloros.html">Volver al listado</a></div>`;
         bindReportPdfButton(root, "[data-download-cloro]", "cloro", () => downloadCloroPdf(record));
     }
@@ -1477,12 +1502,12 @@
         root.innerHTML = `
             <div class="module-detail-head"><span class="eyebrow">REGISTRO DE AFORO</span><h1>${escapeHtml(record.zona)}</h1><p>Registro ${escapeHtml(record.id)} · ${escapeHtml(formatDate(record.fecha))}</p></div>
             <section class="detail-card module-detail-card"><h2>Información del registro</h2><dl class="module-detail-grid">
-                <div><dt>Perfil</dt><dd>${escapeHtml(record.perfil || record.ingresadoPor)}</dd></div>
+                <div><dt>Quién realiza</dt><dd>${escapeHtml(record.perfil || record.ingresadoPor)}</dd></div>
                 <div><dt>Condición del clima</dt><dd>${escapeHtml(record.condicionClima || "No indicada")}</dd></div>
-                <div><dt>Responsable de campo</dt><dd>${escapeHtml(record.responsableCampo || "No indicado")}</dd></div>
+                <div><dt>Ingresado al sistema por</dt><dd>${escapeHtml(record.ingresadoPor || "")}</dd></div>
                 ${clean(record.observaciones) ? `<div><dt>Observaciones</dt><dd>${escapeHtml(record.observaciones).replace(/\r?\n/g, "<br>")}</dd></div>` : ""}
             </dl></section>
-            <section class="detail-card module-detail-card"><h2>Puntos aforados</h2>${detailTable(measurements.map(row => [row.lugar, row.caudalAforado, withUnit(row.litrosSegundo, "L/s"), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Punto", "Caudal aforado", "Litros por segundo (L/s)", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
+            <section class="detail-card module-detail-card"><h2>Puntos aforados</h2>${detailTable(measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Punto", "Litros (L)", "Segundos (5 tomas)", "Litros por segundo (L/s)", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
             <div class="detail-actions module-actions"><button type="button" class="btn primary" data-download-aforo>Descargar PDF</button><a class="btn secondary" href="crear-aforo.html?id=${encodeURIComponent(record.id)}">Editar</a><a class="btn secondary" href="aforos.html">Volver al listado</a></div>`;
         bindReportPdfButton(root, "[data-download-aforo]", "aforo", () => downloadAforoPdf(record));
     }
@@ -1691,14 +1716,14 @@
 
     async function downloadCloroPdf(record, settings = {}) {
         const samples = record.muestras || [];
-        const rows = samples.map(row => [row.lugar, isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.turbiedad, "NTU"), isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.cloro, "mg/L"), row.ph, row.olor, row.temperatura, row.hora, formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
-        const details = [["Quién realiza", record.perfil], ["Responsable de campo", record.responsableCampo]];
+        const rows = samples.map(row => [row.lugar, isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.turbiedad, "NTU"), isNoRealizado(row.noRealizado) ? "No aplica" : withUnit(row.cloro, "mg/L"), row.ph, row.olor, row.temperatura, displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
+        const details = [["Quién realiza", record.perfil], ["Ingresado al sistema por", record.ingresadoPor || "____________________"]];
         if (clean(record.observaciones) && !reportHasUnperformedPoint(samples)) details.push(["Observaciones", record.observaciones]);
         return await createPdf(
             "Control operativo de cloro residual",
             `${record.zona} · ${formatDate(record.fechaMuestreo)} · ID ${record.id}`,
             rows,
-            ["Lugar", "Turbiedad\n(NTU)", "Cloro\n(mg/L)", "pH", "Olor", "Temperatura", "Hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"],
+            ["Lugar", "Turbiedad\n(NTU)", "Cloro\n(mg/L)", "pH", "Olor", "Temperatura", "Fecha y hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"],
             `Reporte_Cloro_${record.id}.pdf`,
             details,
             {
@@ -1727,8 +1752,8 @@
                     3: { cellWidth: 12 },
                     4: { cellWidth: 17 },
                     5: { cellWidth: 29 },
-                    6: { cellWidth: 18 },
-                    7: { cellWidth: 37 },
+                    6: { cellWidth: 28 },
+                    7: { cellWidth: 27 },
                     8: { cellWidth: 22 },
                     9: { cellWidth: 33 }
                 }
@@ -1738,14 +1763,14 @@
 
     async function downloadAforoPdf(record, settings = {}) {
         const measurements = record.mediciones || [];
-        const rows = measurements.map(row => [row.lugar, row.caudalAforado, withUnit(row.litrosSegundo, "L/s"), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
-        const details = [["Condición del clima", record.condicionClima], ["Responsable de campo", record.responsableCampo], ["Ingresado por", record.ingresadoPor]];
+        const rows = measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
+        const details = [["Condición del clima", record.condicionClima], ["Quién realiza", record.perfil], ["Ingresado al sistema por", record.ingresadoPor || "____________________"]];
         if (clean(record.observaciones) && !reportHasUnperformedPoint(measurements)) details.push(["Observaciones", record.observaciones]);
         return await createPdf(
             "Hoja de registro de aforos",
             `${record.zona} · ${formatDate(record.fecha)} · ID ${record.id}`,
             rows,
-            ["Punto", "Caudal aforado", "Litros por segundo\n(L/s)", "Coordenadas", "Se pudo\nrealizar", "Observaciones"],
+            ["Punto", "Litros (L)", "Segundos\n(5 tomas)", "Litros por segundo\n(L/s)", "Fecha y hora", "Coordenadas", "Se pudo\nrealizar", "Observaciones"],
             `Reporte_Aforo_${record.id}.pdf`,
             details,
             {
@@ -1771,12 +1796,14 @@
                 headFontSize: 10,
                 cellPadding: 3,
                 columnStyles: {
-                    0: { cellWidth: 50 },
-                    1: { cellWidth: 34 },
-                    2: { cellWidth: 38 },
-                    3: { cellWidth: 53 },
-                    4: { cellWidth: 22 },
-                    5: { cellWidth: 46 }
+                    0: { cellWidth: 37 },
+                    1: { cellWidth: 20 },
+                    2: { cellWidth: 31 },
+                    3: { cellWidth: 28 },
+                    4: { cellWidth: 32 },
+                    5: { cellWidth: 45 },
+                    6: { cellWidth: 20 },
+                    7: { cellWidth: 30 }
                 }
             }
         );
@@ -1817,7 +1844,6 @@
         const hidden = form.querySelector("[name=muestrasJson]");
         if (hidden) hidden.value = "[]";
         buildCloroRows(form);
-        setAutomaticFields(form);
         const status = form.querySelector("[data-module-status]");
         if (status) setMessage(status, "", "");
     };
@@ -1830,7 +1856,6 @@
         const hidden = form.querySelector("[name=medicionesJson]");
         if (hidden) hidden.value = "[]";
         buildAforoRows(form);
-        setAutomaticFields(form);
         const status = form.querySelector("[data-module-status]");
         if (status) setMessage(status, "", "");
     };
