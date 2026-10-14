@@ -145,22 +145,51 @@
         return clean(site).toLocaleLowerCase("es-CR") === "truchas" ? 15 : 5;
     }
 
+    function aforoChannelVolumes(row) {
+        if (Array.isArray(row.litrosPorCanal)) return row.litrosPorCanal;
+        if (Array.isArray(row.canales) && row.canales.length === 3 && row.canales.every(channel => channel.litros !== undefined)) {
+            return row.canales.map(channel => channel.litros);
+        }
+        // Un volumen compartido de versiones anteriores se conserva en los tres canales.
+        return Array(3).fill(row.litros ?? "");
+    }
+
+    function aforoVolumes(row, compact = false) {
+        if (Array.isArray(row.litrosPorCanal) || row.canales?.some(channel => channel.litros !== undefined)) {
+            return aforoChannelVolumes(row).map((volume, channel) => `${compact ? "C" : "Canal "}${channel + 1}: ${clean(volume) || "—"}`).join("\n");
+        }
+        return row.litros ?? row.caudalAforado ?? "—";
+    }
+
+    function aforoFlowDisplay(row) {
+        if (row.canales?.length === 3) {
+            return [...row.canales.map(channel => `C${channel.numero}: ${withUnit(channel.litrosSegundo, "L/s")}`),
+                `Total: ${withUnit(row.litrosSegundo, "L/s")}`].join("\n");
+        }
+        return withUnit(row.litrosSegundo, "L/s");
+    }
+
     function calculateAforoFlow(litros, segundos, site) {
-        const takeCount = aforoTakeCount(site);
-        const volume = clean(litros) === "" ? NaN : Number(litros);
-        if (!Number.isFinite(volume) || volume <= 0 || segundos.length !== takeCount) return "";
-        const times = segundos.map(value => clean(value) === "" ? NaN : Number(value));
-        if (times.some(value => !Number.isFinite(value) || value <= 0)) return "";
-        const channelFlows = aforoChannelFlows(volume, times, site);
-        return Number(channelFlows.reduce((sum, channel) => sum + channel.litrosSegundo, 0).toFixed(6));
+        if (!Array.isArray(segundos) || segundos.length !== aforoTakeCount(site)) return "";
+        if (Array.isArray(litros) && litros.length !== (aforoTakeCount(site) === 15 ? 3 : 1)) return "";
+        const channels = aforoChannelFlows(litros, segundos, site);
+        if (channels.some(channel => channel.litrosSegundo === "")) return "";
+        // Se suman los promedios sin redondearlos; solo se redondea el resultado mostrado.
+        return Number(channels.reduce((sum, channel) => sum + channel.litrosSegundo, 0).toFixed(6));
     }
 
     function aforoChannelFlows(litros, segundos, site) {
-        const count = aforoTakeCount(site) === 15 ? 3 : 1;
+        const takeCount = aforoTakeCount(site);
+        const count = takeCount === 15 ? 3 : 1;
+        const volumes = Array.isArray(litros) ? litros : Array(count).fill(litros);
         return Array.from({ length: count }, (_, channel) => {
-            const times = segundos.slice(channel * 5, channel * 5 + 5).map(Number);
-            return { numero: channel + 1, segundos: times,
-                litrosSegundo: times.reduce((sum, seconds) => sum + Number(litros) / seconds, 0) / 5 };
+            const volume = clean(volumes[channel]) === "" ? NaN : Number(volumes[channel]);
+            const samples = segundos.slice(channel * 5, channel * 5 + 5);
+            const times = samples.map(value => clean(value) === "" ? NaN : Number(value));
+            const valid = Number.isFinite(volume) && volume > 0 && times.length === 5
+                && times.every(seconds => Number.isFinite(seconds) && seconds > 0);
+            return { numero: channel + 1, litros: clean(volumes[channel]), segundos: samples,
+                litrosSegundo: valid ? times.reduce((sum, seconds) => sum + volume / seconds, 0) / 5 : "" };
         });
     }
 
@@ -273,7 +302,7 @@
         button.textContent = unavailable ? "Restablecer punto" : "No se pudo realizar";
         const definitions = kind === "cloro"
             ? [["turbiedad", "0"], ["cloro", "0"], ["ph", "0"], ["olor", "No aplica"], ["temperatura", "0"]]
-            : [["litros", ""], ...Array.from({ length: aforoTakeCount((AFORO_SITES[valueFromForm(form, "[name=zona]")] || [])[index]) }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
+            : [["litros", ""], ...Array.from({ length: 3 }, (_, channel) => ["litrosCanal" + (channel + 1), ""]), ...Array.from({ length: 3 }, (_, channel) => ["litrosSegundoCanal" + (channel + 1), "0"]), ...Array.from({ length: aforoTakeCount((AFORO_SITES[valueFromForm(form, "[name=zona]")] || [])[index]) }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
         definitions.forEach(([name, defaultValue]) => {
             const input = form.querySelector(`[name="${name}_${index}"]`);
             if (!input) return;
@@ -281,7 +310,7 @@
             if (!unavailable && input.type === "text" && name === "hora") input.type = "time";
             input.value = unavailable ? defaultValue : "";
             input.disabled = unavailable;
-            input.required = !unavailable && name !== "litrosSegundo";
+            input.required = !unavailable && !name.startsWith("litrosSegundo");
         });
         if (kind === "aforo") {
             const date = form.querySelector(`[name="fechaHora_${index}"]`);
@@ -519,9 +548,13 @@
             const renderTakes = (channel = 0) => `<div class="aforo-takes">${Array.from({ length: 5 }, (_, take) => {
                 const absolute = channel * 5 + take;
                 return `<label>Toma ${take + 1} · segundos<input type="number" min="0.000001" step="any" name="segundos${absolute + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1}${takeCount === 15 ? ` de canal ${channel + 1}` : ""} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[absolute]))}"${required}${disabled}></label>`;
-            }).join("")}</div>`;
+            }).join("")}${takeCount === 15 ? `<label class="aforo-channel-result">Caudal del canal<span class="module-unit-input"><input type="text" name="litrosSegundoCanal${channel + 1}_${index}" aria-label="Litros por segundo automáticos de canal ${channel + 1} de ${escapeHtml(site)}" value="" readonly${disabled}><span>L/s</span></span></label>` : ""}</div>`;
+            const channelVolumes = aforoChannelVolumes(row);
             const takesHtml = takeCount === 15
-                ? `<div class="aforo-channels">${Array.from({ length: 3 }, (_, channel) => `<fieldset class="aforo-channel"><legend>Canal ${channel + 1}</legend>${renderTakes(channel)}</fieldset>`).join("")}</div>`
+                ? `<div class="aforo-channels">${Array.from({ length: 3 }, (_, channel) => `<fieldset class="aforo-channel"><legend>Canal ${channel + 1}</legend>
+                    <label class="aforo-channel-volume">Litros del recipiente<span class="module-unit-input"><input type="number" min="0.000001" step="any" name="litrosCanal${channel + 1}_${index}" inputmode="decimal" aria-label="Litros del recipiente de canal ${channel + 1} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(channelVolumes[channel]))}"${required}${disabled}><span>L</span></span></label>
+                    ${renderTakes(channel)}
+                    </fieldset>`).join("")}</div>`
                 : renderTakes();
             const litros = escapeHtml(unavailable ? "0" : stripUnit(row.litrosSegundo));
             const coordinates = unavailable
@@ -530,9 +563,8 @@
             return `
                 <tr>
                     <th scope="row">${escapeHtml(site)}</th>
-                    <td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td>
-                    <td>${takesHtml}</td>
-                    <td><div class="module-unit-input"><input type="number" min="0" step="any" name="litrosSegundo_${index}" inputmode="decimal" aria-label="Litros por segundo (L/s) de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
+                    ${takeCount === 15 ? `<td colspan="2">${takesHtml}</td>` : `<td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td><td>${takesHtml}</td>`}
+                    <td>${takeCount === 15 ? '<span class="aforo-general-label">Total de los tres canales</span>' : ""}<div class="module-unit-input"><input type="text" name="litrosSegundo_${index}" aria-label="Litros por segundo (L/s) automáticos de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
                     <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : pointDateTime(row, valueFromForm(form, "[name=fecha]")))}"${required}${disabled}></td>
                     <td class="sample-coordinate-cell">
                         <input type="hidden" name="latitudAforo_${index}" value="${escapeHtml(clean(coordinates.latitud))}">
@@ -557,16 +589,23 @@
             const button = form.querySelector(`[data-aforo-no-realizado-index="${index}"]`);
             const noRealizado = button?.dataset.noRealizado === "true";
             const get = name => valueFromForm(form, `[name="${name}_${index}"]`);
+            const hasChannels = aforoTakeCount(lugar) === 15;
+            const volumes = hasChannels ? Array.from({ length: 3 }, (_, channel) => get("litrosCanal" + (channel + 1))) : get("litros");
             const segundos = Array.from({ length: aforoTakeCount(lugar) }, (_, take) => get("segundos" + (take + 1)));
-            const litrosSegundo = noRealizado ? "0" : calculateAforoFlow(get("litros"), segundos, lugar);
+            const channels = hasChannels && !noRealizado ? aforoChannelFlows(volumes, segundos, lugar) : [];
+            channels.forEach(channel => {
+                const input = form.querySelector(`[name="litrosSegundoCanal${channel.numero}_${index}"]`);
+                if (input) input.value = channel.litrosSegundo === "" ? "" : Number(channel.litrosSegundo.toFixed(6));
+            });
+            const litrosSegundo = noRealizado ? "0" : calculateAforoFlow(volumes, segundos, lugar);
             const result = form.querySelector(`[name="litrosSegundo_${index}"]`);
             if (result) result.value = litrosSegundo;
             return {
                 lugar,
-                litros: noRealizado ? "" : get("litros"),
+                litros: noRealizado || hasChannels ? "" : get("litros"),
+                ...(hasChannels ? { litrosPorCanal: noRealizado ? [] : volumes } : {}),
                 segundos: noRealizado ? [] : segundos,
-                canales: !noRealizado && litrosSegundo !== "" && aforoTakeCount(lugar) === 15
-                    ? aforoChannelFlows(get("litros"), segundos, lugar).map(channel => ({ ...channel, litrosSegundo: Number(channel.litrosSegundo.toFixed(6)) })) : [],
+                canales: channels.map(channel => ({ ...channel, litrosSegundo: channel.litrosSegundo === "" ? "" : Number(channel.litrosSegundo.toFixed(6)) })),
                 litrosSegundo,
                 fechaHora: noRealizado ? "" : get("fechaHora"),
                 latitud: noRealizado ? "0" : get("latitudAforo"),
@@ -1555,7 +1594,7 @@
                 <div><dt>Ingresado al sistema por</dt><dd>${escapeHtml(record.ingresadoPor || "")}</dd></div>
                 ${clean(record.observaciones) ? `<div><dt>Observaciones</dt><dd>${escapeHtml(record.observaciones).replace(/\r?\n/g, "<br>")}</dd></div>` : ""}
             </dl></section>
-            <section class="detail-card module-detail-card"><h2>Puntos aforados</h2>${detailTable(measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayAforoPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Punto", "Litros (L)", "Segundos (tomas)", "Litros por segundo (L/s)", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
+            <section class="detail-card module-detail-card"><h2>Puntos aforados</h2>${detailTable(measurements.map(row => [row.lugar, aforoVolumes(row), aforoSeconds(row), aforoFlowDisplay(row), displayAforoPointDateTime(row), formatSampleCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", detailPointObservation(record, row)]), ["Punto", "Litros (L)", "Segundos (tomas)", "Litros por segundo (L/s)", "Fecha y hora", "Coordenadas", "Se pudo realizar", "Observaciones"])}</section>
             <div class="detail-actions module-actions"><button type="button" class="btn primary" data-download-aforo>Descargar PDF</button><a class="btn secondary" href="crear-aforo.html?id=${encodeURIComponent(record.id)}">Editar</a><a class="btn secondary" href="aforos.html">Volver al listado</a></div>`;
         bindReportPdfButton(root, "[data-download-aforo]", "aforo", () => downloadAforoPdf(record));
     }
@@ -1812,7 +1851,7 @@
 
     async function downloadAforoPdf(record, settings = {}) {
         const measurements = record.mediciones || [];
-        const rows = measurements.map(row => [row.lugar, row.litros ?? row.caudalAforado ?? "—", aforoSeconds(row), withUnit(row.litrosSegundo, "L/s"), displayAforoPointDateTime(row), formatPdfCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
+        const rows = measurements.map(row => [row.lugar, aforoVolumes(row, true), aforoSeconds(row), aforoFlowDisplay(row), displayAforoPointDateTime(row), formatPdfCoordinates(row), isNoRealizado(row.noRealizado) ? "No" : "Sí", reportPointObservation(record, row)]);
         const details = [["Condición del clima", record.condicionClima], ["Quién realiza", record.perfil], ["Ingresado al sistema por", record.ingresadoPor || "____________________"]];
         if (clean(record.observaciones) && !reportHasUnperformedPoint(measurements)) details.push(["Observaciones", record.observaciones]);
         return await createPdf(
@@ -1845,8 +1884,8 @@
                 headFontSize: 10,
                 cellPadding: 3,
                 columnStyles: {
-                    0: { cellWidth: 34 },
-                    1: { cellWidth: 17 },
+                    0: { cellWidth: 27 },
+                    1: { cellWidth: 24 },
                     2: { cellWidth: 28 },
                     3: { cellWidth: 25 },
                     4: { cellWidth: 32 },

@@ -1921,7 +1921,7 @@
                 return;
             }
 
-            if (kind === "aforo" && /^(caudalAforado|litros|segundos[1-5]|litrosSegundo|fechaHora)_\d+$/.test(key)) {
+            if (kind === "aforo" && /^(caudalAforado|litros|litrosCanal[1-3]|segundos\d+|litrosSegundo(?:Canal[1-3])?|fechaHora)_\d+$/.test(key)) {
                 return;
             }
 
@@ -2033,7 +2033,7 @@
                     label: kind === "cloro" ? `Punto de muestreo · ${row.lugar}` : `Punto de aforo · ${row.lugar}`,
                     value: kind === "cloro"
                         ? `Turbiedad ${shown(row.turbiedad)} NTU · Cloro ${shown(row.cloro)} mg/L · pH ${shown(row.ph)} · Olor ${shown(row.olor)} · Temperatura ${shown(row.temperatura)} · Fecha y hora ${shown(row.fechaHora || row.hora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
-                        : `Litros ${shown(row.litros ?? row.caudalAforado)} · Segundos ${Array.isArray(row.segundos) ? row.segundos.join(" / ") : "—"} · ${shown(row.litrosSegundo)} L/s · Fecha y hora ${shown(row.fechaHora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
+                        : `${row.canales?.length === 3 ? row.canales.map(channel => `Canal ${channel.numero}: ${shown(channel.litros)} L · Segundos ${channel.segundos.map(shown).join(" / ")} · ${shown(channel.litrosSegundo)} L/s`).join("; ") : `Litros ${shown(row.litros ?? row.caudalAforado)} · Segundos ${Array.isArray(row.segundos) ? row.segundos.join(" / ") : "—"}`} · Total ${shown(row.litrosSegundo)} L/s · Fecha y hora ${shown(row.fechaHora)} · Coordenadas ${coordinates}${extra ? ` · ${extra}` : ""}`
                 });
             });
         }
