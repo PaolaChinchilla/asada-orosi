@@ -3213,7 +3213,10 @@
             }
             const expectedCount = kind === "presion"
                 ? form.querySelectorAll('[name^="psi_"]').length
-                : form.querySelectorAll(kind === "cloro" ? '[name^="turbiedad_"]' : '[name^="litros_"]').length;
+                : kind === "cloro"
+                    ? form.querySelectorAll('[name^="turbiedad_"]').length
+                    // Un punto de aforo puede tener uno o varios recipientes (Truchas).
+                    : form.querySelectorAll('[data-aforo-no-realizado-index]').length;
             if (!Array.isArray(rows) || !expectedCount || rows.length !== expectedCount) {
                 setFormStatus(form, "Complete y revise todas las mediciones antes de confirmar.", true);
                 return false;
