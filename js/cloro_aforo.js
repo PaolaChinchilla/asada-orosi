@@ -134,24 +134,32 @@
 
     function aforoSeconds(row) {
         if (!Array.isArray(row.segundos)) return "—";
-        if (row.segundos.length === 15) {
-            return Array.from({ length: 3 }, (_, channel) =>
+        if ([10, 15].includes(row.segundos.length)) {
+            return Array.from({ length: row.segundos.length / 5 }, (_, channel) =>
                 `Canal ${channel + 1}: ${row.segundos.slice(channel * 5, channel * 5 + 5).join(" / ")}`).join("\n");
         }
         return row.segundos.join(" / ");
     }
 
-    function aforoTakeCount(site) {
-        return clean(site).toLocaleLowerCase("es-CR") === "truchas" ? 15 : 5;
+    function aforoChannelCount(site) {
+        const name = clean(site).toLocaleLowerCase("es-CR");
+        return name === "truchas" ? 3 : name === "f5" ? 2 : 1;
     }
 
-    function aforoChannelVolumes(row) {
-        if (Array.isArray(row.litrosPorCanal)) return row.litrosPorCanal;
-        if (Array.isArray(row.canales) && row.canales.length === 3 && row.canales.every(channel => channel.litros !== undefined)) {
+    function aforoTakeCount(site) {
+        return aforoChannelCount(site) * 5;
+    }
+
+    function aforoChannelVolumes(row, site = row.lugar) {
+        const count = aforoChannelCount(site);
+        if (Array.isArray(row.litrosPorCanal)) return Array.from({ length: count }, (_, channel) => row.litrosPorCanal[channel] ?? "");
+        if (Array.isArray(row.canales) && row.canales.length === count && row.canales.every(channel => channel.litros !== undefined)) {
             return row.canales.map(channel => channel.litros);
         }
-        // Un volumen compartido de versiones anteriores se conserva en los tres canales.
-        return Array(3).fill(row.litros ?? "");
+        // Un F5 antiguo conserva sus cinco tomas en el canal 1; el canal nuevo se completa manualmente.
+        if (count === 2 && row.segundos?.length === 5) return [row.litros ?? "", ""];
+        // Conservar el recipiente compartido de las versiones anteriores de Truchas.
+        return Array(count).fill(row.litros ?? "");
     }
 
     function aforoVolumes(row, compact = false) {
@@ -162,7 +170,7 @@
     }
 
     function aforoFlowDisplay(row) {
-        if (row.canales?.length === 3) {
+        if (row.canales?.length > 1) {
             return [...row.canales.map(channel => `C${channel.numero}: ${withUnit(channel.litrosSegundo, "L/s")}`),
                 `Total: ${withUnit(row.litrosSegundo, "L/s")}`].join("\n");
         }
@@ -171,7 +179,7 @@
 
     function calculateAforoFlow(litros, segundos, site) {
         if (!Array.isArray(segundos) || segundos.length !== aforoTakeCount(site)) return "";
-        if (Array.isArray(litros) && litros.length !== (aforoTakeCount(site) === 15 ? 3 : 1)) return "";
+        if (Array.isArray(litros) && litros.length !== aforoChannelCount(site)) return "";
         const channels = aforoChannelFlows(litros, segundos, site);
         if (channels.some(channel => channel.litrosSegundo === "")) return "";
         // Se suman los promedios sin redondearlos; solo se redondea el resultado mostrado.
@@ -179,8 +187,7 @@
     }
 
     function aforoChannelFlows(litros, segundos, site) {
-        const takeCount = aforoTakeCount(site);
-        const count = takeCount === 15 ? 3 : 1;
+        const count = aforoChannelCount(site);
         const volumes = Array.isArray(litros) ? litros : Array(count).fill(litros);
         return Array.from({ length: count }, (_, channel) => {
             const volume = clean(volumes[channel]) === "" ? NaN : Number(volumes[channel]);
@@ -300,9 +307,10 @@
         button.dataset.noRealizado = String(unavailable);
         button.setAttribute("aria-pressed", String(unavailable));
         button.textContent = unavailable ? "Restablecer punto" : "No se pudo realizar";
+        const site = (AFORO_SITES[valueFromForm(form, "[name=zona]")] || [])[index];
         const definitions = kind === "cloro"
             ? [["turbiedad", "0"], ["cloro", "0"], ["ph", "0"], ["olor", "No aplica"], ["temperatura", "0"]]
-            : [["litros", ""], ...Array.from({ length: 3 }, (_, channel) => ["litrosCanal" + (channel + 1), ""]), ...Array.from({ length: 3 }, (_, channel) => ["litrosSegundoCanal" + (channel + 1), "0"]), ...Array.from({ length: aforoTakeCount((AFORO_SITES[valueFromForm(form, "[name=zona]")] || [])[index]) }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
+            : [["litros", ""], ...Array.from({ length: aforoChannelCount(site) }, (_, channel) => ["litrosCanal" + (channel + 1), ""]), ...Array.from({ length: aforoChannelCount(site) }, (_, channel) => ["litrosSegundoCanal" + (channel + 1), "0"]), ...Array.from({ length: aforoTakeCount(site) }, (_, take) => ["segundos" + (take + 1), ""]), ["litrosSegundo", "0"]];
         definitions.forEach(([name, defaultValue]) => {
             const input = form.querySelector(`[name="${name}_${index}"]`);
             if (!input) return;
@@ -544,14 +552,15 @@
             const disabled = unavailable ? " disabled" : "";
             const volume = escapeHtml(unavailable ? "" : clean(row.litros));
             const seconds = Array.isArray(row.segundos) ? row.segundos : [];
-            const takeCount = aforoTakeCount(site);
+            const channelCount = aforoChannelCount(site);
+            const hasChannels = channelCount > 1;
             const renderTakes = (channel = 0) => `<div class="aforo-takes">${Array.from({ length: 5 }, (_, take) => {
                 const absolute = channel * 5 + take;
-                return `<label>Toma ${take + 1} · segundos<input type="number" min="0.000001" step="any" name="segundos${absolute + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1}${takeCount === 15 ? ` de canal ${channel + 1}` : ""} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[absolute]))}"${required}${disabled}></label>`;
-            }).join("")}${takeCount === 15 ? `<label class="aforo-channel-result">Caudal del canal<span class="module-unit-input"><input type="text" name="litrosSegundoCanal${channel + 1}_${index}" aria-label="Litros por segundo automáticos de canal ${channel + 1} de ${escapeHtml(site)}" value="" readonly${disabled}><span>L/s</span></span></label>` : ""}</div>`;
-            const channelVolumes = aforoChannelVolumes(row);
-            const takesHtml = takeCount === 15
-                ? `<div class="aforo-channels">${Array.from({ length: 3 }, (_, channel) => `<fieldset class="aforo-channel"><legend>Canal ${channel + 1}</legend>
+                return `<label>Toma ${take + 1} · segundos<input type="number" min="0.000001" step="any" name="segundos${absolute + 1}_${index}" inputmode="decimal" aria-label="Segundos de toma ${take + 1}${hasChannels ? ` de canal ${channel + 1}` : ""} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(seconds[absolute]))}"${required}${disabled}></label>`;
+            }).join("")}${hasChannels ? `<label class="aforo-channel-result">Caudal del canal<span class="module-unit-input"><input type="text" name="litrosSegundoCanal${channel + 1}_${index}" aria-label="Litros por segundo automáticos de canal ${channel + 1} de ${escapeHtml(site)}" value="" readonly${disabled}><span>L/s</span></span></label>` : ""}</div>`;
+            const channelVolumes = aforoChannelVolumes(row, site);
+            const takesHtml = hasChannels
+                ? `<div class="aforo-channels">${Array.from({ length: channelCount }, (_, channel) => `<fieldset class="aforo-channel"><legend>Canal ${channel + 1}</legend>
                     <label class="aforo-channel-volume">Litros del recipiente<span class="module-unit-input"><input type="number" min="0.000001" step="any" name="litrosCanal${channel + 1}_${index}" inputmode="decimal" aria-label="Litros del recipiente de canal ${channel + 1} de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : clean(channelVolumes[channel]))}"${required}${disabled}><span>L</span></span></label>
                     ${renderTakes(channel)}
                     </fieldset>`).join("")}</div>`
@@ -563,8 +572,8 @@
             return `
                 <tr>
                     <th scope="row">${escapeHtml(site)}</th>
-                    ${takeCount === 15 ? `<td colspan="2">${takesHtml}</td>` : `<td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td><td>${takesHtml}</td>`}
-                    <td>${takeCount === 15 ? '<span class="aforo-general-label">Total de los tres canales</span>' : ""}<div class="module-unit-input"><input type="text" name="litrosSegundo_${index}" aria-label="Litros por segundo (L/s) automáticos de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
+                    ${hasChannels ? `<td colspan="2">${takesHtml}</td>` : `<td><div class="module-unit-input"><input type="number" min="0.000001" step="any" name="litros_${index}" inputmode="decimal" aria-label="Litros del recipiente de ${escapeHtml(site)}" value="${volume}"${required}${disabled}><span>L</span></div></td><td>${takesHtml}</td>`}
+                    <td>${hasChannels ? `<span class="aforo-general-label">Total de los ${channelCount === 2 ? "dos" : "tres"} canales</span>` : ""}<div class="module-unit-input"><input type="text" name="litrosSegundo_${index}" aria-label="Litros por segundo (L/s) automáticos de ${escapeHtml(site)}" value="${litros}" readonly${disabled}><span>L/s</span></div></td>
                     <td><input name="fechaHora_${index}" type="datetime-local" aria-label="Fecha y hora de ${escapeHtml(site)}" value="${escapeHtml(unavailable ? "" : pointDateTime(row, valueFromForm(form, "[name=fecha]")))}"${required}${disabled}></td>
                     <td class="sample-coordinate-cell">
                         <input type="hidden" name="latitudAforo_${index}" value="${escapeHtml(clean(coordinates.latitud))}">
@@ -589,8 +598,9 @@
             const button = form.querySelector(`[data-aforo-no-realizado-index="${index}"]`);
             const noRealizado = button?.dataset.noRealizado === "true";
             const get = name => valueFromForm(form, `[name="${name}_${index}"]`);
-            const hasChannels = aforoTakeCount(lugar) === 15;
-            const volumes = hasChannels ? Array.from({ length: 3 }, (_, channel) => get("litrosCanal" + (channel + 1))) : get("litros");
+            const channelCount = aforoChannelCount(lugar);
+            const hasChannels = channelCount > 1;
+            const volumes = hasChannels ? Array.from({ length: channelCount }, (_, channel) => get("litrosCanal" + (channel + 1))) : get("litros");
             const segundos = Array.from({ length: aforoTakeCount(lugar) }, (_, take) => get("segundos" + (take + 1)));
             const channels = hasChannels && !noRealizado ? aforoChannelFlows(volumes, segundos, lugar) : [];
             channels.forEach(channel => {
